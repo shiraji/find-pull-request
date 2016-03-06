@@ -36,6 +36,6 @@ class FindPullRequestAction : AnAction() {
         return EventData(project, repository)
     }
 
-    private data class EventData(val myProject: Project, val myRepository: GitRepository) {
+    private data class EventData(val project: Project, val repository: GitRepository) {
     }
 }
