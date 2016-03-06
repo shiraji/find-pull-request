@@ -18,7 +18,7 @@
   <idea-version since-build="131"/>
 
   <depends>org.jetbrains.plugins.github</depends>
-  <depends>git4idea</depends>
+  <depends>Git4Idea</depends>
 
   <extensions defaultExtensionNs="com.intellij">
   </extensions>
