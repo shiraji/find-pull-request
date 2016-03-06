@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JavaProjectCodeInsightSettings">
+    <excluded-names>
+      <name>android.app.Fragment</name>
+      <name>android.app.FragmentManager</name>
+      <name>android.app.FragmentTransaction</name>
+      <name>java.sql</name>
+    </excluded-names>
+  </component>
+</project>
