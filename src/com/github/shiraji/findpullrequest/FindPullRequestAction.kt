@@ -15,9 +15,12 @@ class FindPullRequestAction : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         val eventData = calcData(e)
+
         Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
                 "Plugin Importer+Exporter",
-                "EventData: " + eventData.toString(), NotificationType.INFORMATION))
+                "EventData Repo br: " + eventData?.repository?.branches
+                + " " + eventData?.repository?.remotes,
+                NotificationType.INFORMATION))
     }
 
     private fun calcData(e : AnActionEvent): EventData? {
