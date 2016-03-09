@@ -1,4 +1,4 @@
-package com.github.shiraji.findpullrequest
+package com.github.shiraji.findpullrequest.action
 
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType

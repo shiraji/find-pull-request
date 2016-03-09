@@ -24,7 +24,7 @@
   </extensions>
 
   <actions>
-    <action id="com.github.shiraji.findpullrequest.FindPullRequestAction" class="com.github.shiraji.findpullrequest.FindPullRequestAction" text="com.github.shiraji.findpullrequest.FindPullRequestAction">
+    <action id="com.github.shiraji.findpullrequest.action.FindPullRequestAction" class="com.github.shiraji.findpullrequest.action.FindPullRequestAction" text="com.github.shiraji.findpullrequest.action.FindPullRequestAction">
       <add-to-group group-id="EditorPopupMenu" anchor="last" />
     </action>
   </actions>
