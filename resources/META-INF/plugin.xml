@@ -15,7 +15,7 @@
     ]]>
   </change-notes>
 
-  <idea-version since-build="131"/>
+  <idea-version since-build="143"/>
 
   <depends>org.jetbrains.plugins.github</depends>
   <depends>Git4Idea</depends>
