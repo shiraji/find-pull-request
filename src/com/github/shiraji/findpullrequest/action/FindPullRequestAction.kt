@@ -18,45 +18,14 @@ import com.intellij.openapi.vcs.VcsException
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.vcsUtil.VcsUtil
 import git4idea.GitRevisionNumber
+import git4idea.GitVcs
 import git4idea.history.GitHistoryUtils
 import git4idea.repo.GitRepository
 import org.jetbrains.plugins.github.util.GithubUtil
 
 class FindPullRequestAction : AnAction() {
 
-//    override fun actionPerformed(e: AnActionEvent) {
-//        val eventData = calcData(e)
-//
-//        val foo = eventData?.repository?.remotes?.joinToString {
-//            it.pushUrls.toString() + "\n"
-//        }
-//
-//        Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
-//                "Plugin Importer+Exporter",
-//                "EventData: " + foo,
-//                NotificationType.INFORMATION))
-//    }
-//
-//    private fun calcData(e : AnActionEvent): EventData? {
-//        val project = e.getData(CommonDataKeys.PROJECT)
-//        project ?: return null
-//
-//        val virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE)
-//        virtualFile ?: return null
-//
-//        val document = FileDocumentManager.getInstance().getDocument(virtualFile)
-//        document ?: return null
-//
-//        val repository = GithubUtil.getGitRepository(project, virtualFile)
-//        repository ?: return null
-//
-//        return EventData(project, repository)
-//    }
-//
-//    private data class EventData(val project: Project, val repository: GitRepository) {
-//    }
-
-    override fun actionPerformed(e: AnActionEvent?) {
+    override fun actionPerformed(e: AnActionEvent) {
         e ?: return
         val project = e.getData(CommonDataKeys.PROJECT);
         val virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
@@ -65,11 +34,41 @@ class FindPullRequestAction : AnAction() {
             return;
         }
 
-        val foo = getCurrentFileRevisionHash(project, virtualFile)
+        val currentRevisionHash = getCurrentFileRevisionHash(project, virtualFile)
+
+        val eventData = calcData(e)
+
+        val foo = eventData?.repository?.remotes?.joinToString {
+            it.pushUrls.toString() + "\n"
+        }
+
+        val vcs = eventData?.repository?.vcs
+        vcs as GitVcs?
+        var annotate = vcs?.annotationProvider?.annotate(virtualFile)
+
         Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
                 "Plugin Importer+Exporter",
-                "EventData: " + foo,
+                "EventData: $foo hash: $currentRevisionHash Annotate: $annotate",
                 NotificationType.INFORMATION))
+    }
+
+    private fun calcData(e : AnActionEvent): EventData? {
+        val project = e.getData(CommonDataKeys.PROJECT)
+        project ?: return null
+
+        val virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE)
+        virtualFile ?: return null
+
+        val document = FileDocumentManager.getInstance().getDocument(virtualFile)
+        document ?: return null
+
+        val repository = GithubUtil.getGitRepository(project, virtualFile)
+        repository ?: return null
+
+        return EventData(project, repository)
+    }
+
+    private data class EventData(val project: Project, val repository: GitRepository) {
     }
 
 //    @Nullable
