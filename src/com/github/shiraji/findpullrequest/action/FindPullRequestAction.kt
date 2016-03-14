@@ -26,7 +26,6 @@ import org.jetbrains.plugins.github.util.GithubUtil
 class FindPullRequestAction : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
-        e ?: return
         val project = e.getData(CommonDataKeys.PROJECT);
         val virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
         val editor = e.getData(CommonDataKeys.EDITOR);
