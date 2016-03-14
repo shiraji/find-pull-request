@@ -6,7 +6,6 @@ import com.intellij.notification.Notifications
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
@@ -19,6 +18,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.vcsUtil.VcsUtil
 import git4idea.GitRevisionNumber
 import git4idea.GitVcs
+import git4idea.annotate.GitFileAnnotation
 import git4idea.history.GitHistoryUtils
 import git4idea.repo.GitRepository
 import org.jetbrains.plugins.github.util.GithubUtil
@@ -39,14 +39,24 @@ class FindPullRequestAction : AnAction() {
             it.pushUrls.toString() + "\n"
         }
 
-        val vcs = eventData?.repository?.vcs
-        vcs as GitVcs?
-        var annotate = vcs?.annotationProvider?.annotate(virtualFile)
+        val vcs = eventData?.repository?.vcs as GitVcs?
+        val annotate = vcs?.annotationProvider?.annotate(virtualFile) as GitFileAnnotation?
+        val lineNumber = editor?.document?.getLineNumber(editor.selectionModel.selectionStart)
 
-        Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
-                "Plugin Importer+Exporter",
-                "EventData: $foo hash: $currentRevisionHash Annotate: $annotate",
-                NotificationType.INFORMATION))
+        if(lineNumber == null) {
+            Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
+                    "Plugin Importer+Exporter",
+                    "EventData: $foo hash: ${annotate?.currentRevision} Annotate: $annotate",
+                    NotificationType.INFORMATION))
+        } else {
+            lineNumber.plus(1)
+            val revisionHash = annotate?.originalRevision(lineNumber)
+            Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
+                    "Plugin Importer+Exporter",
+                    "hash: $revisionHash currentRev: ${annotate?.currentRevision}",
+                    NotificationType.INFORMATION))
+
+        }
     }
 
     private fun calcData(e : AnActionEvent): EventData? {
