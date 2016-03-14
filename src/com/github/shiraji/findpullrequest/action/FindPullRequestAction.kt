@@ -51,11 +51,15 @@ class FindPullRequestAction : AnAction() {
         } else {
             lineNumber.plus(1)
             val revisionHash = annotate?.originalRevision(lineNumber)
+
+            val revNum = annotate?.revisions?.indexOfFirst {
+                it.revisionNumber == revisionHash
+            }
+
             Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
                     "Plugin Importer+Exporter",
-                    "hash: $revisionHash currentRev: ${annotate?.currentRevision}",
+                    "hash: $revisionHash currentRev: ${annotate?.currentRevision} revNum: $revNum count: ${annotate?.revisions?.count()}",
                     NotificationType.INFORMATION))
-
         }
     }
 
