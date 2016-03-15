@@ -40,7 +40,7 @@ class FindPullRequestAction : AnAction() {
         }
 
         val vcs = eventData?.repository?.vcs as GitVcs?
-        val annotate = vcs?.annotationProvider?.annotate(virtualFile) as GitFileAnnotation?
+        val annotate = vcs?.annotationProvider?.annotate(virtualFile) as GitFileAnnotation? ?: return
         val lineNumber = editor?.document?.getLineNumber(editor.selectionModel.selectionStart)
 
         if(lineNumber == null) {
@@ -64,18 +64,10 @@ class FindPullRequestAction : AnAction() {
     }
 
     private fun calcData(e : AnActionEvent): EventData? {
-        val project = e.getData(CommonDataKeys.PROJECT)
-        project ?: return null
-
-        val virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE)
-        virtualFile ?: return null
-
-        val document = FileDocumentManager.getInstance().getDocument(virtualFile)
-        document ?: return null
-
-        val repository = GithubUtil.getGitRepository(project, virtualFile)
-        repository ?: return null
-
+        val project = e.getData(CommonDataKeys.PROJECT) ?: return null
+        val virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return null
+        val document = FileDocumentManager.getInstance().getDocument(virtualFile) ?: return null
+        val repository = GithubUtil.getGitRepository(project, virtualFile) ?: return null
         return EventData(project, repository)
     }
 
