@@ -46,19 +46,20 @@ class FindPullRequestAction : AnAction() {
         if(lineNumber == null) {
             Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
                     "Plugin Importer+Exporter",
-                    "EventData: $foo hash: ${annotate?.currentRevision} Annotate: $annotate",
+                    "EventData: $foo hash: ${annotate.currentRevision} Annotate: $annotate",
                     NotificationType.INFORMATION))
         } else {
             lineNumber.plus(1)
-            val revisionHash = annotate?.originalRevision(lineNumber)
-
-            val revNum = annotate?.revisions?.indexOfFirst {
-                it.revisionNumber == revisionHash
+            val revisionHash = annotate.originalRevision(lineNumber)
+            val revisions = annotate.revisions ?: return
+            val pullRequestRev = revisions.subList(0, revisions.indexOfFirst { it.revisionNumber == revisionHash }).findLast {
+                val commitMessage = it.commitMessage
+                commitMessage != null && commitMessage.indexOf(string = "Merge pull request #") > 0
             }
 
             Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
                     "Plugin Importer+Exporter",
-                    "hash: $revisionHash currentRev: ${annotate?.currentRevision} revNum: $revNum count: ${annotate?.revisions?.count()}",
+                    "hash: $revisionHash currentRev: ${annotate?.currentRevision} pullRequestRev: $pullRequestRev",
                     NotificationType.INFORMATION))
         }
     }
