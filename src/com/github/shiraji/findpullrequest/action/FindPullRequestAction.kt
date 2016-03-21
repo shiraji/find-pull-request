@@ -32,47 +32,20 @@ class FindPullRequestAction : AnAction() {
         if (virtualFile == null || project == null || project.isDisposed) {
             return;
         }
+        val repository = GithubUtil.getGitRepository(project, virtualFile) ?: return
+        val annotate = repository.vcs?.annotationProvider?.annotate(virtualFile) as GitFileAnnotation? ?: return
+        val lineNumber = editor?.document?.getLineNumber(editor.selectionModel.selectionStart)?.plus(1) ?: return
+        val revisionHash = annotate.originalRevision(lineNumber)
+        val revisions = annotate.revisions ?: return
 
-        val eventData = calcData(e)
-
-        val foo = eventData?.repository?.remotes?.joinToString {
-            it.pushUrls.toString() + "\n"
+        val pullRequestRev = revisions.subList(0, revisions.indexOfFirst { it.revisionNumber == revisionHash }).findLast {
+            val commitMessage = it.commitMessage
+            commitMessage != null && commitMessage.indexOf("Merge pull request #") > 0
         }
 
-        val vcs = eventData?.repository?.vcs as GitVcs?
-        val annotate = vcs?.annotationProvider?.annotate(virtualFile) as GitFileAnnotation? ?: return
-        val lineNumber = editor?.document?.getLineNumber(editor.selectionModel.selectionStart)
-
-        if(lineNumber == null) {
-            Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
-                    "Plugin Importer+Exporter",
-                    "EventData: $foo hash: ${annotate.currentRevision} Annotate: $annotate",
-                    NotificationType.INFORMATION))
-        } else {
-            lineNumber.plus(1)
-            val revisionHash = annotate.originalRevision(lineNumber)
-            val revisions = annotate.revisions ?: return
-            val pullRequestRev = revisions.subList(0, revisions.indexOfFirst { it.revisionNumber == revisionHash }).findLast {
-                val commitMessage = it.commitMessage
-                commitMessage != null && commitMessage.indexOf(string = "Merge pull request #") > 0
-            }
-
-            Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
-                    "Plugin Importer+Exporter",
-                    "hash: $revisionHash currentRev: ${annotate?.currentRevision} pullRequestRev: $pullRequestRev",
-                    NotificationType.INFORMATION))
-        }
+        Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
+                "Plugin Importer+Exporter",
+                "hash: $revisionHash currentRev: ${annotate?.currentRevision} pullRequestRev: $pullRequestRev",
+                NotificationType.INFORMATION))
     }
-
-    private fun calcData(e : AnActionEvent): EventData? {
-        val project = e.getData(CommonDataKeys.PROJECT) ?: return null
-        val virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return null
-        val document = FileDocumentManager.getInstance().getDocument(virtualFile) ?: return null
-        val repository = GithubUtil.getGitRepository(project, virtualFile) ?: return null
-        return EventData(project, repository)
-    }
-
-    private data class EventData(val project: Project, val repository: GitRepository) {
-    }
-
 }
