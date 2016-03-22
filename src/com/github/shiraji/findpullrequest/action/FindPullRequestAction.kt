@@ -43,7 +43,7 @@ class FindPullRequestAction : AnAction() {
             commitMessage != null && commitMessage.indexOf("Merge pull request #") > 0
         }
 
-        val histories = GitHistoryUtils.history(project, repository.root, "$revisions..master")
+        val histories = GitHistoryUtils.history(project, repository.root, "$revisions..master", "-100")
         System.out.println(histories)
 
         Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
