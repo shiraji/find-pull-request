@@ -43,8 +43,9 @@ class FindPullRequestAction : AnAction() {
             commitMessage != null && commitMessage.indexOf("Merge pull request #") > 0
         }
 
-        // https://github.com/JetBrains/intellij-community/blob/master/plugins/git4idea/src/git4idea/history/GitHistoryUtils.java#L695
-        // TODO: check this method
+        val histories = GitHistoryUtils.history(project, virtualFile.parent)
+        System.out.println(histories)
+
         Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
                 "Plugin Importer+Exporter",
                 "hash: $revisionHash currentRev: ${annotate?.currentRevision} pullRequestRev: $pullRequestRev",
