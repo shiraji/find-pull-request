@@ -45,6 +45,11 @@ class FindPullRequestAction : AnAction() {
 
         // TODO: do this http://joey.aghion.com/find-the-github-pull-request-for-a-commit/
         val histories = GitHistoryUtils.history(project, repository.root, "$revisionHash..master", "-100")
+        val pullRequestCommit = histories.findLast {
+            it.fullMessage.indexOf("Merge pull request #") >= 0
+        }
+
+        System.out.println(pullRequestCommit)
 
         Notifications.Bus.notify(Notification("Plugin Importer+Exporter",
                 "Plugin Importer+Exporter",
