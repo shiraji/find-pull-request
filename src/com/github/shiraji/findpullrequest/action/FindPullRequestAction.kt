@@ -43,6 +43,7 @@ class FindPullRequestAction : AnAction() {
             commitMessage != null && commitMessage.indexOf("Merge pull request #") > 0
         }
 
+        // TODO: do this http://joey.aghion.com/find-the-github-pull-request-for-a-commit/
         val histories = GitHistoryUtils.history(project, repository.root, "$revisions..master", "-100")
         System.out.println(histories)
 
