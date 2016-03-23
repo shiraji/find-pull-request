@@ -26,10 +26,17 @@ class FindPullRequestAction : AnAction() {
         val mergedCommits = GitHistoryUtils.history(project, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}")
 
         if(mergedCommits.filter { it.id.asString() == revisionHash.asString() }.size == 0) {
+            // use open commit on github function
             System.out.println("No hash!!! $revisionHash")
         }else {
+            // do followings
             System.out.println("Found!!! $revisionHash")
         }
 
+        // get pull request number
+        // get file md5 hash
+        // get upstream url
+        // if found, then show upstream url
+        // if not found, then show origin url
     }
 }
