@@ -4,16 +4,17 @@
   <version>1.0.0</version>
   <vendor email="isogai.shiraji@gmail.com" url="https://github.com/shiraji">Shiraji</vendor>
 
-  <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+    <description><![CDATA[
+      This plugin find the pull request of the selected line. If there is no pull request for the line, then open Github commit page which the line is added.
     ]]></description>
 
-  <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+    <change-notes><![CDATA[
+        <p>1.0.0</p>
+        <ul>
+            <li>Initial release</li>
+        </ul>
     ]]>
-  </change-notes>
+    </change-notes>
 
   <idea-version since-build="143"/>
 
@@ -24,8 +25,11 @@
   </extensions>
 
   <actions>
-    <action id="com.github.shiraji.findpullrequest.action.FindPullRequestAction" class="com.github.shiraji.findpullrequest.action.FindPullRequestAction" text="com.github.shiraji.findpullrequest.action.FindPullRequestAction">
-      <add-to-group group-id="EditorPopupMenu" anchor="last" />
+    <action id="com.github.shiraji.findpullrequest.action.FindPullRequestAction"
+            class="com.github.shiraji.findpullrequest.action.FindPullRequestAction"
+            text="Find Pull Request"
+            icon="GithubIcons.Github_icon">
+      <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="Github.Open.In.Browser"/>
     </action>
   </actions>
 
