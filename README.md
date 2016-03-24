@@ -18,6 +18,8 @@ Intellij plugin that jumps to the pull request page (or GitHub commits page)
 ## Requirement
 
 * Remote repo should be GitHub/GitHub Enterprise
+* Repository must set upstream or origin remote url
+ * if upstream is set, then use upstream remote url
 * Do not select multiple lines
 * Project that has multiple git repository may not work
 
