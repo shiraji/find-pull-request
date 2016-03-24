@@ -1,14 +1,22 @@
 <idea-plugin version="2">
   <id>com.github.shiraji.findpullrequest</id>
   <name>Find Pull Request</name>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <vendor email="isogai.shiraji@gmail.com" url="https://github.com/shiraji">Shiraji</vendor>
 
     <description><![CDATA[
-      This plugin find the pull request of the selected line. If there is no pull request for the line, then open Github commit page which the line is added.
+      This plugin find the pull request of the selected line. If there is no pull request for the line, then open Github commit page which the line is added.<br/>
+      <br/>
+      <a href="https://github.com/shiraji/find-pull-request">GitHub</a> |
+      <a href="https://github.com/shiraji/find-pull-request/issues">Issues</a>
     ]]></description>
 
     <change-notes><![CDATA[
+        <p>1.0.1</p>
+        <ul>
+            <li>Fix issue #2 invalid revision range</li>
+        </ul>
+
         <p>1.0.0</p>
         <ul>
             <li>Initial release</li>
