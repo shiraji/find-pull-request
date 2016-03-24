@@ -38,52 +38,38 @@ class FindPullRequestModel {
         return startLine == endLine
     }
 
-    fun findPullRequestUrlOrCommitUrl(): String? {
-        if (project == null || editor == null || virtualFile == null) {
-            return null
-        }
-        val repository = GithubUtil.getGitRepository(project, virtualFile) ?: return null
-        val annotate = repository.vcs?.annotationProvider?.annotate(virtualFile) ?: return null
-        val lineNumber = editor.document.getLineNumber(editor.selectionModel.selectionStart)
-        val revisionHash = annotate.originalRevision(lineNumber) ?: return null
-        val githubRepoUrl = createGithubRepoUrl(repository) ?: return null
-        val pullRequestCommit = findPullRequestCommit(repository, revisionHash)
-        var path = if (pullRequestCommit == null) {
-            "commit/$revisionHash"
-        } else {
-            "pull/${pullRequestCommit.getPullRequestNumber()}/files"
-        }
-        return "$githubRepoUrl/$path#diff-${createMd5Hash(repository, annotate, revisionHash)}"
+    fun getRepository(): GitRepository? {
+        project ?: return null
+        virtualFile ?: return null
+        return GithubUtil.getGitRepository(project, virtualFile)
     }
 
-    fun isPullRequestUrl(url: String): Boolean {
-        return url.contains("pull/")
+    fun getFileAnnotation(repository: GitRepository): FileAnnotation? {
+        virtualFile ?: return null
+        return repository.vcs?.annotationProvider?.annotate(virtualFile)
     }
 
-    private fun createGithubRepoUrl(repository: GitRepository): String? {
+    fun createGithubRepoUrl(repository: GitRepository): String? {
         val remoteUrl: String = GithubUtil.findUpstreamRemote(repository) ?: GithubUtil.findGithubRemoteUrl(repository) ?: return null
         return GithubUrlUtil.makeGithubRepoUrlFromRemoteUrl(remoteUrl, "https://" + GithubUrlUtil.getHostFromUrl(remoteUrl))
     }
 
-    private fun createMd5Hash(repository: GitRepository, annotate: FileAnnotation, revisionHash: VcsRevisionNumber): String {
+    fun createMd5Hash(repository: GitRepository, annotate: FileAnnotation, revisionHash: VcsRevisionNumber): String {
         val revision = annotate.revisions?.single { it.revisionNumber == revisionHash } as GitFileRevision
         return revision.path.path.subtract("${repository.gitDir.parent.presentableUrl.toString()}/").toMd5()
     }
 
-    private fun findPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber): GitCommit? {
-        if(project == null) return null
-        try {
-            // pull request commit can be found `git log hash..master --grep="Merge pull request" --merges --ancestry-path --reverse`
-            val pullRequestCommit = GitHistoryUtils.history(project, repository.root, "$revisionHash..master", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse").firstOrNull() ?: return null
-
-            // List all commits that are merged when pull request commits are merged. The command is `git log hash^..hash`
-            val mergedCommits = GitHistoryUtils.history(project, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}")
-
-            if (mergedCommits.filter { it.id.asString() == revisionHash.asString() }.size != 0) {
-                return pullRequestCommit
-            }
-        } catch (e: VcsException) {
-        }
-        return null
+    fun createRevisionHash(annotate: FileAnnotation): VcsRevisionNumber? {
+        editor ?: return null
+        val lineNumber = editor.document.getLineNumber(editor.selectionModel.selectionStart)
+        return annotate.originalRevision(lineNumber)
     }
+
+    fun findPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber): GitCommit? {
+        project ?: return null
+        return GitHistoryUtils.history(project, repository.root, "$revisionHash..master", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse").firstOrNull()
+    }
+
+    fun findMergedCommitdFromPullRequestCommit(repository: GitRepository, pullRequestCommit: GitCommit)
+            = GitHistoryUtils.history(project!!, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}")
 }
