@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vcs.VcsException
 import com.intellij.openapi.vcs.annotate.FileAnnotation
 import com.intellij.openapi.vcs.history.VcsRevisionNumber
 import com.intellij.openapi.vfs.VirtualFile
@@ -71,16 +72,18 @@ class FindPullRequestModel {
 
     private fun findPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber): GitCommit? {
         if(project == null) return null
-        // pull request commit can be found `git log hash..master --grep="Merge pull request" --merges --ancestry-path --reverse`
-        val pullRequestCommit = GitHistoryUtils.history(project, repository.root, "$revisionHash..master", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse").firstOrNull() ?: return null
+        try {
+            // pull request commit can be found `git log hash..master --grep="Merge pull request" --merges --ancestry-path --reverse`
+            val pullRequestCommit = GitHistoryUtils.history(project, repository.root, "$revisionHash..master", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse").firstOrNull() ?: return null
 
-        // List all commits that are merged when pull request commits are merged. The command is `git log hash^..hash`
-        val mergedCommits = GitHistoryUtils.history(project, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}")
+            // List all commits that are merged when pull request commits are merged. The command is `git log hash^..hash`
+            val mergedCommits = GitHistoryUtils.history(project, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}")
 
-        return if (mergedCommits.filter { it.id.asString() == revisionHash.asString() }.size == 0) {
-            null
-        } else {
-            pullRequestCommit
+            if (mergedCommits.filter { it.id.asString() == revisionHash.asString() }.size != 0) {
+                return pullRequestCommit
+            }
+        } catch (e: VcsException) {
         }
+        return null
     }
 }
