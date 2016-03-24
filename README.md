@@ -7,6 +7,14 @@ Intellij plugin that jumps to the pull request page (or GitHub commits page)
 * Select/Choose a line
 * Right click
 * Click "Find Pull Request"
+* Open pull request page if the plugin finds pull request
+* Open commit which the line is added if there is no pull request for the selected line
+
+## Requirement
+
+* Remote repo should be GitHub/GitHub Enterprise
+* Do not select multiple lines
+* Project that has multiple git repository may not work
 
 ## How to install
 
