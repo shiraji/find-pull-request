@@ -16,25 +16,25 @@ class FindPullRequestAction : AnAction() {
 
         val repository = model.getRepository()
         if (repository == null) {
-            FindPullRequestHelper.showInfoNotification("Could not find git repository.")
+            FindPullRequestHelper.showErrorNotification("Could not find git repository.")
             return
         }
 
         val annotate = model.getFileAnnotation(repository)
         if (annotate == null ) {
-            FindPullRequestHelper.showInfoNotification("Could not load file annotations.")
+            FindPullRequestHelper.showErrorNotification("Could not load file annotations.")
             return
         }
 
         val revisionHash = model.createRevisionHash(annotate)
         if (revisionHash == null) {
-            FindPullRequestHelper.showInfoNotification("Could not find revision hash")
+            FindPullRequestHelper.showErrorNotification("Could not find revision hash")
             return
         }
 
         val githubRepoUrl = model.createGithubRepoUrl(repository)
         if (githubRepoUrl == null) {
-            FindPullRequestHelper.showInfoNotification("Could not find GitHub repository url")
+            FindPullRequestHelper.showErrorNotification("Could not find GitHub repository url")
             return
         }
 
@@ -50,7 +50,7 @@ class FindPullRequestAction : AnAction() {
                 "pull/${pullRequestCommit.getPullRequestNumber()}/files"
             }
         } catch (e: VcsException) {
-            FindPullRequestHelper.showInfoNotification("Could not find the pull request for $revisionHash")
+            FindPullRequestHelper.showErrorNotification("Could not find the pull request for $revisionHash")
             return
         }
 
