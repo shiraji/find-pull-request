@@ -9,7 +9,7 @@ class FindPullRequestHelper {
         fun showInfoNotification(message: String)
                 = Notifications.Bus.notify(Notification("FindPullRequest", "Find Pull Request", message, NotificationType.INFORMATION))
 
-        fun showFrrorNotification(message: String)
+        fun showErrorNotification(message: String)
                 = Notifications.Bus.notify(Notification("FindPullRequest", "Find Pull Request", message, NotificationType.ERROR))
     }
 }
