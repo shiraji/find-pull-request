@@ -1,4 +1,4 @@
-<idea-plugin version="2">
+<idea-plugin url="https://plugins.jetbrains.com/plugin/8262?pr=" version="2">
   <id>com.github.shiraji.findpullrequest</id>
   <name>Find Pull Request</name>
   <version>1.0.1</version>
@@ -15,6 +15,7 @@
         <p>1.0.1</p>
         <ul>
             <li>Fix issue #2 invalid revision range</li>
+            <li>Fix issue #5 show error/info notifications</li>
         </ul>
 
         <p>1.0.0</p>

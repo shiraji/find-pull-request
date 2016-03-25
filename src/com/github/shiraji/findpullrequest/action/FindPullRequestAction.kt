@@ -1,12 +1,12 @@
 package com.github.shiraji.findpullrequest.action
 
+import com.github.shiraji.findpullrequest.helper.FindPullRequestHelper
 import com.github.shiraji.findpullrequest.model.FindPullRequestModel
+import com.github.shiraji.getPullRequestNumber
 import com.intellij.ide.BrowserUtil
-import com.intellij.notification.Notification
-import com.intellij.notification.NotificationType
-import com.intellij.notification.Notifications
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.vcs.VcsException
 
 class FindPullRequestAction : AnAction() {
 
@@ -14,15 +14,47 @@ class FindPullRequestAction : AnAction() {
         val model = FindPullRequestModel(e)
         if (!model.isEnable()) return
 
-        val url = model.findPullRequestUrlOrCommitUrl() ?: return
-
-        if (!model.isPullRequestUrl(url)) {
-            Notifications.Bus.notify(Notification("FindPullRequest",
-                    "Find Pull Request",
-                    "Could not find the pull request. Open the commit which the line is added",
-                    NotificationType.INFORMATION))
+        val repository = model.getRepository()
+        if (repository == null) {
+            FindPullRequestHelper.showInfoNotification("Could not find git repository.")
+            return
         }
 
+        val annotate = model.getFileAnnotation(repository)
+        if (annotate == null ) {
+            FindPullRequestHelper.showInfoNotification("Could not load file annotations.")
+            return
+        }
+
+        val revisionHash = model.createRevisionHash(annotate)
+        if (revisionHash == null) {
+            FindPullRequestHelper.showInfoNotification("Could not find revision hash")
+            return
+        }
+
+        val githubRepoUrl = model.createGithubRepoUrl(repository)
+        if (githubRepoUrl == null) {
+            FindPullRequestHelper.showInfoNotification("Could not find GitHub repository url")
+            return
+        }
+
+        var path: String?
+        try {
+            val pullRequestCommit = model.findPullRequestCommit(repository, revisionHash) ?: return
+            val mergedCommits = model.findMergedCommitdFromPullRequestCommit(repository, pullRequestCommit)
+            path = if (mergedCommits.filter { it.id.asString() == revisionHash.asString() }.size == 0) {
+                // show opening commit pages info
+                FindPullRequestHelper.showInfoNotification("Could not find the pull request. Open the commit which the line is added")
+                "commit/$revisionHash"
+            } else {
+                "pull/${pullRequestCommit.getPullRequestNumber()}/files"
+            }
+        } catch (e: VcsException) {
+            FindPullRequestHelper.showInfoNotification("Could not find the pull request for $revisionHash")
+            return
+        }
+
+        val url = "$githubRepoUrl/$path#diff-${model.createMd5Hash(repository, annotate, revisionHash)}"
         BrowserUtil.open(url)
     }
 
@@ -30,7 +62,7 @@ class FindPullRequestAction : AnAction() {
         e ?: return
         super.update(e)
 
-        if(!FindPullRequestModel(e).isEnable()) {
+        if (!FindPullRequestModel(e).isEnable()) {
             e.presentation.isEnabled = false
             e.presentation.isVisible = false
         }
