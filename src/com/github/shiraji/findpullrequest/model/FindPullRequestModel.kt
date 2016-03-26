@@ -1,13 +1,11 @@
 package com.github.shiraji.findpullrequest.model
 
-import com.github.shiraji.getPullRequestNumber
 import com.github.shiraji.subtract
 import com.github.shiraji.toMd5
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vcs.VcsException
 import com.intellij.openapi.vcs.annotate.FileAnnotation
 import com.intellij.openapi.vcs.history.VcsRevisionNumber
 import com.intellij.openapi.vfs.VirtualFile
