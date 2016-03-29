@@ -5,14 +5,8 @@ import java.math.BigInteger
 import java.security.MessageDigest
 
 
-fun String.toMd5(): String {
-    return BigInteger(1, MessageDigest.getInstance("MD5").digest(this.toByteArray())).toString(16)
-}
+fun String.toMd5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(this.toByteArray())).toString(16)
 
-fun String.subtract(text: String): String {
-    return this.replace(text, "")
-}
+fun String.subtract(text: String) = this.replace(text, "")
 
-fun GitCommit.getPullRequestNumber(): Int {
-    return this.fullMessage.replace("Merge pull request #", "").split(" ").first().toInt()
-}
+fun GitCommit.getPullRequestNumber() = this.fullMessage.replace("Merge pull request #", "").split(" ").first().toInt()
