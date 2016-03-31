@@ -12,6 +12,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <p>1.0.2</p>
+        <ul>
+            <li>Support non-master branch pull request(Issue #9)</li>
+        </ul>
+
         <p>1.0.1</p>
         <ul>
             <li>Fix issue #2 invalid revision range</li>
