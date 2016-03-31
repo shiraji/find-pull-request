@@ -1,8 +1,5 @@
-# How to release
-
-This is documentation for find-pull-request release.
-
-* Change plugin.xml version tag `<version>1.0.1</version>`
+* Add CHANGELOG.md to what changes for new version
+* Delete -SNAPSHOT from plugin.xml version tag
 * Add plugin.xml change note
 ```xml
     <change-notes><![CDATA[
@@ -23,3 +20,4 @@ This is documentation for find-pull-request release.
 * Commit & push changes
 * Create Release Tag (Upload archive file as well)
 * Upload to https://plugins.jetbrains.com/
+* Prepare for next version (-> Increment plugin.xml's version and add `-SNAPSHOT`)
