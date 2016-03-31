@@ -1,6 +1,7 @@
 # find-pull-request
 
 [![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/shiraji/find-pull-request/blob/master/LICENSE)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-find--pull--request-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3353)
 
 Intellij plugin that jumps to the pull request page (or GitHub commits page)
 
