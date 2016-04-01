@@ -63,8 +63,7 @@ class FindPullRequestAction : AnAction() {
         super.update(e)
 
         if (!FindPullRequestModel(e).isEnable()) {
-            e.presentation.isEnabled = false
-            e.presentation.isVisible = false
+            e.presentation.isEnabledAndVisible = false
         }
     }
 }
