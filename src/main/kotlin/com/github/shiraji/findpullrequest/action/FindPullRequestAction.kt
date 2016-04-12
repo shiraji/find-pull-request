@@ -40,14 +40,17 @@ class FindPullRequestAction : AnAction() {
 
         var path: String?
         try {
-            val pullRequestCommit = model.findPullRequestCommit(repository, revisionHash) ?: return
-            val mergedCommits = model.findMergedCommitdFromPullRequestCommit(repository, pullRequestCommit)
-            path = if (mergedCommits.filter { it.id.asString() == revisionHash.asString() }.size == 0) {
+            val pullRequestCommit = model.findPullRequestCommit(repository, revisionHash)
+            val mergedCommits = if (pullRequestCommit == null)
+                                    null
+                                else
+                                    model.findMergedCommitdFromPullRequestCommit(repository, pullRequestCommit)
+            path = if (mergedCommits == null || mergedCommits.filter { it.id.asString() == revisionHash.asString() }.size == 0) {
                 // show opening commit pages info
                 FindPullRequestHelper.showInfoNotification("Could not find the pull request. Open the commit which the line is added")
                 "commit/$revisionHash"
             } else {
-                "pull/${pullRequestCommit.getPullRequestNumber()}/files"
+                "pull/${pullRequestCommit!!.getPullRequestNumber()}/files"
             }
         } catch (e: VcsException) {
             FindPullRequestHelper.showErrorNotification("Could not find the pull request for $revisionHash")
