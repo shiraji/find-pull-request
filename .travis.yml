@@ -9,3 +9,7 @@ script:
     - ./gradlew test -PideaVersion=$IDEA_VERSION
 notifications:
   email: false
+cache:
+  directories:
+    - $HOME/.m2
+    - $HOME/.gradle

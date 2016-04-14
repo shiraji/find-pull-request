@@ -17,16 +17,14 @@ apply plugin: 'kotlin'
 
 intellij {
     version = '15.0.4'
-    plugins  = ['github', 'git4idea']
+    plugins = ['github', 'git4idea']
     pluginName = 'Find Pull Request'
+    updateSinceUntilBuild = false
+    sameSinceUntilBuild = false
 }
 
-group 'navigation'
+group 'com.github.shiraji.findpullrequest'
 version '1.0.3-SNAPSHOT'
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.7'
-}
 
 repositories {
     mavenCentral()
