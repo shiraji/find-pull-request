@@ -11,21 +11,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <p>1.0.2</p>
+        <p>1.0.3</p>
         <ul>
-            <li>Support non-master branch pull request(Issue #9)</li>
+            <li>Fix problem with no pull request</li>
         </ul>
 
-        <p>1.0.1</p>
-        <ul>
-            <li>Fix issue #2 invalid revision range</li>
-            <li>Fix issue #5 show error/info notifications</li>
-        </ul>
-
-        <p>1.0.0</p>
-        <ul>
-            <li>Initial release</li>
-        </ul>
+        <p>Older version changes are listed on <a href="https://github.com/shiraji/find-pull-request/blob/master/CHANGELOG.md">CHANGELOG.md</a></p>
     ]]>
     </change-notes>
 
