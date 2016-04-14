@@ -1,7 +1,6 @@
 <idea-plugin url="https://plugins.jetbrains.com/plugin/8262?pr=" version="2">
   <id>com.github.shiraji.findpullrequest</id>
   <name>Find Pull Request</name>
-  <version>1.0.3-SNAPSHOT</version>
   <vendor email="isogai.shiraji@gmail.com" url="https://github.com/shiraji">Shiraji</vendor>
 
     <description><![CDATA[
