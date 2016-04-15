@@ -13,3 +13,5 @@ cache:
   directories:
     - $HOME/.m2
     - $HOME/.gradle
+after_success:
+  - .travis/after_success.sh
