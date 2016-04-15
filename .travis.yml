@@ -6,14 +6,14 @@ env:
   global:
     secure: DA6xFkkuXiUpOGzwPU+APwSFTZ4A3IzwJO8mrEGC8oX5lf9k/Lb8enr07UkCVyDrFMwDzy5HCJMpmUhhrONx9badI16YtoUTbCYEKkzxaqclEGJ0+raMHTj1Wiyqcw6aMjsnq0Ljma0ix3BBHbQIbSoLhuToAogUNEpaDI+yvC8EtoNFhnudDWRPqGZdntR1np1nZfsXp0ptFYbd2QOInEyPYJSmmKf+G72H4aeL+vJ5KEUsSFod3TZh18WZMyR09JKF0onm1wQhfxK2SdvDl57PoK7GaOgyuWmfQovHbH019dY47bKl9zvPr03X9tlfdFCcOVYTeM2nGsR7RUarcAxkw4XouNS7p9Rt22kFYzvUBn2I66ha3mA+oP4fFBxXJ/gthWzORMpklzcb5I2hA9YiEh9yLM6ZGAV7/F7IopQcPvWLTt2bpk2+ICFZV5Ve9Ql0Y5wNFKDAU9tfSubCP3GBJctuFylh2Yw42PPAVKKOK5V7jp/0t72WmJoV19B9Vp/jjdBlpCQJAgvzf5MvO7Z6Ffh46gwwjf9cBTLr1SN9IduPHRn6Z+33uKbhAIzBR/VlL4x+4ungJyefYfQKpmwEhG1zPXE8WfAR+4KYoTheKY7WgSWezZJwLJrqL/pbSHyv72kZ12Wg5HtAskEu3UXcKSYb/9HmeMehE/GVOSI=
 jdk:
-    - oraclejdk7
+- oraclejdk7
 script:
-    - ./gradlew test -PideaVersion=$IDEA_VERSION
+- ./gradlew test -PideaVersion=$IDEA_VERSION
 notifications:
   email: false
 cache:
   directories:
-    - $HOME/.m2
-    - $HOME/.gradle
+  - $HOME/.m2
+  - $HOME/.gradle
 after_success:
-  - .travis/after_success.sh
+- .travis/after_success.sh
