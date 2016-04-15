@@ -4,7 +4,7 @@
 # Adapted from http://benlimmer.com/2013/12/26/automatically-publish-javadoc-to-gh-pages-with-travis-ci/
 
 # Change this
-REPO="travis-ci-config-test"
+REPO="find-pull-request"
 
 # Change if necessary
 USER="shiraji"

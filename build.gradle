@@ -21,6 +21,11 @@ intellij {
     pluginName = 'Find Pull Request'
     updateSinceUntilBuild = false
     sameSinceUntilBuild = false
+    publish {
+        username 'shiraji'
+        password System.getenv('PASSWORD')
+        pluginId '8262'
+    }
 }
 
 group 'com.github.shiraji.findpullrequest'
