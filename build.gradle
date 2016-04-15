@@ -24,7 +24,7 @@ intellij {
 }
 
 group 'com.github.shiraji.findpullrequest'
-version '1.0.3'
+version '1.0.4-SNAPSTHOTS'
 
 repositories {
     mavenCentral()
