@@ -74,6 +74,9 @@ class FindPullRequestModel(e: AnActionEvent) {
         return annotate.originalRevision(lineNumber)
     }
 
+    fun findCommitLog(repository: GitRepository, revisionHash: VcsRevisionNumber)
+            = GitHistoryUtils.history(project!!, repository.root, "$revisionHash").first()
+
     fun findPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber)
             = GitHistoryUtils.history(project!!, repository.root, "$revisionHash..HEAD", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse").firstOrNull()
 
