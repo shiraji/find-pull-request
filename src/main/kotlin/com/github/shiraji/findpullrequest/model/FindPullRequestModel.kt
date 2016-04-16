@@ -7,10 +7,13 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.annotate.FileAnnotation
+import com.intellij.openapi.vcs.changes.Change
+import com.intellij.openapi.vcs.changes.ChangeListManager
 import com.intellij.openapi.vcs.history.VcsRevisionNumber
 import com.intellij.openapi.vfs.VirtualFile
 import git4idea.GitCommit
 import git4idea.GitFileRevision
+import git4idea.GitUtil
 import git4idea.history.GitHistoryUtils
 import git4idea.repo.GitRepository
 import org.jetbrains.plugins.github.util.GithubUrlUtil
@@ -25,6 +28,20 @@ class FindPullRequestModel(e: AnActionEvent) {
         if (project == null || project.isDisposed || editor == null || virtualFile == null) {
             return false
         }
+
+        val repo = getRepository() ?: return false
+        if (!GithubUtil.isRepositoryOnGitHub(repo)) return false
+
+        val manager = GitUtil.getRepositoryManager(project)
+        val gitRepository = manager.getRepositoryForFile(virtualFile) ?: return false
+        if (!GithubUtil.isRepositoryOnGitHub(gitRepository)) return false
+
+        val changeListManager = ChangeListManager.getInstance(project)
+        if (changeListManager.isUnversioned(virtualFile)) return false
+
+        val change = changeListManager.getChange(virtualFile)
+        if (change != null && change.type == Change.Type.NEW) return false
+
         val startLine = editor.document.getLineNumber(editor.selectionModel.selectionStart)
         val endLine = editor.document.getLineNumber(editor.selectionModel.selectionEnd)
         return startLine == endLine
