@@ -3,6 +3,8 @@ package com.github.shiraji.findpullrequest.action
 import com.github.shiraji.findpullrequest.helper.FindPullRequestHelper
 import com.github.shiraji.findpullrequest.model.FindPullRequestModel
 import com.github.shiraji.getPullRequestNumber
+import com.github.shiraji.getPullRequestNumberFromSquashCommit
+import com.github.shiraji.isSquashPullRequestCommit
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -46,9 +48,14 @@ class FindPullRequestAction : AnAction() {
                                 else
                                     model.findMergedCommitdFromPullRequestCommit(repository, pullRequestCommit)
             path = if (mergedCommits == null || mergedCommits.filter { it.id.asString() == revisionHash.asString() }.size == 0) {
-                // show opening commit pages info
-                FindPullRequestHelper.showInfoNotification("Could not find the pull request. Open the commit which the line is added")
-                "commit/$revisionHash"
+                val commit = model.findCommitLog(repository, revisionHash)
+                if (commit.isSquashPullRequestCommit()) {
+                    "pull/${commit.getPullRequestNumberFromSquashCommit()}/files"
+                } else {
+                    // show opening commit pages info
+                    FindPullRequestHelper.showInfoNotification("Could not find the pull request. Open the commit which the line is added")
+                    "commit/$revisionHash"
+                }
             } else {
                 "pull/${pullRequestCommit!!.getPullRequestNumber()}/files"
             }
