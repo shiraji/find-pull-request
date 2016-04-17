@@ -11,7 +11,9 @@
     ]]>
     </change-notes>
 ```
+* `touch .travis/release`
 * Commit & push changes
 * Create Release Tag (Upload archive file as well)
 * Check [travis ci](https://travis-ci.org/shiraji/find-pull-request) to successfully release the module
+* `rm .travis/release`
 * Prepare for next version (e.g. `version '1.0.3'` -> `version '1.0.4-SNAPSHOT'`)
