@@ -3,8 +3,6 @@
 * [#11](https://github.com/shiraji/find-pull-request/issues/11) Update method sometimes different with "Open on GitHub"
 * [#14](https://github.com/shiraji/find-pull-request/issues/14) Support "squash merging"
 
-* Fix the problem with no pull request
-
 ### [ver 1.0.3](https://github.com/shiraji/find-pull-request/releases/tag/v1.0.3)
 
 * Fix the problem with no pull request
