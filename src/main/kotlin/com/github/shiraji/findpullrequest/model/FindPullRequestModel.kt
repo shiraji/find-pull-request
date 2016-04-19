@@ -80,6 +80,9 @@ class FindPullRequestModel(e: AnActionEvent) {
     fun findPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber)
             = GitHistoryUtils.history(project!!, repository.root, "$revisionHash..HEAD", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse").firstOrNull()
 
-    fun findMergedCommitdFromPullRequestCommit(repository: GitRepository, pullRequestCommit: GitCommit)
+    fun listCommitsFromMergedCommit(repository: GitRepository, pullRequestCommit: GitCommit)
             = GitHistoryUtils.history(project!!, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}")
+
+    fun hasCommitsFromRevisionNumber(commits: List<GitCommit>, revisionHash: VcsRevisionNumber)
+            = commits.any { it.id.asString() == revisionHash.asString() }
 }
