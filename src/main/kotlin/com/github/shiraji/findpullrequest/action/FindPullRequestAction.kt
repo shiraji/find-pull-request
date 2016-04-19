@@ -71,9 +71,6 @@ class FindPullRequestAction : AnAction() {
     override fun update(e: AnActionEvent?) {
         e ?: return
         super.update(e)
-
-        if (!FindPullRequestModel(e).isEnable()) {
-            e.presentation.isEnabledAndVisible = false
-        }
+        e.presentation.isEnabledAndVisible = FindPullRequestModel(e).isEnable()
     }
 }
