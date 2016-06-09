@@ -22,6 +22,7 @@
 
   <idea-version since-build="143"/>
 
+  <depends>com.intellij.modules.lang</depends>
   <depends>org.jetbrains.plugins.github</depends>
   <depends>Git4Idea</depends>
 
