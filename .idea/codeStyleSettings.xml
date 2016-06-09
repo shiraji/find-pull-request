@@ -11,6 +11,9 @@
         <option name="RIGHT_MARGIN" value="127" />
         <option name="HTML_KEEP_BLANK_LINES" value="1" />
         <option name="FORMATTER_TAGS_ENABLED" value="true" />
+        <MarkdownNavigatorCodeStyleSettings>
+          <option name="RIGHT_MARGIN" value="72" />
+        </MarkdownNavigatorCodeStyleSettings>
         <MultiMarkdownCodeStyleSettings>
           <option name="RIGHT_MARGIN" value="72" />
         </MultiMarkdownCodeStyleSettings>

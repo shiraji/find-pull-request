@@ -1,3 +1,8 @@
+### [ver 1.1.0](https://github.com/shiraji/find-pull-request/releases/tag/v1.1.1)
+
+* Improve the performance
+* Make this plugin available to all JetBrain products
+
 ### [ver 1.1.0](https://github.com/shiraji/find-pull-request/releases/tag/v1.1.0)
 
 * [#11](https://github.com/shiraji/find-pull-request/issues/11) Update method sometimes different with "Open on GitHub"
