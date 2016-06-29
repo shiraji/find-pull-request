@@ -23,7 +23,7 @@ class FindPullRequestAction : AnAction() {
         }
 
         val annotate = model.getFileAnnotation(repository)
-        if (annotate == null ) {
+        if (annotate == null) {
             FindPullRequestHelper.showErrorNotification("Could not load file annotations.")
             return
         }
@@ -43,18 +43,18 @@ class FindPullRequestAction : AnAction() {
         var path: String?
         try {
             val pullRequestCommit = model.findPullRequestCommit(repository, revisionHash)
-            path = if (pullRequestCommit == null || model.hasCommitsFromRevisionNumber(model.listCommitsFromMergedCommit(repository, pullRequestCommit), revisionHash)) {
-                        val commit = model.findCommitLog(repository, revisionHash)
-                        if (commit.isSquashPullRequestCommit()) {
-                            "pull/${commit.getPullRequestNumberFromSquashCommit()}/files"
-                        } else {
-                            // show opening commit pages info
-                            FindPullRequestHelper.showInfoNotification("Could not find the pull request. Open the commit which the line is added")
-                            "commit/$revisionHash"
-                        }
-                    } else {
-                        "pull/${pullRequestCommit.getPullRequestNumber()}/files"
-                    }
+            path = if (pullRequestCommit == null || !model.hasCommitsFromRevisionNumber(model.listCommitsFromMergedCommit(repository, pullRequestCommit), revisionHash)) {
+                val commit = model.findCommitLog(repository, revisionHash)
+                if (commit.isSquashPullRequestCommit()) {
+                    "pull/${commit.getPullRequestNumberFromSquashCommit()}/files"
+                } else {
+                    // show opening commit pages info
+                    FindPullRequestHelper.showInfoNotification("Could not find the pull request. Open the commit which the line is added")
+                    "commit/$revisionHash"
+                }
+            } else {
+                "pull/${pullRequestCommit.getPullRequestNumber()}/files"
+            }
         } catch (e: VcsException) {
             FindPullRequestHelper.showErrorNotification("Could not find the pull request for $revisionHash")
             return
