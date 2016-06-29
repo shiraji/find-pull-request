@@ -43,7 +43,7 @@ class FindPullRequestAction : AnAction() {
         var path: String?
         try {
             val pullRequestCommit = model.findPullRequestCommit(repository, revisionHash)
-            path = if (pullRequestCommit == null || model.hasCommitsFromRevisionNumber(model.listCommitsFromMergedCommit(repository, pullRequestCommit), revisionHash)) {
+            path = if (pullRequestCommit == null || !model.hasCommitsFromRevisionNumber(model.listCommitsFromMergedCommit(repository, pullRequestCommit), revisionHash)) {
                 val commit = model.findCommitLog(repository, revisionHash)
                 if (commit.isSquashPullRequestCommit()) {
                     "pull/${commit.getPullRequestNumberFromSquashCommit()}/files"
