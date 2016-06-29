@@ -1,4 +1,8 @@
-### [ver 1.1.0](https://github.com/shiraji/find-pull-request/releases/tag/v1.1.1)
+### [ver 1.1.2](https://github.com/shiraji/find-pull-request/releases/tag/v1.1.2)
+
+* Fix critical issue with finding pull request
+
+### [ver 1.1.1](https://github.com/shiraji/find-pull-request/releases/tag/v1.1.1)
 
 * Improve the performance
 * Make this plugin available to all JetBrain products
