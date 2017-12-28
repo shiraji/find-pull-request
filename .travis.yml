@@ -6,7 +6,6 @@ env:
   global:
   - secure: ej+wQhKEKirNWr+SPoTjUJ9Ql0GI9EfoOKB323diXpI2fPxcec7Fk3UvfqgCDaUgkgyyChW0Z3smXVGwOmJQh78vFWDME+gPtNACD0nhyA8evEbwJCF/yzugOo8AD9KojwhMLu1Mde+3PtfMtw1597aawS5qV2UUrlBu1VdJHmFlqYHxl3gvUYZGJaCBcH3EAZHXXb6OGLCxRc6DAkdx5gV77Zg2gfg70cJXZsbOYDho6xqJKKPv3SF/KgZjzO66E+0GFW72rbHu5kGMRr4WFZcXo7wM5CIYLah5eUuBMZMMofqKoC9TFHoGaXdoD4eO47hwobTiBqKxxwjdyv2mvubjVKL8EtrtLwVKTQwl2Xmh51l73tXXT1lUsJxa3Li1H6xDIYYMxyWCKolZ9wncZDgf1fSNhdbwMzPD7OZhG2TwITupBmYYoSAEdABxAfGUub/zeaBhiyhe076iAkSBsJ1XME6XGVriLNW/EpiO2Qqo5J4zFwzWe9uynvtgJXHfkaxjVJzildS+wyfl4PWi41ybLH3lAsiczjp60jyfcqpIVkw5XMcnqeRImIG8m1mShmJIc//3pN3ESLYm/CnJo17eOfkPdTIftb8a7DK+uxVldtfcTzpLaaIafVVyDOGL1twLGdltebrZmfreW8a5UsUqi4pK/ichRcuWoOENU8M=
 jdk:
-- oraclejdk7
 - oraclejdk8
 script:
 - ./gradlew test -PideaVersion=$IDEA_VERSION
@@ -18,3 +17,5 @@ cache:
   - $HOME/.gradle
 after_success:
 - .travis/after_success.sh
+before_install:
+- .travis/before_install.sh
