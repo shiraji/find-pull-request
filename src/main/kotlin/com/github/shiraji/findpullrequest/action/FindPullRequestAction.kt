@@ -40,7 +40,7 @@ class FindPullRequestAction : AnAction() {
             return
         }
 
-        var path: String?
+        val path: String?
         try {
             val pullRequestCommit = model.findPullRequestCommit(repository, revisionHash)
             path = if (pullRequestCommit == null || !model.hasCommitsFromRevisionNumber(model.listCommitsFromMergedCommit(repository, pullRequestCommit), revisionHash)) {
