@@ -58,9 +58,9 @@ class FindPullRequestModel(e: AnActionEvent) {
         return GithubUrlUtil.makeGithubRepoUrlFromRemoteUrl(remoteUrl, "https://" + GithubUrlUtil.getHostFromUrl(remoteUrl))
     }
 
-    fun createMd5Hash(repository: GitRepository, annotate: FileAnnotation, revisionHash: VcsRevisionNumber): String {
-        val revision = annotate.revisions?.single { it.revisionNumber == revisionHash } as GitFileRevision
-        return revision.path.path.subtract("${repository.gitDir.parent.presentableUrl.toString()}/").toMd5()
+    fun createFileMd5Hash(repository: GitRepository, annotate: FileAnnotation, revisionHash: VcsRevisionNumber): String? {
+        val projectDir = repository.project.baseDir.canonicalPath ?: return null
+        return annotate.file.canonicalPath?.subtract(projectDir)?.toMd5()
     }
 
     fun createRevisionHash(annotate: FileAnnotation): VcsRevisionNumber? {
