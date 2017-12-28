@@ -1,6 +1,7 @@
 package com.github.shiraji.findpullrequest.action
 
-import com.github.shiraji.findpullrequest.helper.FindPullRequestHelper
+import com.github.shiraji.findpullrequest.helper.showErrorNotification
+import com.github.shiraji.findpullrequest.helper.showInfoNotification
 import com.github.shiraji.findpullrequest.model.FindPullRequestModel
 import com.github.shiraji.getPullRequestNumber
 import com.github.shiraji.getPullRequestNumberFromSquashCommit
@@ -18,25 +19,25 @@ class FindPullRequestAction : AnAction() {
 
         val repository = model.getRepository()
         if (repository == null) {
-            FindPullRequestHelper.showErrorNotification("Could not find git repository.")
+            showErrorNotification("Could not find git repository.")
             return
         }
 
         val annotate = model.getFileAnnotation(repository)
         if (annotate == null) {
-            FindPullRequestHelper.showErrorNotification("Could not load file annotations.")
+            showErrorNotification("Could not load file annotations.")
             return
         }
 
         val revisionHash = model.createRevisionHash(annotate)
         if (revisionHash == null) {
-            FindPullRequestHelper.showErrorNotification("Could not find revision hash")
+            showErrorNotification("Could not find revision hash")
             return
         }
 
         val githubRepoUrl = model.createGithubRepoUrl(repository)
         if (githubRepoUrl == null) {
-            FindPullRequestHelper.showErrorNotification("Could not find GitHub repository url")
+            showErrorNotification("Could not find GitHub repository url")
             return
         }
 
@@ -56,7 +57,7 @@ class FindPullRequestAction : AnAction() {
                 "pull/${pullRequestCommit.getPullRequestNumber()}/files"
             }
         } catch (e: VcsException) {
-            FindPullRequestHelper.showErrorNotification("Could not find the pull request for $revisionHash")
+            showErrorNotification("Could not find the pull request for $revisionHash")
             return
         }
 
