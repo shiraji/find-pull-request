@@ -60,7 +60,12 @@ class FindPullRequestAction : AnAction() {
             return
         }
 
-        val url = "$githubRepoUrl/$path#diff-${model.createMd5Hash(repository, annotate, revisionHash)}"
+        val fileMD5 = model.createFileMd5Hash(repository, annotate, revisionHash)
+        val url = if (fileMD5 == null) {
+            "$githubRepoUrl/$path"
+        } else {
+            "$githubRepoUrl/$path#diff-$fileMD5"
+        }
         BrowserUtil.open(url)
     }
 
