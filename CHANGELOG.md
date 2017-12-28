@@ -1,3 +1,8 @@
+### [ver 1.2.0](https://github.com/shiraji/find-pull-request/releases/tag/v1.2.0)
+
+* Disable auto jump when no PR found #30
+* Fix the problem with commits that is only exist in local machine
+
 ### [ver 1.1.2](https://github.com/shiraji/find-pull-request/releases/tag/v1.1.2)
 
 * Fix critical issue with finding pull request
