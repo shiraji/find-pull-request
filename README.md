@@ -29,10 +29,6 @@ Intellij plugin that jumps to the pull request page (or GitHub commits page)
 
 Use the IDE's plugin manager to install the latest version of the plugin.
 
-or
-
-[Download](https://github.com/shiraji/find-pull-request/blob/master/find-pull-request.zip?raw=true) jar file and then go to Preferences > Plugins > Install plugin from disk... > Select the jar file you downloaded
-
 ## License
 
 ```
