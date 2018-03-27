@@ -11,7 +11,6 @@ import com.intellij.openapi.vcs.changes.ChangeListManager
 import com.intellij.openapi.vcs.history.VcsRevisionNumber
 import com.intellij.openapi.vfs.VirtualFile
 import git4idea.GitCommit
-import git4idea.GitFileRevision
 import git4idea.history.GitHistoryUtils
 import git4idea.repo.GitRepository
 import org.jetbrains.plugins.github.util.GithubUrlUtil
