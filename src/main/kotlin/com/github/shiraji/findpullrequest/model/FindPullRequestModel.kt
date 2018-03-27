@@ -1,6 +1,7 @@
 package com.github.shiraji.findpullrequest.model
 
 import com.github.shiraji.*
+import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.editor.Editor
@@ -67,19 +68,37 @@ class FindPullRequestModel(e: AnActionEvent) {
         return annotate.originalRevision(lineNumber)
     }
 
-    private fun findCommitLog(repository: GitRepository, revisionHash: VcsRevisionNumber)
-            = GitHistoryUtils.history(project!!, repository.root, "$revisionHash").first()
+    fun createPullRequestPath(repository: GitRepository, revisionHash: VcsRevisionNumber): String {
+        val debugMessage = StringBuilder()
+                .appendln("### Revision hash:")
+                .appendln(revisionHash.asString())
 
-    fun findPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber)
-            = GitHistoryUtils.history(project!!, repository.root, "$revisionHash..HEAD", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse").firstOrNull()
+        fun findCommitLog(repository: GitRepository, revisionHash: VcsRevisionNumber)
+                = GitHistoryUtils.history(project!!, repository.root, "$revisionHash").first().also {
+            debugMessage.appendln("### Squash PR commit:")
+            debugMessage.appendln(it.id.asString())
+        }
 
-    private fun listCommitsFromMergedCommit(repository: GitRepository, pullRequestCommit: GitCommit)
-            = GitHistoryUtils.history(project!!, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}")
+        fun findPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber)
+                = GitHistoryUtils.history(project!!, repository.root, "$revisionHash..HEAD", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse").firstOrNull().also {
+            debugMessage.appendln("### PR commit:")
+            debugMessage.appendln(it?.id?.asString())
+        }
 
-    private fun hasCommitsFromRevisionNumber(commits: List<GitCommit>, revisionHash: VcsRevisionNumber)
-            = commits.any { it.id.asString() == revisionHash.asString() }
+        fun listCommitsFromMergedCommit(repository: GitRepository, pullRequestCommit: GitCommit)
+                = GitHistoryUtils.history(project!!, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}").also {
+            debugMessage.appendln("### Merged commits lists:")
+            it.forEach { debugMessage.appendln(it.id.asString()) }
+        }
 
-    fun createPullRequestPathFromCommit(pullRequestCommit: GitCommit?, repository: GitRepository, revisionHash: VcsRevisionNumber): String? {
+        fun hasCommitsFromRevisionNumber(commits: List<GitCommit>, revisionHash: VcsRevisionNumber)
+                = commits.any { it.id.asString() == revisionHash.asString() }.also {
+            debugMessage.appendln("### Result of `hasCommitsFromRevisionNumber`:")
+            debugMessage.appendln(it)
+        }
+
+        val pullRequestCommit = findPullRequestCommit(repository, revisionHash)
+
         return if (pullRequestCommit != null && hasCommitsFromRevisionNumber(listCommitsFromMergedCommit(repository, pullRequestCommit), revisionHash)) {
             "pull/${pullRequestCommit.getPullRequestNumber()}/files"
         } else {
@@ -87,7 +106,7 @@ class FindPullRequestModel(e: AnActionEvent) {
             if (commit.isSquashPullRequestCommit()) {
                 "pull/${commit.getPullRequestNumberFromSquashCommit()}/files"
             } else {
-                null
+                throw NoPullRequestFoundException(debugMessage.toString())
             }
         }
     }
