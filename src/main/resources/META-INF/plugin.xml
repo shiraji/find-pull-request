@@ -11,10 +11,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <p>1.2.0</p>
+        <p>1.2.1</p>
         <ul>
-          <li>Disable auto jump when no PR found #30</li>
-          <li>Fix the problem with commits that is only exist in local machine</li>
+          <li>Make "Could not find the pull request" message more useful #33</li>
         </ul>
         <p>Older version changes are listed on <a href="https://github.com/shiraji/find-pull-request/blob/master/CHANGELOG.md">CHANGELOG.md</a></p>
     ]]>
