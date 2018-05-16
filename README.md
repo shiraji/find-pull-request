@@ -12,7 +12,7 @@ Intellij plugin that jumps to the pull request page (or GitHub commits page)
 * Right click
 * Click "Find Pull Request"
 
-![screenshot](website/images/screenshot.png)
+![screenshot](website/images/screenshot.gif)
 
 * Open the pull request page if the plugin finds pull request
 * Open the commit page if no pull request found for the selected line
@@ -32,7 +32,7 @@ Use the IDE's plugin manager to install the latest version of the plugin.
 ## License
 
 ```
-Copyright 2016 Yoshinori Isogai
+Copyright 2018 Yoshinori Isogai
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
