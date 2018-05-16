@@ -4,7 +4,7 @@
   <vendor email="isogai.shiraji@gmail.com" url="https://github.com/shiraji">Shiraji</vendor>
 
     <description><![CDATA[
-      This plugin find the pull request of the selected line. If there is no pull request for the line, then open Github commit page which the line is added.<br/>
+      This plugin find the pull request of the selected line. <br/><img src="https://raw.githubusercontent.com/shiraji/find-pull-request/master/website/images/screenshot.gif"/><br/>If there is no pull request for the line, then open Github commit page which the line is added.<br/>
       <br/>
       <a href="https://github.com/shiraji/find-pull-request">GitHub</a> |
       <a href="https://github.com/shiraji/find-pull-request/issues">Issues</a>
