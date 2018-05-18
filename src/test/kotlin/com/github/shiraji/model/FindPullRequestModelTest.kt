@@ -2,8 +2,6 @@ package com.github.shiraji.model
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
 import com.github.shiraji.findpullrequest.model.FindPullRequestModel
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.SelectionModel
@@ -16,7 +14,7 @@ import com.intellij.vcs.log.Hash
 import git4idea.GitCommit
 import git4idea.history.GitHistoryUtils
 import git4idea.repo.GitRepository
-import junit.framework.Assert.*
+import junit.framework.TestCase.*
 import org.jetbrains.plugins.github.util.GithubUtil
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +32,6 @@ class FindPullRequestModelTest {
 
     lateinit var model: FindPullRequestModel
 
-    @Mock lateinit var event: AnActionEvent
     @Mock lateinit var project: Project
     @Mock lateinit var virtualFile: VirtualFile
     @Mock lateinit var editor: Editor
