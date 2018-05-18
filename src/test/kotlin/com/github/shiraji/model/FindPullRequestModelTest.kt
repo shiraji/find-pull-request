@@ -53,6 +53,9 @@ class FindPullRequestModelTest {
     @Suppress("MemberVisibilityCanBePrivate")
     @Mock lateinit var gitRepository: GitRepository
 
+    @Suppress("MemberVisibilityCanBePrivate")
+    @Mock lateinit var changeListManager: ChangeListManager
+
     private val prNumber = 10
     private val hashCode = "123"
     private val diffHashCode = "abc"
@@ -199,7 +202,6 @@ class FindPullRequestModelTest {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(true)
 
-        val changeListManager = mock(ChangeListManager::class.java)
         `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
 
         val change = mock(Change::class.java)
@@ -226,7 +228,6 @@ class FindPullRequestModelTest {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(true)
 
-        val changeListManager = mock(ChangeListManager::class.java)
         `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
 
         `when`(changeListManager.getChange(virtualFile)).thenReturn(null)
@@ -250,7 +251,7 @@ class FindPullRequestModelTest {
     fun `isEnable false if no git repository`() {
         mockGetGitRepository(null)
 
-        assertFalse(model.isEnable(gitRepository, mock(ChangeListManager::class.java)))
+        assertFalse(model.isEnable(gitRepository, changeListManager))
     }
 
     @Test
@@ -258,7 +259,7 @@ class FindPullRequestModelTest {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(false)
 
-        assertFalse(model.isEnable(gitRepository, mock(ChangeListManager::class.java)))
+        assertFalse(model.isEnable(gitRepository, changeListManager))
     }
 
     @Test
@@ -266,7 +267,6 @@ class FindPullRequestModelTest {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(true)
 
-        val changeListManager = mock(ChangeListManager::class.java)
         `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(true)
 
         assertFalse(model.isEnable(gitRepository, changeListManager))
@@ -277,7 +277,6 @@ class FindPullRequestModelTest {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(true)
 
-        val changeListManager = mock(ChangeListManager::class.java)
         `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
 
         val change = mock(Change::class.java)
@@ -292,7 +291,6 @@ class FindPullRequestModelTest {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(true)
 
-        val changeListManager = mock(ChangeListManager::class.java)
         `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
 
         val change = mock(Change::class.java)
