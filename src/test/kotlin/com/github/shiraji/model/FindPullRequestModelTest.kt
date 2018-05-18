@@ -33,28 +33,36 @@ class FindPullRequestModelTest {
     lateinit var model: FindPullRequestModel
 
     @Suppress("MemberVisibilityCanBePrivate")
-    @Mock lateinit var project: Project
+    @Mock
+    lateinit var project: Project
 
     @Suppress("MemberVisibilityCanBePrivate")
-    @Mock lateinit var virtualFile: VirtualFile
+    @Mock
+    lateinit var virtualFile: VirtualFile
 
     @Suppress("MemberVisibilityCanBePrivate")
-    @Mock lateinit var editor: Editor
+    @Mock
+    lateinit var editor: Editor
 
     @Suppress("MemberVisibilityCanBePrivate")
-    @Mock lateinit var repository: GitRepository
+    @Mock
+    lateinit var repository: GitRepository
 
     @Suppress("MemberVisibilityCanBePrivate")
-    @Mock lateinit var vcsRevisionNumber: VcsRevisionNumber
+    @Mock
+    lateinit var vcsRevisionNumber: VcsRevisionNumber
 
     @Suppress("MemberVisibilityCanBePrivate")
-    @Mock lateinit var virtualRoot: VirtualFile
+    @Mock
+    lateinit var virtualRoot: VirtualFile
 
     @Suppress("MemberVisibilityCanBePrivate")
-    @Mock lateinit var gitRepository: GitRepository
+    @Mock
+    lateinit var gitRepository: GitRepository
 
     @Suppress("MemberVisibilityCanBePrivate")
-    @Mock lateinit var changeListManager: ChangeListManager
+    @Mock
+    lateinit var changeListManager: ChangeListManager
 
     private val prNumber = 10
     private val hashCode = "123"
