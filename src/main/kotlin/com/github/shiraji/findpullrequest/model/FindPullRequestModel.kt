@@ -26,13 +26,11 @@ class FindPullRequestModel(
             changeListManager: ChangeListManager = ChangeListManager.getInstance(project)
     ): Boolean {
         if (project.isDisposed) return false
-
         if (!GithubUtil.isRepositoryOnGitHub(repository)) return false
-
         if (changeListManager.isUnversioned(virtualFile)) return false
-
-        val change = changeListManager.getChange(virtualFile)
-        if (change != null && change.type == Change.Type.NEW) return false
+        changeListManager.getChange(virtualFile)?.let {
+            if (it.type == Change.Type.NEW) return false
+        }
 
         val startLine = editor.document.getLineNumber(editor.selectionModel.selectionStart)
         val endLine = editor.document.getLineNumber(editor.selectionModel.selectionEnd)
