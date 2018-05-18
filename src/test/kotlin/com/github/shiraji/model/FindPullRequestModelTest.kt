@@ -4,16 +4,20 @@ import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
 import com.github.shiraji.findpullrequest.model.FindPullRequestModel
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.SelectionModel
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vcs.changes.Change
+import com.intellij.openapi.vcs.changes.ChangeListManager
 import com.intellij.openapi.vcs.history.VcsRevisionNumber
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.vcs.log.Hash
 import git4idea.GitCommit
 import git4idea.history.GitHistoryUtils
 import git4idea.repo.GitRepository
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.fail
+import junit.framework.Assert.*
+import org.jetbrains.plugins.github.util.GithubUtil
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,7 +29,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
 
 @RunWith(PowerMockRunner::class)
-@PrepareForTest(GitHistoryUtils::class, GitCommit::class)
+@PrepareForTest(GitHistoryUtils::class, GitCommit::class, GithubUtil::class, ChangeListManager::class)
 class FindPullRequestModelTest {
 
     lateinit var model: FindPullRequestModel
@@ -41,6 +45,9 @@ class FindPullRequestModelTest {
     private val prNumber = 10
     private val hashCode = "123"
     private val diffHashCode = "abc"
+    private val selectedLine = 10
+    private val diffSelectedLine = 100
+    private val selectedOffline = 111
 
     private fun mockFindPullRequestCommit(results: List<GitCommit?>) {
         PowerMockito.`when`(GitHistoryUtils.history(
@@ -83,10 +90,22 @@ class FindPullRequestModelTest {
         `when`(event.getData(CommonDataKeys.EDITOR)).thenReturn(editor)
         model = FindPullRequestModel(event)
 
+        setUpForCreatePullRequestPath()
+        setUpForIsEnable()
+    }
+
+    private fun setUpForCreatePullRequestPath() {
         PowerMockito.mockStatic(GitHistoryUtils::class.java)
 
         `when`(repository.root).thenReturn(virtualRoot)
         `when`(vcsRevisionNumber.asString()).thenReturn(hashCode)
+    }
+
+    private fun setUpForIsEnable() {
+        PowerMockito.mockStatic(GithubUtil::class.java)
+        PowerMockito.mockStatic(ChangeListManager::class.java)
+
+        `when`(project.isDisposed).thenReturn(false)
     }
 
     @Test
@@ -158,4 +177,136 @@ class FindPullRequestModelTest {
         model.createPullRequestPath(repository, vcsRevisionNumber)
         fail()
     }
+
+    @Test
+    fun `isEnable true`() {
+        val gitRepository = mock(GitRepository::class.java)
+        PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(gitRepository)
+        PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(true)
+
+        val changeListManager = mock(ChangeListManager::class.java)
+        `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
+        PowerMockito.`when`(ChangeListManager.getInstance(project)).thenReturn(changeListManager)
+
+        val change = mock(Change::class.java)
+        `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
+        `when`(change.type).thenReturn(Change.Type.MODIFICATION)
+
+        val selectionModel = mock(SelectionModel::class.java)
+        `when`(editor.selectionModel).thenReturn(selectionModel)
+        `when`(selectionModel.selectionStart).thenReturn(selectedOffline)
+        `when`(selectionModel.selectionEnd).thenReturn(selectedOffline)
+
+        val document = mock(Document::class.java)
+        `when`(editor.document).thenReturn(document)
+
+        `when`(document.getLineNumber(anyInt()))
+                .thenReturn(selectedLine)
+                .thenReturn(selectedLine)
+
+        assertTrue(model.isEnable())
+    }
+
+    @Test
+    fun `isEnable true even the change is null`() {
+        val gitRepository = mock(GitRepository::class.java)
+        PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(gitRepository)
+        PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(true)
+
+        val changeListManager = mock(ChangeListManager::class.java)
+        `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
+        PowerMockito.`when`(ChangeListManager.getInstance(project)).thenReturn(changeListManager)
+
+        `when`(changeListManager.getChange(virtualFile)).thenReturn(null)
+
+        val selectionModel = mock(SelectionModel::class.java)
+        `when`(editor.selectionModel).thenReturn(selectionModel)
+        `when`(selectionModel.selectionStart).thenReturn(selectedOffline)
+        `when`(selectionModel.selectionEnd).thenReturn(selectedOffline)
+
+        val document = mock(Document::class.java)
+        `when`(editor.document).thenReturn(document)
+
+        `when`(document.getLineNumber(anyInt()))
+                .thenReturn(selectedLine)
+                .thenReturn(selectedLine)
+
+        assertTrue(model.isEnable())
+    }
+
+    @Test
+    fun `isEnable false if no git repository`() {
+        PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(null)
+
+        assertFalse(model.isEnable())
+    }
+
+    @Test
+    fun `isEnable false if repository is not github one`() {
+        val gitRepository = mock(GitRepository::class.java)
+        PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(gitRepository)
+        PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(false)
+
+        assertFalse(model.isEnable())
+    }
+
+    @Test
+    fun `isEnable false if the file is not versioned`() {
+        val gitRepository = mock(GitRepository::class.java)
+        PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(gitRepository)
+        PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(true)
+
+        val changeListManager = mock(ChangeListManager::class.java)
+        `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(true)
+        PowerMockito.`when`(ChangeListManager.getInstance(project)).thenReturn(changeListManager)
+
+        assertFalse(model.isEnable())
+    }
+
+    @Test
+    fun `isEnable false if the change type is New`() {
+        val gitRepository = mock(GitRepository::class.java)
+        PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(gitRepository)
+        PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(true)
+
+        val changeListManager = mock(ChangeListManager::class.java)
+        `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
+        PowerMockito.`when`(ChangeListManager.getInstance(project)).thenReturn(changeListManager)
+
+        val change = mock(Change::class.java)
+        `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
+        `when`(change.type).thenReturn(Change.Type.NEW)
+
+        assertFalse(model.isEnable())
+    }
+
+    @Test
+    fun `isEnable false if multiple line is selected`() {
+        val gitRepository = mock(GitRepository::class.java)
+        PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(gitRepository)
+        PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(true)
+
+        val changeListManager = mock(ChangeListManager::class.java)
+        `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
+        PowerMockito.`when`(ChangeListManager.getInstance(project)).thenReturn(changeListManager)
+
+        val change = mock(Change::class.java)
+        `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
+        `when`(change.type).thenReturn(Change.Type.MODIFICATION)
+
+        val selectionModel = mock(SelectionModel::class.java)
+        `when`(editor.selectionModel).thenReturn(selectionModel)
+        `when`(selectionModel.selectionStart).thenReturn(selectedOffline)
+        `when`(selectionModel.selectionEnd).thenReturn(selectedOffline)
+
+        val document = mock(Document::class.java)
+        `when`(editor.document).thenReturn(document)
+
+        `when`(document.getLineNumber(anyInt()))
+                .thenReturn(selectedLine)
+                .thenReturn(diffSelectedLine)
+
+        assertFalse(model.isEnable())
+    }
+
 }
