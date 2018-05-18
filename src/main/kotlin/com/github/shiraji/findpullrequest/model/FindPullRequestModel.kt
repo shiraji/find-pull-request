@@ -37,9 +37,7 @@ class FindPullRequestModel(
         return startLine == endLine
     }
 
-    fun getFileAnnotation(repository: GitRepository): FileAnnotation? {
-        return repository.vcs?.annotationProvider?.annotate(virtualFile)
-    }
+    fun getFileAnnotation(repository: GitRepository) = repository.vcs?.annotationProvider?.annotate(virtualFile)
 
     fun createGithubRepoUrl(repository: GitRepository): String? {
         val remoteUrl: String = GithubUtil.findUpstreamRemote(repository) ?: GithubUtil.findGithubRemoteUrl(repository) ?: return null
