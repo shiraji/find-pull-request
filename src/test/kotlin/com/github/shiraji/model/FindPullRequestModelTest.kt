@@ -1,5 +1,6 @@
 package com.github.shiraji.model
 
+import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
 import com.github.shiraji.findpullrequest.model.FindPullRequestModel
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -12,6 +13,7 @@ import git4idea.GitCommit
 import git4idea.history.GitHistoryUtils
 import git4idea.repo.GitRepository
 import junit.framework.Assert.assertEquals
+import junit.framework.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -110,5 +112,50 @@ class FindPullRequestModelTest {
 
         val path = model.createPullRequestPath(repository, vcsRevisionNumber)
         assertEquals("pull/$prNumber/files", path)
+    }
+
+    @Test(expected = NoPullRequestFoundException::class)
+    fun `No PR found if no PR and the commit is not squash commit`() {
+        val prCommit = null
+        mockFindPullRequestCommit(listOf<GitCommit?>(prCommit))
+
+        val listOfCommits = generateMockGitCommit()
+        // for findCommitLog
+        mockHistory(listOf(listOfCommits))
+
+        model.createPullRequestPath(repository, vcsRevisionNumber)
+        fail()
+    }
+
+    @Test
+    fun `Found PR has different hash code but the commit is squash commit`() {
+        val prCommit = generateMockGitCommit(fullMessage = "Merge pull request #$prNumber from")
+        mockFindPullRequestCommit(listOf(prCommit))
+
+        val mergeCommit = generateMockGitCommit(hashCode = diffHashCode)
+        mockHistory(listOf(mergeCommit))
+
+        val listOfCommits = generateMockGitCommit(fullMessage = "Foo (#$prNumber)")
+        // for findCommitLog
+        mockHistory(listOf(listOfCommits))
+
+        val path = model.createPullRequestPath(repository, vcsRevisionNumber)
+        assertEquals("pull/$prNumber/files", path)
+    }
+
+    @Test(expected = NoPullRequestFoundException::class)
+    fun `Found PR has different hash code and its commit message is not squash commit`() {
+        val prCommit = generateMockGitCommit(fullMessage = "Merge pull request #$prNumber from")
+        mockFindPullRequestCommit(listOf(prCommit))
+
+        val mergeCommit = generateMockGitCommit(hashCode = diffHashCode)
+        mockHistory(listOf(mergeCommit))
+
+        val listOfCommits = generateMockGitCommit()
+        // for findCommitLog
+        mockHistory(listOf(listOfCommits))
+
+        model.createPullRequestPath(repository, vcsRevisionNumber)
+        fail()
     }
 }
