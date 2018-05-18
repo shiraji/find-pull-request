@@ -112,6 +112,19 @@ class FindPullRequestModelTest {
         ch?.let { `when`(it.type).thenReturn(result) }
     }
 
+    private fun mockLineNumber(startLine: Int, endLine: Int) {
+        val selectionModel = mock(SelectionModel::class.java)
+        `when`(editor.selectionModel).thenReturn(selectionModel)
+        `when`(selectionModel.selectionStart).thenReturn(selectedOffline)
+        `when`(selectionModel.selectionEnd).thenReturn(selectedOffline)
+
+        val document = mock(Document::class.java)
+        `when`(editor.document).thenReturn(document)
+        `when`(document.getLineNumber(anyInt()))
+                .thenReturn(startLine)
+                .thenReturn(endLine)
+    }
+
     private fun generateMockGitCommit(hashCode: String = "", fullMessage: String = ""): GitCommit {
         val hash = generateMockHash(hashCode)
         return PowerMockito.mock(GitCommit::class.java).also {
@@ -224,18 +237,7 @@ class FindPullRequestModelTest {
         mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(false)
         mockChangeType(Change.Type.MODIFICATION)
-
-        val selectionModel = mock(SelectionModel::class.java)
-        `when`(editor.selectionModel).thenReturn(selectionModel)
-        `when`(selectionModel.selectionStart).thenReturn(selectedOffline)
-        `when`(selectionModel.selectionEnd).thenReturn(selectedOffline)
-
-        val document = mock(Document::class.java)
-        `when`(editor.document).thenReturn(document)
-
-        `when`(document.getLineNumber(anyInt()))
-                .thenReturn(selectedLine)
-                .thenReturn(selectedLine)
+        mockLineNumber(startLine = selectedLine, endLine = selectedLine)
 
         assertTrue(model.isEnable(gitRepository, changeListManager))
     }
@@ -246,18 +248,7 @@ class FindPullRequestModelTest {
         mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(false)
         mockChangeType(Change.Type.MODIFICATION, null)
-
-        val selectionModel = mock(SelectionModel::class.java)
-        `when`(editor.selectionModel).thenReturn(selectionModel)
-        `when`(selectionModel.selectionStart).thenReturn(selectedOffline)
-        `when`(selectionModel.selectionEnd).thenReturn(selectedOffline)
-
-        val document = mock(Document::class.java)
-        `when`(editor.document).thenReturn(document)
-
-        `when`(document.getLineNumber(anyInt()))
-                .thenReturn(selectedLine)
-                .thenReturn(selectedLine)
+        mockLineNumber(startLine = selectedLine, endLine = selectedLine)
 
         assertTrue(model.isEnable(gitRepository, changeListManager))
     }
@@ -302,18 +293,7 @@ class FindPullRequestModelTest {
         mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(false)
         mockChangeType(Change.Type.MODIFICATION)
-
-        val selectionModel = mock(SelectionModel::class.java)
-        `when`(editor.selectionModel).thenReturn(selectionModel)
-        `when`(selectionModel.selectionStart).thenReturn(selectedOffline)
-        `when`(selectionModel.selectionEnd).thenReturn(selectedOffline)
-
-        val document = mock(Document::class.java)
-        `when`(editor.document).thenReturn(document)
-
-        `when`(document.getLineNumber(anyInt()))
-                .thenReturn(selectedLine)
-                .thenReturn(diffSelectedLine)
+        mockLineNumber(startLine = selectedLine, endLine = diffSelectedLine)
 
         assertFalse(model.isEnable(gitRepository, changeListManager))
     }
