@@ -21,12 +21,14 @@ class FindPullRequestModel(
         private val virtualFile: VirtualFile
 ) {
 
-    fun isEnable(repository: GitRepository): Boolean {
+    fun isEnable(
+            repository: GitRepository,
+            changeListManager: ChangeListManager = ChangeListManager.getInstance(project)
+    ): Boolean {
         if (project.isDisposed) return false
 
         if (!GithubUtil.isRepositoryOnGitHub(repository)) return false
 
-        val changeListManager = ChangeListManager.getInstance(project)
         if (changeListManager.isUnversioned(virtualFile)) return false
 
         val change = changeListManager.getChange(virtualFile)
