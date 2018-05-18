@@ -31,11 +31,14 @@ class FindPullRequestModel(
         changeListManager.getChange(virtualFile)?.let {
             if (it.type == Change.Type.NEW) return false
         }
-
-        val startLine = editor.document.getLineNumber(editor.selectionModel.selectionStart)
-        val endLine = editor.document.getLineNumber(editor.selectionModel.selectionEnd)
+        val (startLine, endLine) = editor.getStartEndLine()
         return startLine == endLine
     }
+
+    private fun Editor.getLine(offset: Int) = document.getLineNumber(offset)
+
+    private fun Editor.getStartEndLine() =
+            Pair(getLine(selectionModel.selectionStart), getLine(selectionModel.selectionEnd))
 
     fun getFileAnnotation(repository: GitRepository) = repository.vcs?.annotationProvider?.annotate(virtualFile)
 
@@ -50,7 +53,7 @@ class FindPullRequestModel(
     }
 
     fun createRevisionHash(annotate: FileAnnotation): VcsRevisionNumber? {
-        val lineNumber = editor.document.getLineNumber(editor.selectionModel.selectionStart)
+        val lineNumber = editor.getLine(editor.selectionModel.selectionStart)
         return annotate.originalRevision(lineNumber)
     }
 
