@@ -17,10 +17,11 @@ import git4idea.repo.GitRepository
 import org.jetbrains.plugins.github.util.GithubUrlUtil
 import org.jetbrains.plugins.github.util.GithubUtil
 
-class FindPullRequestModel(e: AnActionEvent) {
-    private val project: Project? = e.getData(CommonDataKeys.PROJECT)
-    private val editor: Editor? = e.getData(CommonDataKeys.EDITOR)
-    private val virtualFile: VirtualFile? = e.getData(CommonDataKeys.VIRTUAL_FILE)
+class FindPullRequestModel(
+        private val project: Project,
+        private val editor: Editor,
+        private val virtualFile: VirtualFile
+) {
 
     fun isEnable(): Boolean {
         if (project == null || project.isDisposed || editor == null || virtualFile == null) {

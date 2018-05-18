@@ -85,10 +85,7 @@ class FindPullRequestModelTest {
 
     @Before
     fun setup() {
-        `when`(event.getData(CommonDataKeys.PROJECT)).thenReturn(project)
-        `when`(event.getData(CommonDataKeys.VIRTUAL_FILE)).thenReturn(virtualFile)
-        `when`(event.getData(CommonDataKeys.EDITOR)).thenReturn(editor)
-        model = FindPullRequestModel(event)
+        model = FindPullRequestModel(project, editor, virtualFile)
 
         setUpForCreatePullRequestPath()
         setUpForIsEnable()
