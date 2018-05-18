@@ -91,6 +91,10 @@ class FindPullRequestModelTest {
         PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(result)
     }
 
+    private fun mockIsUnversioned(result: Boolean) {
+        `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(result)
+    }
+
     private fun generateMockGitCommit(hashCode: String = "", fullMessage: String = ""): GitCommit {
         val hash = generateMockHash(hashCode)
         return PowerMockito.mock(GitCommit::class.java).also {
@@ -201,8 +205,7 @@ class FindPullRequestModelTest {
     fun `isEnable true`() {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(true)
-
-        `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
+        mockIsUnversioned(false)
 
         val change = mock(Change::class.java)
         `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
@@ -227,8 +230,7 @@ class FindPullRequestModelTest {
     fun `isEnable true even the change is null`() {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(true)
-
-        `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
+        mockIsUnversioned(false)
 
         `when`(changeListManager.getChange(virtualFile)).thenReturn(null)
 
@@ -266,8 +268,7 @@ class FindPullRequestModelTest {
     fun `isEnable false if the file is not versioned`() {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(true)
-
-        `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(true)
+        mockIsUnversioned(true)
 
         assertFalse(model.isEnable(gitRepository, changeListManager))
     }
@@ -276,8 +277,7 @@ class FindPullRequestModelTest {
     fun `isEnable false if the change type is New`() {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(true)
-
-        `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
+        mockIsUnversioned(false)
 
         val change = mock(Change::class.java)
         `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
@@ -290,8 +290,7 @@ class FindPullRequestModelTest {
     fun `isEnable false if multiple line is selected`() {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(true)
-
-        `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
+        mockIsUnversioned(false)
 
         val change = mock(Change::class.java)
         `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
