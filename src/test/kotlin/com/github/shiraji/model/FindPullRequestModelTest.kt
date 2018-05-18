@@ -180,7 +180,6 @@ class FindPullRequestModelTest {
 
         val changeListManager = mock(ChangeListManager::class.java)
         `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
-        PowerMockito.`when`(ChangeListManager.getInstance(project)).thenReturn(changeListManager)
 
         val change = mock(Change::class.java)
         `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
@@ -198,7 +197,7 @@ class FindPullRequestModelTest {
                 .thenReturn(selectedLine)
                 .thenReturn(selectedLine)
 
-        assertTrue(model.isEnable(gitRepository))
+        assertTrue(model.isEnable(gitRepository, changeListManager))
     }
 
     @Test
@@ -209,7 +208,6 @@ class FindPullRequestModelTest {
 
         val changeListManager = mock(ChangeListManager::class.java)
         `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
-        PowerMockito.`when`(ChangeListManager.getInstance(project)).thenReturn(changeListManager)
 
         `when`(changeListManager.getChange(virtualFile)).thenReturn(null)
 
@@ -225,14 +223,14 @@ class FindPullRequestModelTest {
                 .thenReturn(selectedLine)
                 .thenReturn(selectedLine)
 
-        assertTrue(model.isEnable(gitRepository))
+        assertTrue(model.isEnable(gitRepository, changeListManager))
     }
 
     @Test
     fun `isEnable false if no git repository`() {
         PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(null)
 
-        assertFalse(model.isEnable(mock(GitRepository::class.java)))
+        assertFalse(model.isEnable(mock(GitRepository::class.java), mock(ChangeListManager::class.java)))
     }
 
     @Test
@@ -241,7 +239,7 @@ class FindPullRequestModelTest {
         PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(gitRepository)
         PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(false)
 
-        assertFalse(model.isEnable(gitRepository))
+        assertFalse(model.isEnable(gitRepository, mock(ChangeListManager::class.java)))
     }
 
     @Test
@@ -252,9 +250,8 @@ class FindPullRequestModelTest {
 
         val changeListManager = mock(ChangeListManager::class.java)
         `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(true)
-        PowerMockito.`when`(ChangeListManager.getInstance(project)).thenReturn(changeListManager)
 
-        assertFalse(model.isEnable(gitRepository))
+        assertFalse(model.isEnable(gitRepository, changeListManager))
     }
 
     @Test
@@ -265,13 +262,12 @@ class FindPullRequestModelTest {
 
         val changeListManager = mock(ChangeListManager::class.java)
         `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
-        PowerMockito.`when`(ChangeListManager.getInstance(project)).thenReturn(changeListManager)
 
         val change = mock(Change::class.java)
         `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
         `when`(change.type).thenReturn(Change.Type.NEW)
 
-        assertFalse(model.isEnable(gitRepository))
+        assertFalse(model.isEnable(gitRepository, changeListManager))
     }
 
     @Test
@@ -282,7 +278,6 @@ class FindPullRequestModelTest {
 
         val changeListManager = mock(ChangeListManager::class.java)
         `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(false)
-        PowerMockito.`when`(ChangeListManager.getInstance(project)).thenReturn(changeListManager)
 
         val change = mock(Change::class.java)
         `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
@@ -300,7 +295,7 @@ class FindPullRequestModelTest {
                 .thenReturn(selectedLine)
                 .thenReturn(diffSelectedLine)
 
-        assertFalse(model.isEnable(gitRepository))
+        assertFalse(model.isEnable(gitRepository, changeListManager))
     }
 
 }
