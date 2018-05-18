@@ -2,8 +2,6 @@ package com.github.shiraji.findpullrequest.model
 
 import com.github.shiraji.*
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.annotate.FileAnnotation
@@ -24,7 +22,7 @@ class FindPullRequestModel(
 ) {
 
     fun isEnable(): Boolean {
-        if (project == null || project.isDisposed || editor == null || virtualFile == null) {
+        if (project.isDisposed) {
             return false
         }
 
@@ -43,13 +41,10 @@ class FindPullRequestModel(
     }
 
     fun getRepository(): GitRepository? {
-        project ?: return null
-        virtualFile ?: return null
         return GithubUtil.getGitRepository(project, virtualFile)
     }
 
     fun getFileAnnotation(repository: GitRepository): FileAnnotation? {
-        virtualFile ?: return null
         return repository.vcs?.annotationProvider?.annotate(virtualFile)
     }
 
@@ -64,7 +59,6 @@ class FindPullRequestModel(
     }
 
     fun createRevisionHash(annotate: FileAnnotation): VcsRevisionNumber? {
-        editor ?: return null
         val lineNumber = editor.document.getLineNumber(editor.selectionModel.selectionStart)
         return annotate.originalRevision(lineNumber)
     }
@@ -75,19 +69,19 @@ class FindPullRequestModel(
                 .appendln(revisionHash.asString())
 
         fun findCommitLog(repository: GitRepository, revisionHash: VcsRevisionNumber)
-                = GitHistoryUtils.history(project!!, repository.root, "$revisionHash").first().also {
+                = GitHistoryUtils.history(project, repository.root, "$revisionHash").first().also {
             debugMessage.appendln("### Squash PR commit:")
             debugMessage.appendln(it.id.asString())
         }
 
         fun findPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber)
-                = GitHistoryUtils.history(project!!, repository.root, "$revisionHash..HEAD", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse").firstOrNull().also {
+                = GitHistoryUtils.history(project, repository.root, "$revisionHash..HEAD", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse").firstOrNull().also {
             debugMessage.appendln("### PR commit:")
             debugMessage.appendln(it?.id?.asString())
         }
 
         fun listCommitsFromMergedCommit(repository: GitRepository, pullRequestCommit: GitCommit)
-                = GitHistoryUtils.history(project!!, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}").also {
+                = GitHistoryUtils.history(project, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}").also {
             debugMessage.appendln("### Merged commits lists:")
             it.forEach { debugMessage.appendln(it.id.asString()) }
         }
