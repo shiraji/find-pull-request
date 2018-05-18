@@ -175,8 +175,8 @@ class FindPullRequestModelTest {
 
     @Test
     fun `Finding squash commit`() {
-        val prCommit = null
-        mockFindPullRequestCommit(listOf<GitCommit?>(prCommit))
+        val prCommit: GitCommit? = null
+        mockFindPullRequestCommit(listOf(prCommit))
 
         val listOfCommits = generateMockGitCommit(fullMessage = "Foo (#$prNumber)")
         // for findCommitLog
