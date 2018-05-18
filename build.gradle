@@ -1,5 +1,6 @@
 buildscript {
     ext.kotlin_version = '1.2.31'
+    ext.powermock_version = '1.6.4'
     repositories {
         mavenCentral()
     }
@@ -44,8 +45,13 @@ repositories {
 }
 
 dependencies {
-    testCompile 'junit:junit:4.12'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile "org.powermock:powermock-api-mockito:$powermock_version"
+    testCompile "org.powermock:powermock-module-junit4:$powermock_version"
+    testCompile "org.powermock:powermock-module-junit4-rule:$powermock_version"
+    testCompile "org.powermock:powermock-classloading-xstream:$powermock_version"
 }
 
 sourceSets {
