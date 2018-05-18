@@ -21,13 +21,10 @@ class FindPullRequestModel(
         private val virtualFile: VirtualFile
 ) {
 
-    fun isEnable(): Boolean {
-        if (project.isDisposed) {
-            return false
-        }
+    fun isEnable(repository: GitRepository): Boolean {
+        if (project.isDisposed) return false
 
-        val repo = getRepository() ?: return false
-        if (!GithubUtil.isRepositoryOnGitHub(repo)) return false
+        if (!GithubUtil.isRepositoryOnGitHub(repository)) return false
 
         val changeListManager = ChangeListManager.getInstance(project)
         if (changeListManager.isUnversioned(virtualFile)) return false
@@ -38,10 +35,6 @@ class FindPullRequestModel(
         val startLine = editor.document.getLineNumber(editor.selectionModel.selectionStart)
         val endLine = editor.document.getLineNumber(editor.selectionModel.selectionEnd)
         return startLine == endLine
-    }
-
-    fun getRepository(): GitRepository? {
-        return GithubUtil.getGitRepository(project, virtualFile)
     }
 
     fun getFileAnnotation(repository: GitRepository): FileAnnotation? {

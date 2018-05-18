@@ -201,7 +201,7 @@ class FindPullRequestModelTest {
                 .thenReturn(selectedLine)
                 .thenReturn(selectedLine)
 
-        assertTrue(model.isEnable())
+        assertTrue(model.isEnable(gitRepository))
     }
 
     @Test
@@ -228,14 +228,14 @@ class FindPullRequestModelTest {
                 .thenReturn(selectedLine)
                 .thenReturn(selectedLine)
 
-        assertTrue(model.isEnable())
+        assertTrue(model.isEnable(gitRepository))
     }
 
     @Test
     fun `isEnable false if no git repository`() {
         PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(null)
 
-        assertFalse(model.isEnable())
+        assertFalse(model.isEnable(mock(GitRepository::class.java)))
     }
 
     @Test
@@ -244,7 +244,7 @@ class FindPullRequestModelTest {
         PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(gitRepository)
         PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(false)
 
-        assertFalse(model.isEnable())
+        assertFalse(model.isEnable(gitRepository))
     }
 
     @Test
@@ -257,7 +257,7 @@ class FindPullRequestModelTest {
         `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(true)
         PowerMockito.`when`(ChangeListManager.getInstance(project)).thenReturn(changeListManager)
 
-        assertFalse(model.isEnable())
+        assertFalse(model.isEnable(gitRepository))
     }
 
     @Test
@@ -274,7 +274,7 @@ class FindPullRequestModelTest {
         `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
         `when`(change.type).thenReturn(Change.Type.NEW)
 
-        assertFalse(model.isEnable())
+        assertFalse(model.isEnable(gitRepository))
     }
 
     @Test
@@ -303,7 +303,7 @@ class FindPullRequestModelTest {
                 .thenReturn(selectedLine)
                 .thenReturn(diffSelectedLine)
 
-        assertFalse(model.isEnable())
+        assertFalse(model.isEnable(gitRepository))
     }
 
 }
