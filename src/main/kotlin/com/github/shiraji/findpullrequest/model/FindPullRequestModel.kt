@@ -31,14 +31,12 @@ class FindPullRequestModel(
         changeListManager.getChange(virtualFile)?.let {
             if (it.type == Change.Type.NEW) return false
         }
-        val (startLine, endLine) = editor.getStartEndLine()
-        return startLine == endLine
+        return editor.isPointSingleLine()
     }
 
-    private fun Editor.getLine(offset: Int) = document.getLineNumber(offset)
+    private fun Editor.isPointSingleLine() = getLine(selectionModel.selectionStart) == getLine(selectionModel.selectionEnd)
 
-    private fun Editor.getStartEndLine() =
-            Pair(getLine(selectionModel.selectionStart), getLine(selectionModel.selectionEnd))
+    private fun Editor.getLine(offset: Int) = document.getLineNumber(offset)
 
     fun getFileAnnotation(repository: GitRepository) = repository.vcs?.annotationProvider?.annotate(virtualFile)
 
