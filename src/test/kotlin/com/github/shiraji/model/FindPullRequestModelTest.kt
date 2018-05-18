@@ -107,6 +107,11 @@ class FindPullRequestModelTest {
         `when`(changeListManager.isUnversioned(virtualFile)).thenReturn(result)
     }
 
+    private fun mockChangeType(result: Change.Type, ch: Change? = change) {
+        `when`(changeListManager.getChange(virtualFile)).thenReturn(ch)
+        ch?.let { `when`(it.type).thenReturn(result) }
+    }
+
     private fun generateMockGitCommit(hashCode: String = "", fullMessage: String = ""): GitCommit {
         val hash = generateMockHash(hashCode)
         return PowerMockito.mock(GitCommit::class.java).also {
@@ -218,9 +223,7 @@ class FindPullRequestModelTest {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(false)
-
-        `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
-        `when`(change.type).thenReturn(Change.Type.MODIFICATION)
+        mockChangeType(Change.Type.MODIFICATION)
 
         val selectionModel = mock(SelectionModel::class.java)
         `when`(editor.selectionModel).thenReturn(selectionModel)
@@ -242,8 +245,7 @@ class FindPullRequestModelTest {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(false)
-
-        `when`(changeListManager.getChange(virtualFile)).thenReturn(null)
+        mockChangeType(Change.Type.MODIFICATION, null)
 
         val selectionModel = mock(SelectionModel::class.java)
         `when`(editor.selectionModel).thenReturn(selectionModel)
@@ -289,9 +291,7 @@ class FindPullRequestModelTest {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(false)
-
-        `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
-        `when`(change.type).thenReturn(Change.Type.NEW)
+        mockChangeType(Change.Type.NEW)
 
         assertFalse(model.isEnable(gitRepository, changeListManager))
     }
@@ -301,9 +301,7 @@ class FindPullRequestModelTest {
         mockGetGitRepository()
         mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(false)
-
-        `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
-        `when`(change.type).thenReturn(Change.Type.MODIFICATION)
+        mockChangeType(Change.Type.MODIFICATION)
 
         val selectionModel = mock(SelectionModel::class.java)
         `when`(editor.selectionModel).thenReturn(selectionModel)
