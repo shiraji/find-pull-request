@@ -59,7 +59,7 @@ class FindPullRequestModel(e: AnActionEvent) {
 
     fun createFileMd5Hash(repository: GitRepository, annotate: FileAnnotation): String? {
         val projectDir = repository.project.baseDir.canonicalPath?.plus("/") ?: return null
-        return annotate.file.canonicalPath?.subtract(projectDir)?.toMd5()
+        return annotate.file?.canonicalPath?.subtract(projectDir)?.toMd5()
     }
 
     fun createRevisionHash(annotate: FileAnnotation): VcsRevisionNumber? {
