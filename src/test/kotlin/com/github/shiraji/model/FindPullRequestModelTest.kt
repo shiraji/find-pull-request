@@ -50,6 +50,9 @@ class FindPullRequestModelTest {
     @Suppress("MemberVisibilityCanBePrivate")
     @Mock lateinit var virtualRoot: VirtualFile
 
+    @Suppress("MemberVisibilityCanBePrivate")
+    @Mock lateinit var gitRepository: GitRepository
+
     private val prNumber = 10
     private val hashCode = "123"
     private val diffHashCode = "abc"
@@ -185,7 +188,6 @@ class FindPullRequestModelTest {
 
     @Test
     fun `isEnable true`() {
-        val gitRepository = mock(GitRepository::class.java)
         PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(gitRepository)
         PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(true)
 
@@ -213,7 +215,6 @@ class FindPullRequestModelTest {
 
     @Test
     fun `isEnable true even the change is null`() {
-        val gitRepository = mock(GitRepository::class.java)
         PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(gitRepository)
         PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(true)
 
@@ -241,12 +242,11 @@ class FindPullRequestModelTest {
     fun `isEnable false if no git repository`() {
         PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(null)
 
-        assertFalse(model.isEnable(mock(GitRepository::class.java), mock(ChangeListManager::class.java)))
+        assertFalse(model.isEnable(gitRepository, mock(ChangeListManager::class.java)))
     }
 
     @Test
     fun `isEnable false if repository is not github one`() {
-        val gitRepository = mock(GitRepository::class.java)
         PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(gitRepository)
         PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(false)
 
@@ -255,7 +255,6 @@ class FindPullRequestModelTest {
 
     @Test
     fun `isEnable false if the file is not versioned`() {
-        val gitRepository = mock(GitRepository::class.java)
         PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(gitRepository)
         PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(true)
 
@@ -267,7 +266,6 @@ class FindPullRequestModelTest {
 
     @Test
     fun `isEnable false if the change type is New`() {
-        val gitRepository = mock(GitRepository::class.java)
         PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(gitRepository)
         PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(true)
 
@@ -283,7 +281,6 @@ class FindPullRequestModelTest {
 
     @Test
     fun `isEnable false if multiple line is selected`() {
-        val gitRepository = mock(GitRepository::class.java)
         PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(gitRepository)
         PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(true)
 
