@@ -64,6 +64,10 @@ class FindPullRequestModelTest {
     @Mock
     lateinit var changeListManager: ChangeListManager
 
+    @Suppress("MemberVisibilityCanBePrivate")
+    @Mock
+    lateinit var change: Change
+
     private val prNumber = 10
     private val hashCode = "123"
     private val diffHashCode = "abc"
@@ -215,7 +219,6 @@ class FindPullRequestModelTest {
         mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(false)
 
-        val change = mock(Change::class.java)
         `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
         `when`(change.type).thenReturn(Change.Type.MODIFICATION)
 
@@ -287,7 +290,6 @@ class FindPullRequestModelTest {
         mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(false)
 
-        val change = mock(Change::class.java)
         `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
         `when`(change.type).thenReturn(Change.Type.NEW)
 
@@ -300,7 +302,6 @@ class FindPullRequestModelTest {
         mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(false)
 
-        val change = mock(Change::class.java)
         `when`(changeListManager.getChange(virtualFile)).thenReturn(change)
         `when`(change.type).thenReturn(Change.Type.MODIFICATION)
 
