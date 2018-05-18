@@ -1,7 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="find-pull-request:test" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" external.system.module.group="com.github.shiraji.findpullrequest" external.system.module.type="sourceSet" external.system.module.version="1.1.1-SNAPSHOT" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="false">
-    <output-test url="file://$MODULE_DIR$/../../build/classes/test" />
+<module external.linked.project.id="find-pull-request:test" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" external.system.module.group="com.github.shiraji.findpullrequest" external.system.module.type="sourceSet" external.system.module.version="1.2.2-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="kotlin-language" name="Kotlin">
+      <configuration version="3" platform="JVM 1.6" useProjectSettings="false">
+        <compilerSettings />
+        <compilerArguments>
+          <option name="destination" value="$MODULE_DIR$/../../build/kotlin-classes/test" />
+          <option name="noStdlib" value="true" />
+          <option name="noReflect" value="true" />
+          <option name="moduleName" value="find-pull-request" />
+          <option name="addCompilerBuiltIns" value="true" />
+          <option name="languageVersion" value="1.2" />
+          <option name="apiVersion" value="1.2" />
+          <option name="pluginOptions">
+            <array />
+          </option>
+          <option name="pluginClasspaths">
+            <array />
+          </option>
+        </compilerArguments>
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+    <output-test url="file://$MODULE_DIR$/../../out/test/classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../src/test">
       <sourceFolder url="file://$MODULE_DIR$/../../src/test/java" isTestSource="true" />
@@ -11,7 +33,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="find-pull-request_main" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.0.1-2" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.2.31" level="project" />
     <orderEntry type="module-library">
       <library name="Gradle: com.jetbrains:idea:15.0.4">
         <CLASSES>
@@ -114,14 +136,6 @@
           <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/lib/xmlrpc-2.0.jar!/" />
           <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/lib/xpp3-1.1.4-min.jar!/" />
           <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/lib/xstream-1.4.3.jar!/" />
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/plugins/git4idea/lib/git4idea-rt.jar!/" />
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/plugins/git4idea/lib/git4idea.jar!/" />
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/plugins/git4idea/lib/ini4j-0.5.2-patched.jar!/" />
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/plugins/git4idea/lib/remote-servers-git.jar!/" />
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/plugins/git4idea/lib/resources_en.jar!/" />
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/plugins/git4idea/lib/trilead-ssh2.jar!/" />
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/plugins/github/lib/github.jar!/" />
-          <root url="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_71.jdk/Contents/Home/lib/tools.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
@@ -129,9 +143,48 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/lib/tools.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="Gradle: xpp3:xpp3_min:1.1.4c" level="project" />
+    <orderEntry type="library" name="Gradle: xmlpull:xmlpull:1.1.3.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.javassist:javassist:3.20.0-GA" level="project" />
+    <orderEntry type="library" name="Gradle: org.powermock:powermock-reflect:1.6.4" level="project" />
+    <orderEntry type="library" name="Gradle: com.thoughtworks.xstream:xstream:1.4.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.powermock:powermock-core:1.6.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.powermock:powermock-classloading-base:1.6.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.powermock:powermock-module-junit4-common:1.6.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.powermock:powermock-api-support:1.6.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.objenesis:objenesis:2.1" level="project" />
     <orderEntry type="library" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-runtime:1.0.1-2" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains:annotations:13.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.powermock:powermock-classloading-xstream:1.6.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.powermock:powermock-module-junit4-rule:1.6.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.powermock:powermock-module-junit4:1.6.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.powermock:powermock-api-mockito:1.6.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.mockito:mockito-core:1.10.19" level="project" />
     <orderEntry type="library" name="Gradle: junit:junit:4.12" level="project" />
+    <orderEntry type="module-library">
+      <library name="Gradle: org.jetbrains.plugins:git4idea:15.0.4">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/plugins/git4idea/lib/trilead-ssh2.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/plugins/git4idea/lib/resources_en.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/plugins/git4idea/lib/remote-servers-git.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/plugins/git4idea/lib/git4idea-rt.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/plugins/git4idea/lib/ini4j-0.5.2-patched.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/15.0.4/10df24cb31a137d6047c254702e8f0c7b116bf5a/ideaIC-15.0.4/plugins/git4idea/lib/git4idea.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="Gradle: org.jetbrains.plugins:github:15.0.4" level="project" />
   </component>
   <component name="TestModuleProperties" production-module="find-pull-request_main" />
 </module>
