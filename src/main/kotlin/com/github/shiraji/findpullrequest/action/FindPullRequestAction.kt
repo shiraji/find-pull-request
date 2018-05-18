@@ -7,20 +7,24 @@ import com.github.shiraji.findpullrequest.model.FindPullRequestModel
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.VcsException
+import com.intellij.openapi.vfs.VirtualFile
+import org.jetbrains.plugins.github.util.GithubUtil
 import java.net.URLEncoder
 
 class FindPullRequestAction : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
-        val model = FindPullRequestModel(e)
-        if (!model.isEnable()) return
+        val project: Project = e.getData(CommonDataKeys.PROJECT) ?: return
+        val editor: Editor = e.getData(CommonDataKeys.EDITOR) ?: return
+        val virtualFile: VirtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
+        val repository = GithubUtil.getGitRepository(project, virtualFile) ?: return
 
-        val repository = model.getRepository()
-        if (repository == null) {
-            showErrorNotification("Could not find git repository.")
-            return
-        }
+        val model = FindPullRequestModel(project, editor, virtualFile)
+        if (!model.isEnable(repository)) return
 
         val annotate = model.getFileAnnotation(repository)
         if (annotate == null) {
@@ -61,6 +65,11 @@ class FindPullRequestAction : AnAction() {
     override fun update(e: AnActionEvent?) {
         e ?: return
         super.update(e)
-        e.presentation.isEnabledAndVisible = FindPullRequestModel(e).isEnable()
+        val project: Project = e.getData(CommonDataKeys.PROJECT) ?: return
+        val editor: Editor = e.getData(CommonDataKeys.EDITOR) ?: return
+        val virtualFile: VirtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
+        val repository = GithubUtil.getGitRepository(project, virtualFile) ?: return
+
+        e.presentation.isEnabledAndVisible = FindPullRequestModel(project, editor, virtualFile).isEnable(repository)
     }
 }

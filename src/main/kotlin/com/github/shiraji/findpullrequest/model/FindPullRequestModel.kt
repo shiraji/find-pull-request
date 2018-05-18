@@ -2,8 +2,6 @@ package com.github.shiraji.findpullrequest.model
 
 import com.github.shiraji.*
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.annotate.FileAnnotation
@@ -17,40 +15,30 @@ import git4idea.repo.GitRepository
 import org.jetbrains.plugins.github.util.GithubUrlUtil
 import org.jetbrains.plugins.github.util.GithubUtil
 
-class FindPullRequestModel(e: AnActionEvent) {
-    private val project: Project? = e.getData(CommonDataKeys.PROJECT)
-    private val editor: Editor? = e.getData(CommonDataKeys.EDITOR)
-    private val virtualFile: VirtualFile? = e.getData(CommonDataKeys.VIRTUAL_FILE)
+class FindPullRequestModel(
+        private val project: Project,
+        private val editor: Editor,
+        private val virtualFile: VirtualFile
+) {
 
-    fun isEnable(): Boolean {
-        if (project == null || project.isDisposed || editor == null || virtualFile == null) {
-            return false
-        }
-
-        val repo = getRepository() ?: return false
-        if (!GithubUtil.isRepositoryOnGitHub(repo)) return false
-
-        val changeListManager = ChangeListManager.getInstance(project)
+    fun isEnable(
+            repository: GitRepository,
+            changeListManager: ChangeListManager = ChangeListManager.getInstance(project)
+    ): Boolean {
+        if (project.isDisposed) return false
+        if (!GithubUtil.isRepositoryOnGitHub(repository)) return false
         if (changeListManager.isUnversioned(virtualFile)) return false
-
-        val change = changeListManager.getChange(virtualFile)
-        if (change != null && change.type == Change.Type.NEW) return false
-
-        val startLine = editor.document.getLineNumber(editor.selectionModel.selectionStart)
-        val endLine = editor.document.getLineNumber(editor.selectionModel.selectionEnd)
-        return startLine == endLine
+        changeListManager.getChange(virtualFile)?.let {
+            if (it.type == Change.Type.NEW) return false
+        }
+        return editor.isPointSingleLine()
     }
 
-    fun getRepository(): GitRepository? {
-        project ?: return null
-        virtualFile ?: return null
-        return GithubUtil.getGitRepository(project, virtualFile)
-    }
+    private fun Editor.isPointSingleLine() = getLine(selectionModel.selectionStart) == getLine(selectionModel.selectionEnd)
 
-    fun getFileAnnotation(repository: GitRepository): FileAnnotation? {
-        virtualFile ?: return null
-        return repository.vcs?.annotationProvider?.annotate(virtualFile)
-    }
+    private fun Editor.getLine(offset: Int) = document.getLineNumber(offset)
+
+    fun getFileAnnotation(repository: GitRepository) = repository.vcs?.annotationProvider?.annotate(virtualFile)
 
     fun createGithubRepoUrl(repository: GitRepository): String? {
         val remoteUrl: String = GithubUtil.findUpstreamRemote(repository) ?: GithubUtil.findGithubRemoteUrl(repository) ?: return null
@@ -63,8 +51,7 @@ class FindPullRequestModel(e: AnActionEvent) {
     }
 
     fun createRevisionHash(annotate: FileAnnotation): VcsRevisionNumber? {
-        editor ?: return null
-        val lineNumber = editor.document.getLineNumber(editor.selectionModel.selectionStart)
+        val lineNumber = editor.getLine(editor.selectionModel.selectionStart)
         return annotate.originalRevision(lineNumber)
     }
 
@@ -74,19 +61,19 @@ class FindPullRequestModel(e: AnActionEvent) {
                 .appendln(revisionHash.asString())
 
         fun findCommitLog(repository: GitRepository, revisionHash: VcsRevisionNumber)
-                = GitHistoryUtils.history(project!!, repository.root, "$revisionHash").first().also {
+                = GitHistoryUtils.history(project, repository.root, "$revisionHash").first().also {
             debugMessage.appendln("### Squash PR commit:")
             debugMessage.appendln(it.id.asString())
         }
 
         fun findPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber)
-                = GitHistoryUtils.history(project!!, repository.root, "$revisionHash..HEAD", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse").firstOrNull().also {
+                = GitHistoryUtils.history(project, repository.root, "$revisionHash..HEAD", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse").firstOrNull().also {
             debugMessage.appendln("### PR commit:")
             debugMessage.appendln(it?.id?.asString())
         }
 
         fun listCommitsFromMergedCommit(repository: GitRepository, pullRequestCommit: GitCommit)
-                = GitHistoryUtils.history(project!!, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}").also {
+                = GitHistoryUtils.history(project, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}").also {
             debugMessage.appendln("### Merged commits lists:")
             it.forEach { debugMessage.appendln(it.id.asString()) }
         }
