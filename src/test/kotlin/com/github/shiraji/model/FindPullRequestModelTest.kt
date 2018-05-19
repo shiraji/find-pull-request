@@ -25,6 +25,7 @@ import org.mockito.Mockito.*
 import org.powermock.api.mockito.PowerMockito
 import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
+import java.util.*
 
 @RunWith(PowerMockRunner::class)
 @PrepareForTest(GitHistoryUtils::class, GitCommit::class, GithubUtil::class, ChangeListManager::class)
@@ -129,6 +130,7 @@ class FindPullRequestModelTest {
         val hash = generateMockHash(hashCode)
         return PowerMockito.mock(GitCommit::class.java).also {
             `when`(it.fullMessage).thenReturn(fullMessage)
+            `when`(it.commitTime).thenReturn(Date().time)
             `when`(it.id).thenReturn(hash)
         }
     }
@@ -175,7 +177,7 @@ class FindPullRequestModelTest {
 
     @Test
     fun `Finding squash commit`() {
-        val prCommit: GitCommit? = null
+        val prCommit = generateMockGitCommit()
         mockFindPullRequestCommit(listOf(prCommit))
 
         val listOfCommits = generateMockGitCommit(fullMessage = "Foo (#$prNumber)")
@@ -188,8 +190,8 @@ class FindPullRequestModelTest {
 
     @Test(expected = NoPullRequestFoundException::class)
     fun `No PR found if no PR and the commit is not squash commit`() {
-        val prCommit = null
-        mockFindPullRequestCommit(listOf<GitCommit?>(prCommit))
+        val prCommit = generateMockGitCommit()
+        mockFindPullRequestCommit(listOf(prCommit))
 
         val listOfCommits = generateMockGitCommit()
         // for findCommitLog

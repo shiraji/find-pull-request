@@ -66,10 +66,14 @@ class FindPullRequestModel(
             debugMessage.appendln(it.id.asString())
         }
 
-        fun findPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber)
-                = GitHistoryUtils.history(project, repository.root, "$revisionHash..HEAD", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse").firstOrNull().also {
+        fun findPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber): GitCommit? {
+            // I think there is a bug in history() since it does not keep the order correctly
+            // It seems GitLogUtil#readFullDetails is the place that store the results in list
+            val results = GitHistoryUtils.history(project, repository.root, "$revisionHash..HEAD", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse")
+            val result = results.minBy { it.commitTime }
             debugMessage.appendln("### PR commit:")
-            debugMessage.appendln(it?.id?.asString())
+            debugMessage.appendln(result?.id?.asString())
+            return result
         }
 
         fun listCommitsFromMergedCommit(repository: GitRepository, pullRequestCommit: GitCommit)
