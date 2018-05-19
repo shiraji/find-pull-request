@@ -1,3 +1,10 @@
+### [ver 1.2.2](https://github.com/shiraji/find-pull-request/releases/tag/1.2.2)
+
+* Fix the problem with v2017.x or above #43
+* Refactor model #41
+* Update README #36
+* Add test cases #35
+
 ### [ver 1.2.1](https://github.com/shiraji/find-pull-request/releases/tag/1.2.1)
 
 * Make "Could not find the pull request" message more useful #33
