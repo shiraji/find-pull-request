@@ -3,6 +3,7 @@ package com.github.shiraji.findpullrequest.action
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
 import com.github.shiraji.findpullrequest.helper.showErrorNotification
 import com.github.shiraji.findpullrequest.helper.showInfoNotification
+import com.github.shiraji.findpullrequest.model.FindPullRequestConfig
 import com.github.shiraji.findpullrequest.model.FindPullRequestModel
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.actionSystem.AnAction
@@ -45,19 +46,21 @@ class FindPullRequestAction : AnAction() {
         }
 
         val fileMD5 = model.createFileMd5Hash(repository, annotate)
-        val path = try {
-            model.createPullRequestPath(repository, revisionHash)
+        try {
+            val path = "$githubRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
+            val url = if (FindPullRequestConfig.isJumpToFile(project)) path + createDiffPathFrom(fileMD5) else path
+            BrowserUtil.open(url)
         } catch (e: VcsException) {
             showErrorNotification("Could not find the pull request for $revisionHash : ${e.message}")
-            return
         } catch (e: NoPullRequestFoundException) {
-            val title = URLEncoder.encode("Could not find the pull request", "UTF-8")
-            val encodedMessage = URLEncoder.encode(e.detailMessage, "UTF-8")
-            showInfoNotification("Could not find the pull request. <a href=\"$githubRepoUrl/commit/$revisionHash${createDiffPathFrom(fileMD5)}\">Open the commit page</a> " +
-                    "or <a href=\"https://github.com/shiraji/find-pull-request/issues/new?title=$title&body=$encodedMessage\">Submit Issue</a>")
-            return
+            val message = StringBuilder("Could not find the pull request. <a href=\"$githubRepoUrl/commit/$revisionHash${createDiffPathFrom(fileMD5)}\">Open the commit page</a> ")
+            if (FindPullRequestConfig.isDebugMode(project)) {
+                val title = URLEncoder.encode("Could not find the pull request", "UTF-8")
+                val encodedMessage = URLEncoder.encode(e.detailMessage, "UTF-8")
+                message.append("or <a href=\"https://github.com/shiraji/find-pull-request/issues/new?title=$title&body=$encodedMessage\">Submit Issue</a>")
+            }
+            showInfoNotification(message.toString())
         }
-        BrowserUtil.open("$githubRepoUrl/$path${createDiffPathFrom(fileMD5)}")
     }
 
     private fun createDiffPathFrom(fileMD5: String?) = if(fileMD5 == null) "" else "#diff-$fileMD5"

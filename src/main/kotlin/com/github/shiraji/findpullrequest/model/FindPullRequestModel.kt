@@ -2,6 +2,8 @@ package com.github.shiraji.findpullrequest.model
 
 import com.github.shiraji.*
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
+import com.github.shiraji.findpullrequest.model.FindPullRequestConfig.getProtocol
+import com.github.shiraji.findpullrequest.model.FindPullRequestConfig.isDebugMode
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.annotate.FileAnnotation
@@ -42,7 +44,7 @@ class FindPullRequestModel(
 
     fun createGithubRepoUrl(repository: GitRepository): String? {
         val remoteUrl: String = GithubUtil.findUpstreamRemote(repository) ?: GithubUtil.findGithubRemoteUrl(repository) ?: return null
-        return GithubUrlUtil.makeGithubRepoUrlFromRemoteUrl(remoteUrl, "https://" + GithubUrlUtil.getHostFromUrl(remoteUrl))
+        return GithubUrlUtil.makeGithubRepoUrlFromRemoteUrl(remoteUrl, getProtocol(project) + GithubUrlUtil.getHostFromUrl(remoteUrl))
     }
 
     fun createFileMd5Hash(repository: GitRepository, annotate: FileAnnotation): String? {
@@ -57,13 +59,18 @@ class FindPullRequestModel(
 
     fun createPullRequestPath(repository: GitRepository, revisionHash: VcsRevisionNumber): String {
         val debugMessage = StringBuilder()
-                .appendln("### Revision hash:")
-                .appendln(revisionHash.asString())
+        if (isDebugMode(project)) {
+            debugMessage
+                    .appendln("### Revision hash:")
+                    .appendln(revisionHash.asString())
+        }
 
         fun findCommitLog(repository: GitRepository, revisionHash: VcsRevisionNumber)
                 = GitHistoryUtils.history(project, repository.root, "$revisionHash").first().also {
-            debugMessage.appendln("### Squash PR commit:")
-            debugMessage.appendln(it.id.asString())
+            if (isDebugMode(project)) {
+                debugMessage.appendln("### Squash PR commit:")
+                debugMessage.appendln(it.id.asString())
+            }
         }
 
         fun findPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber): GitCommit? {
@@ -71,21 +78,27 @@ class FindPullRequestModel(
             // It seems GitLogUtil#readFullDetails is the place that store the results in list
             val results = GitHistoryUtils.history(project, repository.root, "$revisionHash..HEAD", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse")
             val result = results.minBy { it.commitTime }
-            debugMessage.appendln("### PR commit:")
-            debugMessage.appendln(result?.id?.asString())
+            if (isDebugMode(project)) {
+                debugMessage.appendln("### PR commit:")
+                debugMessage.appendln(result?.id?.asString())
+            }
             return result
         }
 
         fun listCommitsFromMergedCommit(repository: GitRepository, pullRequestCommit: GitCommit)
                 = GitHistoryUtils.history(project, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}").also {
-            debugMessage.appendln("### Merged commits lists:")
-            it.forEach { debugMessage.appendln(it.id.asString()) }
+            if (isDebugMode(project)) {
+                debugMessage.appendln("### Merged commits lists:")
+                it.forEach { debugMessage.appendln(it.id.asString()) }
+            }
         }
 
         fun hasCommitsFromRevisionNumber(commits: List<GitCommit>, revisionHash: VcsRevisionNumber)
                 = commits.any { it.id.asString() == revisionHash.asString() }.also {
-            debugMessage.appendln("### Result of `hasCommitsFromRevisionNumber`:")
-            debugMessage.appendln(it)
+            if (isDebugMode(project)) {
+                debugMessage.appendln("### Result of `hasCommitsFromRevisionNumber`:")
+                debugMessage.appendln(it)
+            }
         }
 
         val pullRequestCommit = findPullRequestCommit(repository, revisionHash)

@@ -1,6 +1,7 @@
 package com.github.shiraji.model
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
+import com.github.shiraji.findpullrequest.model.FindPullRequestConfig
 import com.github.shiraji.findpullrequest.model.FindPullRequestModel
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
@@ -28,7 +29,13 @@ import org.powermock.modules.junit4.PowerMockRunner
 import java.util.*
 
 @RunWith(PowerMockRunner::class)
-@PrepareForTest(GitHistoryUtils::class, GitCommit::class, GithubUtil::class, ChangeListManager::class)
+@PrepareForTest(
+        GitHistoryUtils::class,
+        GitCommit::class,
+        GithubUtil::class,
+        ChangeListManager::class,
+        FindPullRequestConfig::class
+)
 class FindPullRequestModelTest {
 
     lateinit var model: FindPullRequestModel
@@ -144,6 +151,11 @@ class FindPullRequestModelTest {
     @Before
     fun setup() {
         model = FindPullRequestModel(project, editor, virtualFile)
+
+        PowerMockito.mockStatic(FindPullRequestConfig::class.java)
+        PowerMockito.`when`(FindPullRequestConfig.isDebugMode(project)).thenReturn(false)
+        PowerMockito.`when`(FindPullRequestConfig.isJumpToFile(project)).thenReturn(true)
+        PowerMockito.`when`(FindPullRequestConfig.getProtocol(project)).thenReturn("https://")
 
         setUpForCreatePullRequestPath()
         setUpForIsEnable()
