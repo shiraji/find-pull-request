@@ -27,6 +27,7 @@ class FindPullRequestModel(
             repository: GitRepository,
             changeListManager: ChangeListManager = ChangeListManager.getInstance(project)
     ): Boolean {
+        if (FindPullRequestConfig.isDisable(project)) return false
         if (project.isDisposed) return false
         if (!GithubUtil.isRepositoryOnGitHub(repository)) return false
         if (changeListManager.isUnversioned(virtualFile)) return false

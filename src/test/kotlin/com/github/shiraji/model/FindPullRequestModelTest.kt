@@ -153,12 +153,16 @@ class FindPullRequestModelTest {
         model = FindPullRequestModel(project, editor, virtualFile)
 
         PowerMockito.mockStatic(FindPullRequestConfig::class.java)
-        PowerMockito.`when`(FindPullRequestConfig.isDebugMode(project)).thenReturn(false)
-        PowerMockito.`when`(FindPullRequestConfig.isJumpToFile(project)).thenReturn(true)
-        PowerMockito.`when`(FindPullRequestConfig.getProtocol(project)).thenReturn("https://")
 
         setUpForCreatePullRequestPath()
         setUpForIsEnable()
+    }
+
+    private fun mockConfig(isDisable: Boolean = false, isDebugMode: Boolean = false, isJumpToFile: Boolean = true, protocol: String = "https://") {
+        PowerMockito.`when`(FindPullRequestConfig.isDisable(project)).thenReturn(isDisable)
+        PowerMockito.`when`(FindPullRequestConfig.isDebugMode(project)).thenReturn(isDebugMode)
+        PowerMockito.`when`(FindPullRequestConfig.isJumpToFile(project)).thenReturn(isJumpToFile)
+        PowerMockito.`when`(FindPullRequestConfig.getProtocol(project)).thenReturn(protocol)
     }
 
     private fun setUpForCreatePullRequestPath() {
@@ -173,6 +177,8 @@ class FindPullRequestModelTest {
         PowerMockito.mockStatic(ChangeListManager::class.java)
 
         `when`(project.isDisposed).thenReturn(false)
+
+        mockConfig()
     }
 
     @Test
@@ -254,6 +260,13 @@ class FindPullRequestModelTest {
         mockLineNumber(startLine = selectedLine, endLine = selectedLine)
 
         assertTrue(model.isEnable(gitRepository, changeListManager))
+    }
+
+    @Test
+    fun `isEnable false if the plugin is disabled`() {
+        mockConfig(isDisable = true)
+
+        assertFalse(model.isEnable(gitRepository, changeListManager))
     }
 
     @Test
