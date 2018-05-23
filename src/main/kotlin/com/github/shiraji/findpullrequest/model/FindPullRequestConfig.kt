@@ -9,22 +9,33 @@ object FindPullRequestConfig {
     private const val JUMP_TO_FILE = "com.github.shiraji.findpullrequest.model.FindPullRequestConfig.JUMP_TO_FILE"
     private const val PROTOCOL = "com.github.shiraji.findpullrequest.model.FindPullRequestConfig.PROTOCOL"
 
-    @JvmStatic
-    fun isDebugMode(project: Project) = PropertiesComponent.getInstance(project).getBoolean(DEBUG_MODE, false)
+    private fun Project.getConfigBoolean(key: String, defaultValue: Boolean) = PropertiesComponent.getInstance(this).getBoolean(key, defaultValue)
+    private fun Project.setConfigBoolean(key: String, value: Boolean, defaultValue: Boolean) = PropertiesComponent.getInstance(this).setValue(key, value, defaultValue)
+    private fun Project.getConfigString(key: String, defaultValue: String) = PropertiesComponent.getInstance(this).getValue(key, defaultValue)
+    private fun Project.setConfigString(key: String, value: String, defaultValue: String) = PropertiesComponent.getInstance(this).setValue(key, value, defaultValue)
 
     @JvmStatic
-    fun setDebugMode(value: Boolean, project: Project) = PropertiesComponent.getInstance(project).setValue(DEBUG_MODE, value, false)
+    fun isDisable(project: Project) = project.getConfigBoolean(DISABLE, false)
 
     @JvmStatic
-    fun isJumpToFile(project: Project) = PropertiesComponent.getInstance(project).getBoolean(JUMP_TO_FILE, true)
+    fun setDisable(value: Boolean, project: Project) = project.setConfigBoolean(DISABLE, value, false)
 
     @JvmStatic
-    fun setJumpToFile(value: Boolean, project: Project) = PropertiesComponent.getInstance(project).setValue(JUMP_TO_FILE, value, true)
+    fun isDebugMode(project: Project) = project.getConfigBoolean(DEBUG_MODE, false)
 
     @JvmStatic
-    fun getProtocol(project: Project) = PropertiesComponent.getInstance(project).getValue(PROTOCOL, "https://")
+    fun setDebugMode(value: Boolean, project: Project) = project.setConfigBoolean(DEBUG_MODE, value, false)
 
     @JvmStatic
-    fun setProtocol(value: String, project: Project) = PropertiesComponent.getInstance(project).setValue(PROTOCOL, value, "https://")
+    fun isJumpToFile(project: Project) = project.getConfigBoolean(JUMP_TO_FILE, true)
+
+    @JvmStatic
+    fun setJumpToFile(value: Boolean, project: Project) = project.setConfigBoolean(JUMP_TO_FILE, value, true)
+
+    @JvmStatic
+    fun getProtocol(project: Project) = project.getConfigString(PROTOCOL, "https://")
+
+    @JvmStatic
+    fun setProtocol(value: String, project: Project) = project.setConfigString(PROTOCOL, value, "https://")
 
 }
