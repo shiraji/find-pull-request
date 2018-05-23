@@ -4,8 +4,8 @@ import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.project.Project
 
 object FindPullRequestConfig {
+    private const val DISABLE = "com.github.shiraji.findpullrequest.model.FindPullRequestConfig.DISABLE"
     private const val DEBUG_MODE = "com.github.shiraji.findpullrequest.model.FindPullRequestConfig.DEBUG_MODE"
-    private const val OPEN_COMMIT = "com.github.shiraji.findpullrequest.model.FindPullRequestConfig.OPEN_COMMIT"
     private const val JUMP_TO_FILE = "com.github.shiraji.findpullrequest.model.FindPullRequestConfig.JUMP_TO_FILE"
     private const val PROTOCOL = "com.github.shiraji.findpullrequest.model.FindPullRequestConfig.PROTOCOL"
 
