@@ -29,8 +29,7 @@
   <depends>Git4Idea</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationConfigurable
-            instance="com.github.shiraji.findpullrequest.menu.FindPullRequestMenu"/>
+    <projectConfigurable instance="com.github.shiraji.findpullrequest.menu.FindPullRequestMenu" />
   </extensions>
 
   <actions>

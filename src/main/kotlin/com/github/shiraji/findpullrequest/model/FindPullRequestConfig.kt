@@ -1,7 +1,8 @@
+@file:JvmName("FindPullRequestConfig")
+
 package com.github.shiraji.findpullrequest.model
 
 import com.intellij.ide.util.PropertiesComponent
-import com.intellij.openapi.project.Project
 
 private const val DISABLE = "com.github.shiraji.findpullrequest.model.FindPullRequestConfig.DISABLE"
 private const val DEBUG_MODE = "com.github.shiraji.findpullrequest.model.FindPullRequestConfig.DEBUG_MODE"
@@ -14,8 +15,8 @@ fun PropertiesComponent.setDisable(value: Boolean) = setValue(DISABLE, value, fa
 fun PropertiesComponent.isDebugMode() = getBoolean(DEBUG_MODE, false)
 fun PropertiesComponent.setDebugMode(value: Boolean) = setValue(DEBUG_MODE, value, false)
 
-fun PropertiesComponent.isJumpToFile() = getBoolean(JUMP_TO_FILE, false)
-fun PropertiesComponent.setJumpToFile(value: Boolean) = setValue(JUMP_TO_FILE, value, false)
+fun PropertiesComponent.isJumpToFile() = getBoolean(JUMP_TO_FILE, true)
+fun PropertiesComponent.setJumpToFile(value: Boolean) = setValue(JUMP_TO_FILE, value, true)
 
 fun PropertiesComponent.getProtocol() = getValue(PROTOCOL, "https://")
 fun PropertiesComponent.setProtocol(value: String) = setValue(PROTOCOL, value, "https://")

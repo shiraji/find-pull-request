@@ -30,6 +30,14 @@ public class FindPullRequestMenu implements Configurable {
         @NotNull public String getText() {
             return text;
         }
+
+        @Nullable public static Protocol findProtocolBy(String name) {
+            switch (name) {
+                case "https://": return https;
+                case "http://": return http;
+                default: return null;
+            }
+        }
     }
 
     FindPullRequestMenu(Project project) {
@@ -62,30 +70,39 @@ public class FindPullRequestMenu implements Configurable {
     public boolean isModified() {
         Object selectedItem = protocols.getSelectedItem();
         if (selectedItem instanceof Protocol) {
-            if (!FindPullRequestConfig.getProtocol(project).equals(((Protocol)selectedItem).getText())) {
+            if (!FindPullRequestConfig.getProtocol(config).equals(((Protocol)selectedItem).getText())) {
                 return true;
             }
         }
 
-        return FindPullRequestConfig.isDebugMode(project) != debugMode.isSelected()
-                || FindPullRequestConfig.isJumpToFile(project) != jumpToFile.isSelected()
-                || FindPullRequestConfig.isDisable(project) != disable.isSelected();
+        return FindPullRequestConfig.isDebugMode(config) != debugMode.isSelected()
+                || FindPullRequestConfig.isJumpToFile(config) != jumpToFile.isSelected()
+                || FindPullRequestConfig.isDisable(config) != disable.isSelected();
     }
 
     @Override
     public void apply() throws ConfigurationException {
-        FindPullRequestConfig.setDisable(disable.isSelected(), project);
-        FindPullRequestConfig.setDebugMode(debugMode.isSelected(), project);
-        FindPullRequestConfig.setJumpToFile(jumpToFile.isSelected(), project);
+        FindPullRequestConfig.setDisable(config, disable.isSelected());
+        FindPullRequestConfig.setDebugMode(config, debugMode.isSelected());
+        FindPullRequestConfig.setJumpToFile(config, jumpToFile.isSelected());
         Object selectedItem = protocols.getSelectedItem();
         if (selectedItem instanceof Protocol) {
-            FindPullRequestConfig.setProtocol(((Protocol)selectedItem).getText(), project);
+            FindPullRequestConfig.setProtocol(config, ((Protocol)selectedItem).getText());
         }
     }
 
     @Override
     public void reset() {
-
+        String protocol = FindPullRequestConfig.getProtocol(config);
+        Protocol protocolBy = Protocol.findProtocolBy(protocol);
+        int selectedIndex = 0;
+        if (protocolBy != null) {
+            selectedIndex = protocolBy.ordinal();
+        }
+        protocols.setSelectedIndex(selectedIndex);
+        disable.setSelected(FindPullRequestConfig.isDisable(config));
+        debugMode.setSelected(FindPullRequestConfig.isDebugMode(config));
+        jumpToFile.setSelected(FindPullRequestConfig.isJumpToFile(config));
     }
 
     @Override
