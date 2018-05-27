@@ -1,7 +1,8 @@
 package com.github.shiraji.model
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
-import com.github.shiraji.findpullrequest.model.FindPullRequestModel
+import com.github.shiraji.findpullrequest.model.*
+import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.SelectionModel
@@ -28,7 +29,12 @@ import org.powermock.modules.junit4.PowerMockRunner
 import java.util.*
 
 @RunWith(PowerMockRunner::class)
-@PrepareForTest(GitHistoryUtils::class, GitCommit::class, GithubUtil::class, ChangeListManager::class)
+@PrepareForTest(
+        GitHistoryUtils::class,
+        GitCommit::class,
+        GithubUtil::class,
+        ChangeListManager::class
+)
 class FindPullRequestModelTest {
 
     lateinit var model: FindPullRequestModel
@@ -68,6 +74,10 @@ class FindPullRequestModelTest {
     @Suppress("MemberVisibilityCanBePrivate")
     @Mock
     lateinit var change: Change
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    @Mock
+    lateinit var conf: PropertiesComponent
 
     private val prNumber = 10
     private val hashCode = "123"
@@ -143,10 +153,17 @@ class FindPullRequestModelTest {
 
     @Before
     fun setup() {
-        model = FindPullRequestModel(project, editor, virtualFile)
+        model = FindPullRequestModel(project, editor, virtualFile, conf)
 
         setUpForCreatePullRequestPath()
         setUpForIsEnable()
+    }
+
+    private fun mockConfig(isDisable: Boolean = false, isDebugMode: Boolean = false, isJumpToFile: Boolean = true, protocol: String = "https://") {
+        doReturn(isDisable).`when`(conf).isDisable()
+        doReturn(isDebugMode).`when`(conf).isDebugMode()
+        doReturn(isJumpToFile).`when`(conf).isJumpToFile()
+        doReturn(protocol).`when`(conf).getProtocol()
     }
 
     private fun setUpForCreatePullRequestPath() {
@@ -161,6 +178,8 @@ class FindPullRequestModelTest {
         PowerMockito.mockStatic(ChangeListManager::class.java)
 
         `when`(project.isDisposed).thenReturn(false)
+
+        mockConfig()
     }
 
     @Test
@@ -242,6 +261,13 @@ class FindPullRequestModelTest {
         mockLineNumber(startLine = selectedLine, endLine = selectedLine)
 
         assertTrue(model.isEnable(gitRepository, changeListManager))
+    }
+
+    @Test
+    fun `isEnable false if the plugin is disabled`() {
+        mockConfig(isDisable = true)
+
+        assertFalse(model.isEnable(gitRepository, changeListManager))
     }
 
     @Test
