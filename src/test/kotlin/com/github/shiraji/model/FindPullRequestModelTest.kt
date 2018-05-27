@@ -1,8 +1,8 @@
 package com.github.shiraji.model
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
-import com.github.shiraji.findpullrequest.model.FindPullRequestConfig
-import com.github.shiraji.findpullrequest.model.FindPullRequestModel
+import com.github.shiraji.findpullrequest.model.*
+import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.SelectionModel
@@ -33,8 +33,7 @@ import java.util.*
         GitHistoryUtils::class,
         GitCommit::class,
         GithubUtil::class,
-        ChangeListManager::class,
-        FindPullRequestConfig::class
+        ChangeListManager::class
 )
 class FindPullRequestModelTest {
 
@@ -75,6 +74,10 @@ class FindPullRequestModelTest {
     @Suppress("MemberVisibilityCanBePrivate")
     @Mock
     lateinit var change: Change
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    @Mock
+    lateinit var conf: PropertiesComponent
 
     private val prNumber = 10
     private val hashCode = "123"
@@ -150,19 +153,17 @@ class FindPullRequestModelTest {
 
     @Before
     fun setup() {
-        model = FindPullRequestModel(project, editor, virtualFile)
-
-        PowerMockito.mockStatic(FindPullRequestConfig::class.java)
+        model = FindPullRequestModel(project, editor, virtualFile, conf)
 
         setUpForCreatePullRequestPath()
         setUpForIsEnable()
     }
 
     private fun mockConfig(isDisable: Boolean = false, isDebugMode: Boolean = false, isJumpToFile: Boolean = true, protocol: String = "https://") {
-        PowerMockito.`when`(FindPullRequestConfig.isDisable(project)).thenReturn(isDisable)
-        PowerMockito.`when`(FindPullRequestConfig.isDebugMode(project)).thenReturn(isDebugMode)
-        PowerMockito.`when`(FindPullRequestConfig.isJumpToFile(project)).thenReturn(isJumpToFile)
-        PowerMockito.`when`(FindPullRequestConfig.getProtocol(project)).thenReturn(protocol)
+        doReturn(isDisable).`when`(conf).isDisable()
+        doReturn(isDebugMode).`when`(conf).isDebugMode()
+        doReturn(isJumpToFile).`when`(conf).isJumpToFile()
+        doReturn(protocol).`when`(conf).getProtocol()
     }
 
     private fun setUpForCreatePullRequestPath() {
