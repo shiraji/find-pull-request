@@ -10,7 +10,7 @@ buildscript {
 }
 
 plugins {
-    id "org.jetbrains.intellij" version "0.1.10"
+    id "org.jetbrains.intellij" version "0.3.6"
 }
 
 apply plugin: 'org.jetbrains.intellij'
@@ -30,11 +30,11 @@ intellij {
     pluginName = 'Find Pull Request'
     updateSinceUntilBuild = false
     sameSinceUntilBuild = false
-    publish {
-        username 'shiraji'
-        password System.getenv('PASSWORD')
-        pluginId '8262'
-    }
+}
+
+publishPlugin {
+    username 'shiraji'
+    password System.getenv('PASSWORD')
 }
 
 group 'com.github.shiraji.findpullrequest'

@@ -13,8 +13,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import git4idea.GitCommit
 import git4idea.history.GitHistoryUtils
 import git4idea.repo.GitRepository
-import org.jetbrains.plugins.github.util.GithubUrlUtil
-import org.jetbrains.plugins.github.util.GithubUtil
+
 
 class FindPullRequestModel(
         private val project: Project,
@@ -24,13 +23,17 @@ class FindPullRequestModel(
 
 ) {
 
+    companion object {
+        const val DOT_GIT = ".git"
+    }
+
     fun isEnable(
             repository: GitRepository,
             changeListManager: ChangeListManager = ChangeListManager.getInstance(project)
     ): Boolean {
         if (config.isDisable()) return false
         if (project.isDisposed) return false
-        if (!GithubUtil.isRepositoryOnGitHub(repository)) return false
+        if (!isOriginRepositoryOnGitHub(repository)) return false
         if (changeListManager.isUnversioned(virtualFile)) return false
         changeListManager.getChange(virtualFile)?.let {
             if (it.type == Change.Type.NEW) return false
@@ -45,8 +48,8 @@ class FindPullRequestModel(
     fun getFileAnnotation(repository: GitRepository) = repository.vcs?.annotationProvider?.annotate(virtualFile)
 
     fun createGithubRepoUrl(repository: GitRepository): String? {
-        val remoteUrl: String = GithubUtil.findUpstreamRemote(repository) ?: GithubUtil.findGithubRemoteUrl(repository) ?: return null
-        return GithubUrlUtil.makeGithubRepoUrlFromRemoteUrl(remoteUrl, config.getProtocol() + GithubUrlUtil.getHostFromUrl(remoteUrl))
+        val remoteUrl: String = findUpstreamUrl(repository) ?: findOriginUrl(repository) ?: return null
+        return makeGithubRepoUrlFromRemoteUrl(remoteUrl, config.getProtocol() + getHostFromUrl(remoteUrl))
     }
 
     fun createFileMd5Hash(repository: GitRepository, annotate: FileAnnotation): String? {
@@ -115,5 +118,82 @@ class FindPullRequestModel(
                 throw NoPullRequestFoundException(debugMessage.toString())
             }
         }
+    }
+
+    private fun isOriginRepositoryOnGitHub(repository: GitRepository): Boolean {
+        return findOriginUrl(repository) != null
+    }
+
+    private fun findOriginUrl(repository: GitRepository): String? {
+        return findRemoteUrl(repository, "origin")
+    }
+
+    private fun findUpstreamUrl(repository: GitRepository): String? {
+        return findRemoteUrl(repository, "upstream")
+    }
+
+    private fun findRemoteUrl(repository: GitRepository, targetRemoteName: String): String? {
+        return repository.remotes.firstOrNull { it.name == targetRemoteName }?.firstUrl
+    }
+
+    // --- Require refactoring ---
+
+    private fun removeProtocolPrefix(url: String): String {
+        var index = url.indexOf('@')
+        if (index != -1) {
+            return url.substring(index + 1).replace(':', '/')
+        }
+        index = url.indexOf("://")
+        return if (index != -1) {
+            url.substring(index + 3)
+        } else url
+    }
+
+    private fun removeTrailingSlash(text: String): String {
+        return if (text.endsWith("/")) {
+            text.substring(0, text.length - 1)
+        } else text
+    }
+
+    private fun getUserAndRepositoryFromRemoteUrl(gitRemoteUrl: String): Pair<String, String>? {
+        var remoteUrl = gitRemoteUrl
+        remoteUrl = removeProtocolPrefix(removeEndingDotGit(remoteUrl))
+        val index1 = remoteUrl.lastIndexOf('/')
+        if (index1 == -1) {
+            return null
+        }
+        val url = remoteUrl.substring(0, index1)
+        val index2 = Math.max(url.lastIndexOf('/'), url.lastIndexOf(':'))
+        if (index2 == -1) {
+            return null
+        }
+        val username = remoteUrl.substring(index2 + 1, index1)
+        val repo = remoteUrl.substring(index1 + 1)
+        return if (username.isEmpty() || repo.isEmpty()) {
+            null
+        } else Pair(username, repo)
+    }
+
+    private fun removeEndingDotGit(targetUrl: String): String {
+        var url = targetUrl
+        url = removeTrailingSlash(url)
+        return if (url.endsWith(DOT_GIT)) {
+            url.substring(0, url.length - DOT_GIT.length)
+        } else url
+    }
+
+    private fun getHostFromUrl(url: String): String {
+        val path = removeProtocolPrefix(url).replace(':', '/')
+        val index = path.indexOf('/')
+        return if (index == -1) {
+            path
+        } else {
+            path.substring(0, index)
+        }
+    }
+
+    fun makeGithubRepoUrlFromRemoteUrl(remoteUrl: String, host: String): String? {
+        val repo = getUserAndRepositoryFromRemoteUrl(remoteUrl) ?: return null
+        return host + '/'.toString() + repo.first + '/'.toString() + repo.second
     }
 }
