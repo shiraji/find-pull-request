@@ -1,3 +1,7 @@
+### [ver 1.2.3](https://github.com/shiraji/find-pull-request/releases/tag/1.2.3)
+
+* Fix problem with v2018.2.1 #48 Thanks @gfx for reporting
+
 ### [ver 1.2.2](https://github.com/shiraji/find-pull-request/releases/tag/1.2.2)
 
 * Fix the problem with v2017.x or above #43

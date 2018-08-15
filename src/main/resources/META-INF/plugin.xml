@@ -11,12 +11,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <p>1.2.2</p>
+        <p>1.2.3</p>
         <ul>
-          <li>Fix the problem with v2017.x or above #43</li>
-          <li>Refactor model #41</li>
-          <li>Update README #36</li>
-          <li>Add test cases #35</li>
+          <li>Fix problem with v2018.2.1 #48 Thanks @gfx for reporting</li>
         </ul>
         <p>Older version changes are listed on <a href="https://github.com/shiraji/find-pull-request/blob/master/CHANGELOG.md">CHANGELOG.md</a></p>
     ]]>
