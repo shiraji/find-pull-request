@@ -52,7 +52,7 @@ class FindPullRequestModel(
 
     fun createWebRepoUrl(repository: GitRepository): String? {
         val remoteUrl: String = findUpstreamUrl(repository) ?: findOriginUrl(repository) ?: return null
-        return makeGithubRepoUrlFromRemoteUrl(remoteUrl, config.getProtocol())
+        return makeWebRemoteRepoUrlFromRemoteUrl(remoteUrl, config.getProtocol())
     }
 
     fun createFileMd5Hash(repository: GitRepository, annotate: FileAnnotation): String? {
@@ -154,7 +154,7 @@ class FindPullRequestModel(
         return path.substringBefore("/")
     }
 
-    private fun makeGithubRepoUrlFromRemoteUrl(remoteUrl: String, protocol: String): String? {
+    private fun makeWebRemoteRepoUrlFromRemoteUrl(remoteUrl: String, protocol: String): String? {
         val host = getHostFromUrl(remoteUrl)
         val repo = getUserAndRepositoryFromRemoteUrl(remoteUrl) ?: return null
         return "$protocol$host/${repo.first}/${repo.second}"
