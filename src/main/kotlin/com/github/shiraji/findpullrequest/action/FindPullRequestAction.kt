@@ -15,7 +15,8 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.VcsException
 import com.intellij.openapi.vfs.VirtualFile
-import org.jetbrains.plugins.github.util.GithubUtil
+import git4idea.GitUtil
+import git4idea.repo.GitRepository
 import java.net.URLEncoder
 
 class FindPullRequestAction : AnAction() {
@@ -24,7 +25,7 @@ class FindPullRequestAction : AnAction() {
         val project: Project = e.getData(CommonDataKeys.PROJECT) ?: return
         val editor: Editor = e.getData(CommonDataKeys.EDITOR) ?: return
         val virtualFile: VirtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
-        val repository = GithubUtil.getGitRepository(project, virtualFile) ?: return
+        val repository = getGitRepository(project, virtualFile) ?: return
         val config = PropertiesComponent.getInstance(project) ?: return
 
         val model = FindPullRequestModel(project, editor, virtualFile)
@@ -42,21 +43,21 @@ class FindPullRequestAction : AnAction() {
             return
         }
 
-        val githubRepoUrl = model.createGithubRepoUrl(repository)
-        if (githubRepoUrl == null) {
+        val webRepoUrl = model.createWebRepoUrl(repository)
+        if (webRepoUrl == null) {
             showErrorNotification("Could not find GitHub repository url")
             return
         }
 
         val fileMD5 = model.createFileMd5Hash(repository, annotate)
         try {
-            val path = "$githubRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
+            val path = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
             val url = createUrl(config, path, fileMD5)
             BrowserUtil.open(url)
         } catch (e: VcsException) {
             showErrorNotification("Could not find the pull request for $revisionHash : ${e.message}")
         } catch (e: NoPullRequestFoundException) {
-            val path = "$githubRepoUrl/commit/$revisionHash"
+            val path = "$webRepoUrl/commit/$revisionHash"
             val url = createUrl(config, path, fileMD5)
             val message = StringBuilder("Could not find the pull request. <a href=\"$url\">Open the commit page</a> ")
             if (config.isDebugMode()) {
@@ -78,8 +79,24 @@ class FindPullRequestAction : AnAction() {
         val project: Project = e.getData(CommonDataKeys.PROJECT) ?: return
         val editor: Editor = e.getData(CommonDataKeys.EDITOR) ?: return
         val virtualFile: VirtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
-        val repository = GithubUtil.getGitRepository(project, virtualFile) ?: return
+        val repository = getGitRepository(project, virtualFile) ?: return
 
         e.presentation.isEnabledAndVisible = FindPullRequestModel(project, editor, virtualFile).isEnable(repository)
+    }
+
+    private fun getGitRepository(project: Project, file: VirtualFile?): GitRepository? {
+        val manager = GitUtil.getRepositoryManager(project)
+        val repositories = manager.repositories
+        return when(repositories.size) {
+            0 -> null
+            1 -> repositories[0]
+            else -> {
+                if (file != null) {
+                    val repository = manager.getRepositoryForFile(file)
+                    if (repository != null) return repository
+                }
+                manager.getRepositoryForFile(project.baseDir)
+            }
+        }
     }
 }

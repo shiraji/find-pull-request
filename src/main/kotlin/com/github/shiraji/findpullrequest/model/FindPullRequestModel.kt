@@ -23,9 +23,12 @@ class FindPullRequestModel(
 
 ) {
 
-    companion object {
-        const val DOT_GIT = ".git"
-    }
+    /**
+     * The expected remote url format is
+     * * https://[HOST]/[USER]/[REPO].git
+     * * git@[HOST]:[USER]/[REPO].git
+     */
+    private val repoUserRegex = Regex(".*[/:](.*)/(.*).git")
 
     fun isEnable(
             repository: GitRepository,
@@ -33,7 +36,7 @@ class FindPullRequestModel(
     ): Boolean {
         if (config.isDisable()) return false
         if (project.isDisposed) return false
-        if (!isOriginRepositoryOnGitHub(repository)) return false
+        if (!hasOriginOrUpstreamRepository(repository)) return false
         if (changeListManager.isUnversioned(virtualFile)) return false
         changeListManager.getChange(virtualFile)?.let {
             if (it.type == Change.Type.NEW) return false
@@ -47,9 +50,9 @@ class FindPullRequestModel(
 
     fun getFileAnnotation(repository: GitRepository) = repository.vcs?.annotationProvider?.annotate(virtualFile)
 
-    fun createGithubRepoUrl(repository: GitRepository): String? {
+    fun createWebRepoUrl(repository: GitRepository): String? {
         val remoteUrl: String = findUpstreamUrl(repository) ?: findOriginUrl(repository) ?: return null
-        return makeGithubRepoUrlFromRemoteUrl(remoteUrl, config.getProtocol() + getHostFromUrl(remoteUrl))
+        return makeWebRemoteRepoUrlFromRemoteUrl(remoteUrl, config.getProtocol())
     }
 
     fun createFileMd5Hash(repository: GitRepository, annotate: FileAnnotation): String? {
@@ -120,8 +123,8 @@ class FindPullRequestModel(
         }
     }
 
-    private fun isOriginRepositoryOnGitHub(repository: GitRepository): Boolean {
-        return findOriginUrl(repository) != null
+    private fun hasOriginOrUpstreamRepository(repository: GitRepository): Boolean {
+        return findOriginUrl(repository) != null || findUpstreamUrl(repository) != null
     }
 
     private fun findOriginUrl(repository: GitRepository): String? {
@@ -136,64 +139,24 @@ class FindPullRequestModel(
         return repository.remotes.firstOrNull { it.name == targetRemoteName }?.firstUrl
     }
 
-    // --- Require refactoring ---
-
     private fun removeProtocolPrefix(url: String): String {
-        var index = url.indexOf('@')
-        if (index != -1) {
-            return url.substring(index + 1).replace(':', '/')
-        }
-        index = url.indexOf("://")
-        return if (index != -1) {
-            url.substring(index + 3)
-        } else url
-    }
-
-    private fun removeTrailingSlash(text: String): String {
-        return if (text.endsWith("/")) {
-            text.substring(0, text.length - 1)
-        } else text
+        return if (url.contains("@")) url.substringAfter("@") else url.substringAfter("://")
     }
 
     private fun getUserAndRepositoryFromRemoteUrl(gitRemoteUrl: String): Pair<String, String>? {
-        var remoteUrl = gitRemoteUrl
-        remoteUrl = removeProtocolPrefix(removeEndingDotGit(remoteUrl))
-        val index1 = remoteUrl.lastIndexOf('/')
-        if (index1 == -1) {
-            return null
-        }
-        val url = remoteUrl.substring(0, index1)
-        val index2 = Math.max(url.lastIndexOf('/'), url.lastIndexOf(':'))
-        if (index2 == -1) {
-            return null
-        }
-        val username = remoteUrl.substring(index2 + 1, index1)
-        val repo = remoteUrl.substring(index1 + 1)
-        return if (username.isEmpty() || repo.isEmpty()) {
-            null
-        } else Pair(username, repo)
-    }
-
-    private fun removeEndingDotGit(targetUrl: String): String {
-        var url = targetUrl
-        url = removeTrailingSlash(url)
-        return if (url.endsWith(DOT_GIT)) {
-            url.substring(0, url.length - DOT_GIT.length)
-        } else url
+        val (username, repo) = repoUserRegex.find(gitRemoteUrl)?.destructured ?: return null
+        if (username.isBlank() || repo.isBlank()) return null
+        return Pair(username, repo)
     }
 
     private fun getHostFromUrl(url: String): String {
         val path = removeProtocolPrefix(url).replace(':', '/')
-        val index = path.indexOf('/')
-        return if (index == -1) {
-            path
-        } else {
-            path.substring(0, index)
-        }
+        return path.substringBefore("/")
     }
 
-    fun makeGithubRepoUrlFromRemoteUrl(remoteUrl: String, host: String): String? {
+    private fun makeWebRemoteRepoUrlFromRemoteUrl(remoteUrl: String, protocol: String): String? {
+        val host = getHostFromUrl(remoteUrl)
         val repo = getUserAndRepositoryFromRemoteUrl(remoteUrl) ?: return null
-        return host + '/'.toString() + repo.first + '/'.toString() + repo.second
+        return "$protocol$host/${repo.first}/${repo.second}"
     }
 }

@@ -14,6 +14,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.vcs.log.Hash
 import git4idea.GitCommit
 import git4idea.history.GitHistoryUtils
+import git4idea.repo.GitRemote
 import git4idea.repo.GitRepository
 import junit.framework.TestCase.*
 import org.junit.Before
@@ -28,7 +29,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest
 import org.powermock.modules.junit4.PowerMockRunner
 import java.util.*
 
-@Ignore
 @RunWith(PowerMockRunner::class)
 @PrepareForTest(
         GitHistoryUtils::class,
@@ -106,12 +106,12 @@ class FindPullRequestModelTest {
         ).thenReturn(results)
     }
 
-    private fun mockGetGitRepository(result: GitRepository? = gitRepository) {
-//        PowerMockito.`when`(GithubUtil.getGitRepository(project, virtualFile)).thenReturn(result)
-    }
-
-    private fun mockIsRepositoryOnGitHub(result: Boolean) {
-//        PowerMockito.`when`(GithubUtil.isRepositoryOnGitHub(gitRepository)).thenReturn(result)
+    private fun mockGetGitRepository(result: GitRepository = gitRepository) {
+        val remote = generateGitRemote(
+                name = "origin",
+                urls = listOf("git@github.com:shiraji/find-pull-request.git")
+        )
+        `when`(result.remotes).thenReturn(listOf(remote))
     }
 
     private fun mockIsUnversioned(result: Boolean) {
@@ -150,6 +150,14 @@ class FindPullRequestModelTest {
             `when`(it.asString()).thenReturn(hashCode)
         }
     }
+
+    private fun generateGitRemote(
+            name: String = "origin",
+            urls: List<String> = listOf(""),
+            pushUrls: Collection<String> = listOf(""),
+            fetchRefSpecs: List<String> = listOf(""),
+            pushRefSpecs: List<String> = listOf("")
+    ) = GitRemote(name, urls, pushUrls, fetchRefSpecs, pushRefSpecs)
 
     @Before
     fun setup() {
@@ -254,7 +262,6 @@ class FindPullRequestModelTest {
     @Test
     fun `isEnable true`() {
         mockGetGitRepository()
-        mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(false)
         mockChangeType(Change.Type.MODIFICATION)
         mockLineNumber(startLine = selectedLine, endLine = selectedLine)
@@ -272,7 +279,6 @@ class FindPullRequestModelTest {
     @Test
     fun `isEnable true even the change is null`() {
         mockGetGitRepository()
-        mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(false)
         mockChangeType(Change.Type.MODIFICATION, null)
         mockLineNumber(startLine = selectedLine, endLine = selectedLine)
@@ -282,23 +288,12 @@ class FindPullRequestModelTest {
 
     @Test
     fun `isEnable false if no git repository`() {
-        mockGetGitRepository(null)
-
-        assertFalse(model.isEnable(gitRepository, changeListManager))
-    }
-
-    @Test
-    fun `isEnable false if repository is not github one`() {
-        mockGetGitRepository()
-        mockIsRepositoryOnGitHub(false)
-
         assertFalse(model.isEnable(gitRepository, changeListManager))
     }
 
     @Test
     fun `isEnable false if the file is not versioned`() {
         mockGetGitRepository()
-        mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(true)
 
         assertFalse(model.isEnable(gitRepository, changeListManager))
@@ -307,7 +302,6 @@ class FindPullRequestModelTest {
     @Test
     fun `isEnable false if the change type is New`() {
         mockGetGitRepository()
-        mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(false)
         mockChangeType(Change.Type.NEW)
 
@@ -317,12 +311,115 @@ class FindPullRequestModelTest {
     @Test
     fun `isEnable false if multiple line is selected`() {
         mockGetGitRepository()
-        mockIsRepositoryOnGitHub(true)
         mockIsUnversioned(false)
         mockChangeType(Change.Type.MODIFICATION)
         mockLineNumber(startLine = selectedLine, endLine = diffSelectedLine)
 
         assertFalse(model.isEnable(gitRepository, changeListManager))
+    }
+
+    @Test
+    fun `createWebRepoUrl returns correct https url if there is upstream url`() {
+        val remote = generateGitRemote(
+                name = "upstream",
+                urls = listOf("git@github.com:shiraji/find-pull-request.git")
+        )
+        `when`(gitRepository.remotes).thenReturn(listOf(remote))
+
+        val result = model.createWebRepoUrl(gitRepository)
+
+        assertEquals("https://github.com/shiraji/find-pull-request", result)
+    }
+
+    @Test
+    fun `createWebRepoUrl returns correct https url if there is origin url`() {
+        val remote = generateGitRemote(
+                name = "origin",
+                urls = listOf("git@github.com:shiraji/find-pull-request.git")
+        )
+        `when`(gitRepository.remotes).thenReturn(listOf(remote))
+
+        val result = model.createWebRepoUrl(gitRepository)
+
+        assertEquals("https://github.com/shiraji/find-pull-request", result)
+    }
+
+    @Test
+    fun `createWebRepoUrl returns correct https url if url is https format`() {
+        val remote = generateGitRemote(
+                name = "origin",
+                urls = listOf("https://github.com/shiraji/find-pull-request.git")
+        )
+        `when`(gitRepository.remotes).thenReturn(listOf(remote))
+
+        val result = model.createWebRepoUrl(gitRepository)
+
+        assertEquals("https://github.com/shiraji/find-pull-request", result)
+    }
+
+    @Test
+    fun `createWebRepoUrl returns correct https url if url is custom domain`() {
+        val remote = generateGitRemote(
+                name = "origin",
+                urls = listOf("https://github.enterprise.local/shiraji/find-pull-request.git")
+        )
+        `when`(gitRepository.remotes).thenReturn(listOf(remote))
+
+        val result = model.createWebRepoUrl(gitRepository)
+
+        assertEquals("https://github.enterprise.local/shiraji/find-pull-request", result)
+    }
+
+    @Test
+    fun `createWebRepoUrl returns null if there is no remote for origin or upstream`() {
+        val remote = generateGitRemote(
+                name = "shiraji",
+                urls = listOf("https://github.enterprise.local/shiraji/find-pull-request.git")
+        )
+        `when`(gitRepository.remotes).thenReturn(listOf(remote))
+
+        val result = model.createWebRepoUrl(gitRepository)
+
+        assertNull(result)
+    }
+
+    @Test
+    fun `createWebRepoUrl returns null if the format is no user name`() {
+        val remote = generateGitRemote(
+                name = "origin",
+                urls = listOf("https://github.enterprise.local/shiraji/find-pull-request")
+        )
+        `when`(gitRepository.remotes).thenReturn(listOf(remote))
+
+        val result = model.createWebRepoUrl(gitRepository)
+
+        assertNull(result)
+    }
+
+    @Test
+    fun `createWebRepoUrl returns correct https url if url is https format for bitbucket`() {
+        val remote = generateGitRemote(
+                name = "origin",
+                urls = listOf("https://shiraji@bitbucket.org/shiraji/find-pull-request.git")
+        )
+        `when`(gitRepository.remotes).thenReturn(listOf(remote))
+
+        val result = model.createWebRepoUrl(gitRepository)
+
+        assertEquals("https://bitbucket.org/shiraji/find-pull-request", result)
+    }
+
+    @Test
+    fun `createWebRepoUrl returns correct https url if url is https format for gitlab`() {
+        val remote = generateGitRemote(
+                name = "origin",
+                urls = listOf("https://gitlab.com/shiraji/find-pull-request.git")
+        )
+        `when`(gitRepository.remotes).thenReturn(listOf(remote))
+
+        val result = model.createWebRepoUrl(gitRepository)
+
+        assertEquals("https://gitlab.com/shiraji/find-pull-request", result)
     }
 
 }
