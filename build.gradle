@@ -26,7 +26,7 @@ ext {
 
 intellij {
     version = '15.0.4'
-    plugins = ['github', 'git4idea']
+    plugins = ['git4idea']
     pluginName = 'Find Pull Request'
     updateSinceUntilBuild = false
     sameSinceUntilBuild = false
