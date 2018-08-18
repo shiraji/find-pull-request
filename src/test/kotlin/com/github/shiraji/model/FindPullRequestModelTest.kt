@@ -35,6 +35,7 @@ import java.util.*
         GitCommit::class,
         ChangeListManager::class
 )
+@Ignore
 class FindPullRequestModelTest {
 
     lateinit var model: FindPullRequestModel
