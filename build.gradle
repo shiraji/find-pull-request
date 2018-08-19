@@ -54,6 +54,12 @@ sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
 }
 
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
 task prepareForNextDevelopment << {
     def versionParts = versionName.split(/\./)
     versionParts[2] = (versionParts[2] as int) + 1
