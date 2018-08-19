@@ -1,5 +1,6 @@
 package com.github.shiraji.model
 
+import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
 import com.github.shiraji.findpullrequest.model.*
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.editor.Document
@@ -20,7 +21,6 @@ import io.mockk.impl.annotations.MockK
 import junit.framework.TestCase.*
 import org.junit.Before
 import org.junit.Test
-import java.util.*
 
 class FindPullRequestModelTest2 {
 
@@ -76,34 +76,6 @@ class FindPullRequestModelTest2 {
         model = FindPullRequestModel(project, editor, virtualFile, conf)
     }
 
-//
-//    private val prNumber = 10
-//    private val hashCode = "123"
-//    private val diffHashCode = "abc"
-//    private val selectedLine = 10
-//    private val diffSelectedLine = 100
-//
-//    private fun mockFindPullRequestCommit(results: List<GitCommit?>) {
-//        PowerMockito.`when`(GitHistoryUtils.history(
-//                Matchers.eq(project),
-//                Matchers.eq(virtualRoot),
-//                anyString(),
-//                anyString(),
-//                anyString(),
-//                anyString(),
-//                anyString()
-//        )).thenReturn(results)
-//    }
-//
-//    private fun mockHistory(results: List<GitCommit>) {
-//        PowerMockito.`when`(GitHistoryUtils.history(
-//                Matchers.eq(project),
-//                Matchers.eq(virtualRoot),
-//                Matchers.anyString())
-//        ).thenReturn(results)
-//    }
-//
-
     private fun mockGitRepository(remotes: List<GitRemote>, root: VirtualFile = virtualRoot) {
         every { gitRepository.remotes } returns remotes
         every { gitRepository.root } returns root
@@ -131,7 +103,6 @@ class FindPullRequestModelTest2 {
         every { editor.selectionModel } returns selectionModel
         every { selectionModel.selectionStart } returns SELECTED_START_OFFSET
         every { selectionModel.selectionEnd } returns SELECTED_END_OFFSET
-
         every { editor.document } returns document
         every { document.getLineNumber(SELECTED_START_OFFSET) } returns startLine
         every { document.getLineNumber(SELECTED_END_OFFSET) } returns endLine
@@ -152,16 +123,6 @@ class FindPullRequestModelTest2 {
         }
     }
 
-//
-//
-//    @Before
-//    fun setup() {
-//        model = FindPullRequestModel(project, editor, virtualFile, conf)
-//
-//        setUpForCreatePullRequestPath()
-//        setUpForIsEnable()
-//    }
-//
     private fun mockConfig(isDisable: Boolean = false, isDebugMode: Boolean = false, isJumpToFile: Boolean = true, protocol: String = "https://") {
         every { conf.isDisable() } returns isDisable
         every { conf.isDebugMode() } returns isDebugMode
@@ -177,30 +138,74 @@ class FindPullRequestModelTest2 {
         every { vcsRevisionNumber.asString() } returns hashCode
     }
 
-//
-//    private fun setUpForCreatePullRequestPath() {
-//        PowerMockito.mockStatic(GitHistoryUtils::class.java)
-//
-//        `when`(repository.root).thenReturn(virtualRoot)
-//        `when`(vcsRevisionNumber.asString()).thenReturn(hashCode)
-//    }
-//
-//    private fun setUpForIsEnable() {
-//        PowerMockito.mockStatic(ChangeListManager::class.java)
-//
-//        `when`(project.isDisposed).thenReturn(false)
-//
-//        mockConfig()
-//    }
-//
+    private fun mockHistory(closestPRCommits: List<GitCommit>, mergeCommits: List<GitCommit>) {
+        mockkStatic(GitHistoryUtils::class)
+
+        every {
+            GitHistoryUtils.history(
+                    project,
+                    virtualRoot,
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any())
+        } returns closestPRCommits
+
+        every {
+            GitHistoryUtils.history(project, virtualRoot, any())
+        } returns mergeCommits
+    }
+
     @Test
     fun `Finding pull request`() {
-        mockConfig()
-        mockGitRepository(listOf(generateGitRemote()))
-        mockkStatic(GitHistoryUtils::class)
         val prCommit1 = generateGitCommit(hashCode = HASH, fullMessage = "Merge pull request #$PR_NUMBER from")
         val prCommit2 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #${PR_NUMBER + 1} from")
         val prCommit3 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #${PR_NUMBER + 2} from")
+
+        mockConfig()
+        mockGitRepository(listOf(generateGitRemote()))
+        mockHistory(closestPRCommits = listOf(prCommit1), mergeCommits = listOf(prCommit1, prCommit2, prCommit3))
+        mockRevisionNumber(HASH)
+
+        val path = model.createPullRequestPath(gitRepository, vcsRevisionNumber)
+        assertEquals("pull/$PR_NUMBER/files", path)
+    }
+
+    @Test
+    fun `Finding squash commit`() {
+        val prCommit1 = generateGitCommit(hashCode = HASH, fullMessage = "Foo (#$PR_NUMBER)")
+
+        mockConfig()
+        mockGitRepository(listOf(generateGitRemote()))
+        mockHistory(closestPRCommits = emptyList(), mergeCommits = listOf(prCommit1))
+
+        val path = model.createPullRequestPath(gitRepository, vcsRevisionNumber)
+        assertEquals("pull/$PR_NUMBER/files", path)
+    }
+
+    @Test(expected = NoPullRequestFoundException::class)
+    fun `No PR found if no PR and the commit is not squash commit`() {
+        val prCommit1 = generateGitCommit(hashCode = HASH, fullMessage = "Merge pull request #$PR_NUMBER from")
+
+        mockConfig()
+        mockGitRepository(listOf(generateGitRemote()))
+        mockHistory(closestPRCommits = emptyList(), mergeCommits = listOf(prCommit1))
+
+        model.createPullRequestPath(gitRepository, vcsRevisionNumber)
+        fail()
+    }
+
+    @Test
+    fun `Found PR has different hash code but the commit is squash commit`() {
+        val prCommit1 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #${PR_NUMBER + 1} from")
+        val prCommit2 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Foo (#${PR_NUMBER})")
+        val prCommit3 = generateGitCommit(hashCode = HASH, fullMessage = "Foo (#${PR_NUMBER})")
+
+        mockConfig()
+        mockGitRepository(listOf(generateGitRemote()))
+        mockkStatic(GitHistoryUtils::class)
+        mockRevisionNumber(HASH)
 
         every {
             GitHistoryUtils.history(
@@ -215,76 +220,50 @@ class FindPullRequestModelTest2 {
 
         every {
             GitHistoryUtils.history(project, virtualRoot, any())
-        } returns listOf(prCommit1, prCommit2, prCommit3)
-
-        mockRevisionNumber(HASH)
+        } returnsMany listOf(listOf(prCommit2), listOf(prCommit3))
 
         val path = model.createPullRequestPath(gitRepository, vcsRevisionNumber)
         assertEquals("pull/$PR_NUMBER/files", path)
+        verify(exactly = 1) { GitHistoryUtils.history(project, virtualRoot, any(), any(), any(), any(), any()) }
+        verify(exactly = 2) { GitHistoryUtils.history(project, virtualRoot, any()) }
     }
-//
-//    @Test
-//    fun `Finding squash commit`() {
-//        val prCommit = generateMockGitCommit()
-//        mockFindPullRequestCommit(listOf(prCommit))
-//
-//        val listOfCommits = generateMockGitCommit(fullMessage = "Foo (#$prNumber)")
-//        // for findCommitLog
-//        mockHistory(listOf(listOfCommits))
-//
-//        val path = model.createPullRequestPath(repository, vcsRevisionNumber)
-//        assertEquals("pull/$prNumber/files", path)
-//    }
-//
-//    @Test(expected = NoPullRequestFoundException::class)
-//    fun `No PR found if no PR and the commit is not squash commit`() {
-//        val prCommit = generateMockGitCommit()
-//        mockFindPullRequestCommit(listOf(prCommit))
-//
-//        val listOfCommits = generateMockGitCommit()
-//        // for findCommitLog
-//        mockHistory(listOf(listOfCommits))
-//
-//        model.createPullRequestPath(repository, vcsRevisionNumber)
-//        fail()
-//    }
-//
-//    @Test
-//    fun `Found PR has different hash code but the commit is squash commit`() {
-//        val prCommit = generateMockGitCommit(fullMessage = "Merge pull request #$prNumber from")
-//        mockFindPullRequestCommit(listOf(prCommit))
-//
-//        val mergeCommit = generateMockGitCommit(hashCode = diffHashCode)
-//        mockHistory(listOf(mergeCommit))
-//
-//        val listOfCommits = generateMockGitCommit(fullMessage = "Foo (#$prNumber)")
-//        // for findCommitLog
-//        mockHistory(listOf(listOfCommits))
-//
-//        val path = model.createPullRequestPath(repository, vcsRevisionNumber)
-//        assertEquals("pull/$prNumber/files", path)
-//    }
-//
-//    @Test(expected = NoPullRequestFoundException::class)
-//    fun `Found PR has different hash code and its commit message is not squash commit`() {
-//        val prCommit = generateMockGitCommit(fullMessage = "Merge pull request #$prNumber from")
-//        mockFindPullRequestCommit(listOf(prCommit))
-//
-//        val mergeCommit = generateMockGitCommit(hashCode = diffHashCode)
-//        mockHistory(listOf(mergeCommit))
-//
-//        val listOfCommits = generateMockGitCommit()
-//        // for findCommitLog
-//        mockHistory(listOf(listOfCommits))
-//
-//        model.createPullRequestPath(repository, vcsRevisionNumber)
-//        fail()
-//    }
+
+    @Test(expected = NoPullRequestFoundException::class)
+    fun `Found PR has different hash code and its commit message is not squash commit`() {
+        val prCommit1 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #${PR_NUMBER} from")
+        val prCommit2 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Foo (#${PR_NUMBER})")
+        val prCommit3 = generateGitCommit(hashCode = HASH, fullMessage = "Merge pull request #${PR_NUMBER} from")
+
+        mockConfig()
+        mockGitRepository(listOf(generateGitRemote()))
+        mockkStatic(GitHistoryUtils::class)
+        mockRevisionNumber(HASH)
+
+        every {
+            GitHistoryUtils.history(
+                    project,
+                    virtualRoot,
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any())
+        } returns listOf(prCommit1)
+
+        every {
+            GitHistoryUtils.history(project, virtualRoot, any())
+        } returnsMany listOf(listOf(prCommit2), listOf(prCommit3))
+
+        model.createPullRequestPath(gitRepository, vcsRevisionNumber)
+        fail()
+    }
 
     @Test
     fun `isEnable false if the plugin is disabled`() {
         mockConfig(isDisable = true)
+
         assertFalse(model.isEnable(gitRepository, changeListManager))
+
         verify(exactly = 1) { conf.isDisable() }
     }
 
@@ -292,7 +271,9 @@ class FindPullRequestModelTest2 {
     fun `isEnable false if project is disposed`() {
         mockConfig()
         mockProject(isDisposed = true)
+
         assertFalse(model.isEnable(gitRepository, changeListManager))
+
         verify(exactly = 1) { project.isDisposed }
     }
 
@@ -342,6 +323,8 @@ class FindPullRequestModelTest2 {
         mockLineNumber(startLine = SELECTED_LINE, endLine = SELECTED_LINE_DIFF)
 
         assertFalse(model.isEnable(gitRepository, changeListManager))
+
+        verify { document.getLineNumber(any()) }
     }
 
     @Test
