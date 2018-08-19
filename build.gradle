@@ -48,11 +48,6 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testCompile 'junit:junit:4.12'
     testCompile "io.mockk:mockk:1.8.6"
-    testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile "org.powermock:powermock-api-mockito:$powermock_version"
-    testCompile "org.powermock:powermock-module-junit4:$powermock_version"
-    testCompile "org.powermock:powermock-module-junit4-rule:$powermock_version"
-    testCompile "org.powermock:powermock-classloading-xstream:$powermock_version"
 }
 
 sourceSets {
