@@ -49,16 +49,13 @@ class FindPullRequestAction : AnAction() {
             return
         }
 
-        val fileMD5 = model.createFileMd5Hash(repository, annotate)
         try {
-            val path = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
-            val url = createUrl(config, path, fileMD5)
-            BrowserUtil.open(url)
+            BrowserUtil.open("$webRepoUrl/${model.createPullRequestPath(repository, revisionHash, annotate)}")
         } catch (e: VcsException) {
             showErrorNotification("Could not find the pull request for $revisionHash : ${e.message}")
         } catch (e: NoPullRequestFoundException) {
             val path = "$webRepoUrl/commit/$revisionHash"
-            val url = createUrl(config, path, fileMD5)
+            val url = createUrl(config, path, model.createFileMd5Hash(repository, annotate))
             val message = StringBuilder("Could not find the pull request. <a href=\"$url\">Open the commit page</a> ")
             if (config.isDebugMode()) {
                 val title = URLEncoder.encode("Could not find the pull request", "UTF-8")
