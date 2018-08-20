@@ -2,6 +2,8 @@ package com.github.shiraji.findpullrequest.action
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
 import com.github.shiraji.findpullrequest.helper.showInfoNotification
+import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices
+import com.github.shiraji.findpullrequest.model.getHosting
 import com.github.shiraji.findpullrequest.model.isDebugMode
 import com.github.shiraji.findpullrequest.model.isPopupAfterCopy
 import com.intellij.ide.util.PropertiesComponent
@@ -30,9 +32,9 @@ class FindPullRequestCopyAction : BaseFindPullRequestAction() {
     override fun actionPerformForNoPullRequestFount(e: AnActionEvent, ex: NoPullRequestFoundException, url: String) {
         val project: Project = e.getData(CommonDataKeys.PROJECT) ?: return
         val config = PropertiesComponent.getInstance(project) ?: return
-        val message = StringBuilder("Could not find the pull request. <a href=\"$url\">Copy the commit URL</a> ")
+        val message = StringBuilder("Could not find the ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.toLowerCase()}. <a href=\"$url\">Copy the commit URL</a> ")
         if (config.isDebugMode()) {
-            val title = URLEncoder.encode("Could not find the pull request", "UTF-8")
+            val title = URLEncoder.encode("Could not find the ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.toLowerCase()}", "UTF-8")
             val encodedMessage = URLEncoder.encode(ex.detailMessage, "UTF-8")
             message.append("or <a href=\"https://github.com/shiraji/find-pull-request/issues/new?title=$title&body=$encodedMessage\">Submit Issue</a>")
         }
@@ -56,6 +58,14 @@ class FindPullRequestCopyAction : BaseFindPullRequestAction() {
 
     private fun copy(text: String) {
         CopyPasteManager.getInstance().setContents(TextTransferable(text))
+    }
+
+    override fun update(e: AnActionEvent?) {
+        e ?: return
+        super.update(e)
+        val project: Project = e.getData(CommonDataKeys.PROJECT) ?: return
+        val config = PropertiesComponent.getInstance(project) ?: return
+        e.presentation.text = "Copy ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName} URL"
     }
 
 }

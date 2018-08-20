@@ -2,11 +2,10 @@ package com.github.shiraji.findpullrequest.action
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
 import com.github.shiraji.findpullrequest.helper.showErrorNotification
-import com.github.shiraji.findpullrequest.helper.showInfoNotification
+import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices
 import com.github.shiraji.findpullrequest.model.FindPullRequestModel
-import com.github.shiraji.findpullrequest.model.isDebugMode
+import com.github.shiraji.findpullrequest.model.getHosting
 import com.github.shiraji.findpullrequest.model.isJumpToFile
-import com.intellij.ide.BrowserUtil
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -17,7 +16,6 @@ import com.intellij.openapi.vcs.VcsException
 import com.intellij.openapi.vfs.VirtualFile
 import git4idea.GitUtil
 import git4idea.repo.GitRepository
-import java.net.URLEncoder
 
 abstract class BaseFindPullRequestAction : AnAction() {
 
@@ -53,23 +51,35 @@ abstract class BaseFindPullRequestAction : AnAction() {
             return
         }
 
-        val fileMD5 = model.createFileMd5Hash(repository, annotate)
+        val hostingServices = FindPullRequestHostingServices.findBy(config.getHosting())
         try {
             val path = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
-            val url = createUrl(config, path, fileMD5)
+            val url = createUrl(config, hostingServices, path, repository, model)
             actionPerform(e, url)
         } catch (ex: VcsException) {
-            showErrorNotification("Could not find the pull request for $revisionHash : ${ex.message}")
+            val name = FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.toLowerCase()
+            showErrorNotification("Could not find the $name for $revisionHash : ${ex.message}")
         } catch (ex: NoPullRequestFoundException) {
-            val path = "$webRepoUrl/commit/$revisionHash"
-            val url = createUrl(config, path, fileMD5)
+            val path = hostingServices.commitPathFormat.format(webRepoUrl, revisionHash)
+            val url = createUrl(config, hostingServices, path, repository, model)
             actionPerformForNoPullRequestFount(e, ex, url = url)
         }
     }
 
-    private fun createUrl(config: PropertiesComponent, path: String, fileMD5: String?) = if (config.isJumpToFile()) path + createDiffPathFrom(fileMD5) else path
-
-    private fun createDiffPathFrom(fileMD5: String?) = if(fileMD5 == null) "" else "#diff-$fileMD5"
+    private fun createUrl(
+            config: PropertiesComponent,
+            hostingServices: FindPullRequestHostingServices,
+            path: String,
+            repository: GitRepository,
+            model: FindPullRequestModel
+    ): String {
+        return if (config.isJumpToFile()) {
+            val fileAnnotation = model.getFileAnnotation(repository) ?: return path
+            path + hostingServices.createFileAnchorValue(repository, fileAnnotation)
+        } else {
+            path
+        }
+    }
 
     override fun update(e: AnActionEvent?) {
         e ?: return

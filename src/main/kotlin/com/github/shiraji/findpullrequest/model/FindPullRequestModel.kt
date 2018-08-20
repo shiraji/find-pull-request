@@ -1,6 +1,5 @@
 package com.github.shiraji.findpullrequest.model
 
-import com.github.shiraji.*
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.editor.Editor
@@ -25,8 +24,8 @@ class FindPullRequestModel(
 
     /**
      * The expected remote url format is
-     * * https://[HOST]/[USER]/[REPO].git
-     * * git@[HOST]:[USER]/[REPO].git
+     * * https://HOST/USER/REPO.git
+     * * git@HOST:USER/REPO.git
      */
     private val repoUserRegex = Regex(".*[/:](.*)/(.*).git")
 
@@ -55,11 +54,6 @@ class FindPullRequestModel(
         return makeWebRemoteRepoUrlFromRemoteUrl(remoteUrl, config.getProtocol())
     }
 
-    fun createFileMd5Hash(repository: GitRepository, annotate: FileAnnotation): String? {
-        val projectDir = repository.project.baseDir.canonicalPath?.plus("/") ?: return null
-        return annotate.file?.canonicalPath?.subtract(projectDir)?.toMd5()
-    }
-
     fun createRevisionHash(annotate: FileAnnotation): VcsRevisionNumber? {
         val lineNumber = editor.getLine(editor.selectionModel.selectionStart)
         return annotate.originalRevision(lineNumber)
@@ -84,7 +78,7 @@ class FindPullRequestModel(
         fun findClosestPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber): GitCommit? {
             // I think there is a bug in history() since it does not keep the order correctly
             // It seems GitLogUtil#readFullDetails is the place that store the results in list
-            val results = GitHistoryUtils.history(project, repository.root, "$revisionHash..HEAD", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse")
+            val results = GitHistoryUtils.history(project, repository.root, "$revisionHash..HEAD", "--merges", "--ancestry-path", "--reverse")
             val result = results.minBy { it.commitTime }
             if (config.isDebugMode()) {
                 debugMessage.appendln("### PR commit:")
@@ -97,7 +91,7 @@ class FindPullRequestModel(
                 = GitHistoryUtils.history(project, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}").also {
             if (config.isDebugMode()) {
                 debugMessage.appendln("### Merged commits lists:")
-                it.forEach { debugMessage.appendln(it.id.asString()) }
+                it.forEach { commit -> debugMessage.appendln(commit.id.asString()) }
             }
         }
 
@@ -109,18 +103,64 @@ class FindPullRequestModel(
             }
         }
 
+        fun createUrl(hostingServices: FindPullRequestHostingServices, path: String): String {
+            return if (config.isJumpToFile()) {
+                val fileAnnotation = getFileAnnotation(repository) ?: return path
+                path + hostingServices.createFileAnchorValue(repository, fileAnnotation)
+            } else {
+                path
+            }
+        }
+
         val pullRequestCommit = findClosestPullRequestCommit(repository, revisionHash)
 
         return if (pullRequestCommit != null && hasCommitsFromRevisionNumber(listCommitsFromMergedCommit(repository, pullRequestCommit), revisionHash)) {
-            "pull/${pullRequestCommit.getPullRequestNumber()}/files"
+            val hosting = FindPullRequestHostingServices.findBy(config.getHosting())
+            val prNumberUsingConfig = pullRequestCommit.getNumberFromCommitMessage(hosting.defaultMergeCommitMessage)
+
+            val (prNumber, targetHostingService) = if (prNumberUsingConfig == null) {
+                // Check if the merge commit message comes from other supporting hosting service
+                findPrNumberAndHostingService(pullRequestCommit)
+            } else {
+                Pair(prNumberUsingConfig, hosting)
+            }
+
+            if (prNumber == null || targetHostingService == null) {
+                throw NoPullRequestFoundException(debugMessage.toString())
+            }
+
+            val path = targetHostingService.urlPathFormat.format(prNumber)
+            createUrl(targetHostingService, path)
         } else {
             val commit = findCommitLog(repository, revisionHash)
-            if (commit.isSquashPullRequestCommit()) {
-                "pull/${commit.getPullRequestNumberFromSquashCommit()}/files"
+            val hostingServices = FindPullRequestHostingServices.values().firstOrNull {
+                commit.isSquashPullRequestCommit(it)
+            }
+
+            if (hostingServices != null) {
+                val path = hostingServices.urlPathFormat.format(commit.getNumberFromCommitMessage(hostingServices.squashCommitMessage))
+                createUrl(hostingServices, path)
             } else {
                 throw NoPullRequestFoundException(debugMessage.toString())
             }
         }
+    }
+
+    private fun findPrNumberAndHostingService(pullRequestCommit: GitCommit): Pair<Int?, FindPullRequestHostingServices?> {
+        var prNumber: Int? = null
+        val targetHostingService = FindPullRequestHostingServices.values().firstOrNull {
+            prNumber = pullRequestCommit.getNumberFromCommitMessage(it.defaultMergeCommitMessage)
+            prNumber != null
+        }
+        return Pair(prNumber, targetHostingService)
+    }
+
+    private fun GitCommit.isSquashPullRequestCommit(hostingServices: FindPullRequestHostingServices): Boolean {
+        return hostingServices.squashCommitMessage.containsMatchIn(this.fullMessage)
+    }
+
+    private fun GitCommit.getNumberFromCommitMessage(commitMessageTemplate: Regex): Int? {
+        return commitMessageTemplate.find(this.fullMessage)?.groups?.get(1)?.value?.toInt()
     }
 
     private fun hasOriginOrUpstreamRepository(repository: GitRepository): Boolean {
