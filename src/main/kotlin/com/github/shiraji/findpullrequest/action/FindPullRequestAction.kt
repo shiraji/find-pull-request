@@ -50,7 +50,7 @@ class FindPullRequestAction : AnAction() {
         }
 
         try {
-            BrowserUtil.open("$webRepoUrl/${model.createPullRequestPath(repository, revisionHash, annotate)}")
+            BrowserUtil.open("$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}")
         } catch (e: VcsException) {
             showErrorNotification("Could not find the pull request for $revisionHash : ${e.message}")
         } catch (e: NoPullRequestFoundException) {

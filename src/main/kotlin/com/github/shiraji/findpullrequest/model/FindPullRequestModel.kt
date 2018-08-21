@@ -65,7 +65,7 @@ class FindPullRequestModel(
         return annotate.originalRevision(lineNumber)
     }
 
-    fun createPullRequestPath(repository: GitRepository, revisionHash: VcsRevisionNumber, annotate: FileAnnotation): String {
+    fun createPullRequestPath(repository: GitRepository, revisionHash: VcsRevisionNumber): String {
         val debugMessage = StringBuilder()
         if (config.isDebugMode()) {
             debugMessage
@@ -111,7 +111,8 @@ class FindPullRequestModel(
 
         fun createUrl(hostingServices: FindPullRequestHostingServices, path: String): String {
             return if (config.isJumpToFile()) {
-                path + hostingServices.createFileAnchorValue(repository, annotate)
+                val fileAnnotation = getFileAnnotation(repository) ?: return path
+                path + hostingServices.createFileAnchorValue(repository, fileAnnotation)
             } else {
                 path
             }
