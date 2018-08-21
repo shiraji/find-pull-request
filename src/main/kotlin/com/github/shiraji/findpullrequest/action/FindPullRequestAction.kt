@@ -3,6 +3,7 @@ package com.github.shiraji.findpullrequest.action
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
 import com.github.shiraji.findpullrequest.helper.showErrorNotification
 import com.github.shiraji.findpullrequest.helper.showInfoNotification
+import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices
 import com.github.shiraji.findpullrequest.model.FindPullRequestModel
 import com.github.shiraji.findpullrequest.model.isDebugMode
 import com.github.shiraji.findpullrequest.model.isJumpToFile
@@ -55,7 +56,7 @@ class FindPullRequestAction : AnAction() {
             showErrorNotification("Could not find the pull request for $revisionHash : ${e.message}")
         } catch (e: NoPullRequestFoundException) {
             val path = "$webRepoUrl/commit/$revisionHash"
-            val url = createUrl(config, path, model.createFileMd5Hash(repository, annotate))
+            val url = createUrl(config, path, repository, model)
             val message = StringBuilder("Could not find the pull request. <a href=\"$url\">Open the commit page</a> ")
             if (config.isDebugMode()) {
                 val title = URLEncoder.encode("Could not find the pull request", "UTF-8")
@@ -66,9 +67,15 @@ class FindPullRequestAction : AnAction() {
         }
     }
 
-    private fun createUrl(config: PropertiesComponent, path: String, fileMD5: String?) = if (config.isJumpToFile()) path + createDiffPathFrom(fileMD5) else path
-
-    private fun createDiffPathFrom(fileMD5: String?) = if(fileMD5 == null) "" else "#diff-$fileMD5"
+    private fun createUrl(config: PropertiesComponent, path: String, repository: GitRepository, model: FindPullRequestModel): String {
+        return if (config.isJumpToFile()) {
+            val fileAnnotation = model.getFileAnnotation(repository) ?: return path
+            val hostingServices = FindPullRequestHostingServices.from(path)
+            path + hostingServices.createFileAnchorValue(repository, fileAnnotation)
+        } else {
+            path
+        }
+    }
 
     override fun update(e: AnActionEvent?) {
         e ?: return
