@@ -8,7 +8,7 @@ import git4idea.repo.GitRepository
 
 enum class FindPullRequestHostingServices(val defaultMergeCommitMessage: Regex, val urlPathFormat: String) {
     GitHub("Merge pull request #(\\d*)".toRegex(), "pull/%d/files"),
-    GitLab("See merge request !(\\d*)".toRegex(), "merge_requests/%d/diffs"),
+    GitLab("See merge request .*!(\\d*)".toRegex(), "merge_requests/%d/diffs"),
     BitBucket("\\(pull request #(\\d*)\\)".toRegex(), "pull-requests/%d/diff"),
 
     ;
