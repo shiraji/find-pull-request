@@ -153,7 +153,6 @@ class FindPullRequestModelTest {
                     any(),
                     any(),
                     any(),
-                    any(),
                     any())
         } returns closestPRCommits
 
@@ -229,7 +228,6 @@ class FindPullRequestModelTest {
                     any(),
                     any(),
                     any(),
-                    any(),
                     any())
         } returns listOf(prCommit1)
 
@@ -239,7 +237,7 @@ class FindPullRequestModelTest {
 
         val path = model.createPullRequestPath(gitRepository, vcsRevisionNumber)
         assertEquals("pull/$PR_NUMBER/files#diff-4c6e90faac2675aa89e2176d2eec7d8", path)
-        verify(exactly = 1) { GitHistoryUtils.history(project, virtualRoot, any(), any(), any(), any(), any()) }
+        verify(exactly = 1) { GitHistoryUtils.history(project, virtualRoot, any(), any(), any(), any()) }
         verify(exactly = 2) { GitHistoryUtils.history(project, virtualRoot, any()) }
     }
 
@@ -258,7 +256,6 @@ class FindPullRequestModelTest {
             GitHistoryUtils.history(
                     project,
                     virtualRoot,
-                    any(),
                     any(),
                     any(),
                     any(),

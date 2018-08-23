@@ -84,7 +84,7 @@ class FindPullRequestModel(
         fun findClosestPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber): GitCommit? {
             // I think there is a bug in history() since it does not keep the order correctly
             // It seems GitLogUtil#readFullDetails is the place that store the results in list
-            val results = GitHistoryUtils.history(project, repository.root, "$revisionHash..HEAD", "--grep=Merge pull request", "--merges", "--ancestry-path", "--reverse")
+            val results = GitHistoryUtils.history(project, repository.root, "$revisionHash..HEAD", "--merges", "--ancestry-path", "--reverse")
             val result = results.minBy { it.commitTime }
             if (config.isDebugMode()) {
                 debugMessage.appendln("### PR commit:")
