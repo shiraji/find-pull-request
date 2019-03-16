@@ -9,6 +9,8 @@ jdk:
 - oraclejdk8
 script:
 - ./gradlew test -PideaVersion=$IDEA_VERSION
+- ./gradlew jacocoTestReport
+- bash <(curl -s https://codecov.io/bash)
 notifications:
   email: false
 cache:
