@@ -36,6 +36,13 @@
             icon="GithubIcons.Github_icon">
       <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="Github.Open.In.Browser"/>
     </action>
+
+    <action id="com.github.shiraji.findpullrequest.action.FindPullRequestCopyAction"
+            class="com.github.shiraji.findpullrequest.action.FindPullRequestCopyAction"
+            text="Copy Pull Request URL"
+            icon="AllIcons.Actions.Copy">
+      <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.github.shiraji.findpullrequest.action.FindPullRequestAction"/>
+    </action>
   </actions>
 
 </idea-plugin>
