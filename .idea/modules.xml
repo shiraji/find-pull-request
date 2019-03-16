@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/find-pull-request.iml" filepath="$PROJECT_DIR$/.idea/modules/find-pull-request.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/find-pull-request_main.iml" filepath="$PROJECT_DIR$/.idea/modules/find-pull-request_main.iml" group="find-pull-request" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/find-pull-request_test.iml" filepath="$PROJECT_DIR$/.idea/modules/find-pull-request_test.iml" group="find-pull-request" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/find-pull-request.iml" filepath="$PROJECT_DIR$/.idea/find-pull-request.iml" />
     </modules>
   </component>
 </project>
