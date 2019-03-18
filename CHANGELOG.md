@@ -1,3 +1,8 @@
+### [ver 1.3.0](https://github.com/shiraji/find-pull-request/releases/tag/1.3.0)
+
+* Create copy action #62
+* Change Notification IDs #63
+
 ### [ver 1.2.3](https://github.com/shiraji/find-pull-request/releases/tag/1.2.3)
 
 * Fix problem with v2018.2.1 #48 Thanks @gfx for reporting
