@@ -21,7 +21,7 @@ import java.net.URLEncoder
 
 abstract class BaseFindPullRequestAction : AnAction() {
 
-    abstract fun actionPerform(url: String)
+    abstract fun actionPerform(e: AnActionEvent, url: String)
 
     override fun actionPerformed(e: AnActionEvent) {
         val project: Project = e.getData(CommonDataKeys.PROJECT) ?: return
@@ -55,7 +55,7 @@ abstract class BaseFindPullRequestAction : AnAction() {
         try {
             val path = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
             val url = createUrl(config, path, fileMD5)
-            actionPerform(url)
+            actionPerform(e, url)
         } catch (e: VcsException) {
             showErrorNotification("Could not find the pull request for $revisionHash : ${e.message}")
         } catch (e: NoPullRequestFoundException) {

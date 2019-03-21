@@ -18,6 +18,7 @@ public class FindPullRequestMenu implements Configurable {
     private JCheckBox jumpToFile;
     private JComboBox<Protocol> protocols;
     private JPanel root;
+    private JCheckBox copyPopup;
     private PropertiesComponent config;
 
     private enum Protocol {
@@ -77,7 +78,8 @@ public class FindPullRequestMenu implements Configurable {
 
         return FindPullRequestConfig.isDebugMode(config) != debugMode.isSelected()
                 || FindPullRequestConfig.isJumpToFile(config) != jumpToFile.isSelected()
-                || FindPullRequestConfig.isDisable(config) != disable.isSelected();
+                || FindPullRequestConfig.isDisable(config) != disable.isSelected()
+                || FindPullRequestConfig.isPopupAfterCopy(config) != copyPopup.isSelected();
     }
 
     @Override
@@ -85,6 +87,7 @@ public class FindPullRequestMenu implements Configurable {
         FindPullRequestConfig.setDisable(config, disable.isSelected());
         FindPullRequestConfig.setDebugMode(config, debugMode.isSelected());
         FindPullRequestConfig.setJumpToFile(config, jumpToFile.isSelected());
+        FindPullRequestConfig.setPopupAfterCopy(config, copyPopup.isSelected());
         Object selectedItem = protocols.getSelectedItem();
         if (selectedItem instanceof Protocol) {
             FindPullRequestConfig.setProtocol(config, ((Protocol)selectedItem).getText());
@@ -103,6 +106,7 @@ public class FindPullRequestMenu implements Configurable {
         disable.setSelected(FindPullRequestConfig.isDisable(config));
         debugMode.setSelected(FindPullRequestConfig.isDebugMode(config));
         jumpToFile.setSelected(FindPullRequestConfig.isJumpToFile(config));
+        copyPopup.setSelected(FindPullRequestConfig.isPopupAfterCopy(config));
     }
 
     @Override

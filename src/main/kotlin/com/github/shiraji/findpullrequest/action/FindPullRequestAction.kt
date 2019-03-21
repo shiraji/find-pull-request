@@ -21,7 +21,7 @@ import java.net.URLEncoder
 
 class FindPullRequestAction : BaseFindPullRequestAction() {
 
-    override fun actionPerform(url: String) {
+    override fun actionPerform(e: AnActionEvent, url: String) {
         BrowserUtil.open(url)
     }
 
