@@ -20,6 +20,17 @@ import git4idea.repo.GitRepository
 import java.net.URLEncoder
 
 class FindPullRequestAction : BaseFindPullRequestAction() {
+    override fun actionPerformForNoPullRequestFount(e: AnActionEvent, ex: NoPullRequestFoundException, url: String) {
+        val project: Project = e.getData(CommonDataKeys.PROJECT) ?: return
+        val config = PropertiesComponent.getInstance(project) ?: return
+        val message = StringBuilder("Could not find the pull request. <a href=\"$url\">Open the commit page</a> ")
+        if (config.isDebugMode()) {
+            val title = URLEncoder.encode("Could not find the pull request", "UTF-8")
+            val encodedMessage = URLEncoder.encode(ex.detailMessage, "UTF-8")
+            message.append("or <a href=\"https://github.com/shiraji/find-pull-request/issues/new?title=$title&body=$encodedMessage\">Submit Issue</a>")
+        }
+        showInfoNotification(message.toString())
+    }
 
     override fun actionPerform(e: AnActionEvent, url: String) {
         BrowserUtil.open(url)
