@@ -23,6 +23,8 @@ abstract class BaseFindPullRequestAction : AnAction() {
 
     abstract fun actionPerform(e: AnActionEvent, url: String)
 
+    abstract fun actionPerformForNoPullRequestFount(e: AnActionEvent, ex: NoPullRequestFoundException, url: String)
+
     override fun actionPerformed(e: AnActionEvent) {
         val project: Project = e.getData(CommonDataKeys.PROJECT) ?: return
         val editor: Editor = e.getData(CommonDataKeys.EDITOR) ?: return
@@ -56,18 +58,12 @@ abstract class BaseFindPullRequestAction : AnAction() {
             val path = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
             val url = createUrl(config, path, fileMD5)
             actionPerform(e, url)
-        } catch (e: VcsException) {
-            showErrorNotification("Could not find the pull request for $revisionHash : ${e.message}")
-        } catch (e: NoPullRequestFoundException) {
+        } catch (ex: VcsException) {
+            showErrorNotification("Could not find the pull request for $revisionHash : ${ex.message}")
+        } catch (ex: NoPullRequestFoundException) {
             val path = "$webRepoUrl/commit/$revisionHash"
             val url = createUrl(config, path, fileMD5)
-            val message = StringBuilder("Could not find the pull request. <a href=\"$url\">Open the commit page</a> ")
-            if (config.isDebugMode()) {
-                val title = URLEncoder.encode("Could not find the pull request", "UTF-8")
-                val encodedMessage = URLEncoder.encode(e.detailMessage, "UTF-8")
-                message.append("or <a href=\"https://github.com/shiraji/find-pull-request/issues/new?title=$title&body=$encodedMessage\">Submit Issue</a>")
-            }
-            showInfoNotification(message.toString())
+            actionPerformForNoPullRequestFount(e, ex, url = url)
         }
     }
 
