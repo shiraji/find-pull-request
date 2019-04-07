@@ -18,8 +18,8 @@ class FindPullRequestModel(
         private val project: Project,
         private val editor: Editor,
         private val virtualFile: VirtualFile,
+        private val gitRepositoryService: GitRepositoryService,
         private val config: PropertiesComponent = PropertiesComponent.getInstance(project)
-
 ) {
 
     /**
@@ -35,7 +35,7 @@ class FindPullRequestModel(
     ): Boolean {
         if (config.isDisable()) return false
         if (project.isDisposed) return false
-        if (!hasOriginOrUpstreamRepository(repository)) return false
+        if (!gitRepositoryService.hasOriginOrUpstreamRepository(repository)) return false
         if (changeListManager.isUnversioned(virtualFile)) return false
         changeListManager.getChange(virtualFile)?.let {
             if (it.type == Change.Type.NEW) return false
@@ -50,7 +50,7 @@ class FindPullRequestModel(
     fun getFileAnnotation(repository: GitRepository) = repository.vcs?.annotationProvider?.annotate(virtualFile)
 
     fun createWebRepoUrl(repository: GitRepository): String? {
-        val remoteUrl: String = findUpstreamUrl(repository) ?: findOriginUrl(repository) ?: return null
+        val remoteUrl: String = gitRepositoryService.findUpstreamUrl(repository) ?: gitRepositoryService.findOriginUrl(repository) ?: return null
         return makeWebRemoteRepoUrlFromRemoteUrl(remoteUrl, config.getProtocol())
     }
 
@@ -161,22 +161,6 @@ class FindPullRequestModel(
 
     private fun GitCommit.getNumberFromCommitMessage(commitMessageTemplate: Regex): Int? {
         return commitMessageTemplate.find(this.fullMessage)?.groups?.get(1)?.value?.toInt()
-    }
-
-    private fun hasOriginOrUpstreamRepository(repository: GitRepository): Boolean {
-        return findOriginUrl(repository) != null || findUpstreamUrl(repository) != null
-    }
-
-    private fun findOriginUrl(repository: GitRepository): String? {
-        return findRemoteUrl(repository, "origin")
-    }
-
-    private fun findUpstreamUrl(repository: GitRepository): String? {
-        return findRemoteUrl(repository, "upstream")
-    }
-
-    private fun findRemoteUrl(repository: GitRepository, targetRemoteName: String): String? {
-        return repository.remotes.firstOrNull { it.name == targetRemoteName }?.firstUrl
     }
 
     private fun removeProtocolPrefix(url: String): String {

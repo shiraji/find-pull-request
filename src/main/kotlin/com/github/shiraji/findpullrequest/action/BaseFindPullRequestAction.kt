@@ -2,10 +2,7 @@ package com.github.shiraji.findpullrequest.action
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
 import com.github.shiraji.findpullrequest.helper.showErrorNotification
-import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices
-import com.github.shiraji.findpullrequest.model.FindPullRequestModel
-import com.github.shiraji.findpullrequest.model.getHosting
-import com.github.shiraji.findpullrequest.model.isJumpToFile
+import com.github.shiraji.findpullrequest.model.*
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -29,8 +26,9 @@ abstract class BaseFindPullRequestAction : AnAction() {
         val virtualFile: VirtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
         val repository = getGitRepository(project, virtualFile) ?: return
         val config = PropertiesComponent.getInstance(project) ?: return
+        val gitRepositoryService = GitRepositoryService()
 
-        val model = FindPullRequestModel(project, editor, virtualFile)
+        val model = FindPullRequestModel(project, editor, virtualFile, gitRepositoryService)
         if (!model.isEnable(repository)) return
 
         val annotate = model.getFileAnnotation(repository)
@@ -88,8 +86,9 @@ abstract class BaseFindPullRequestAction : AnAction() {
         val editor: Editor = e.getData(CommonDataKeys.EDITOR) ?: return
         val virtualFile: VirtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
         val repository = getGitRepository(project, virtualFile) ?: return
+        val gitRepositoryService = GitRepositoryService()
 
-        e.presentation.isEnabledAndVisible = FindPullRequestModel(project, editor, virtualFile).isEnable(repository)
+        e.presentation.isEnabledAndVisible = FindPullRequestModel(project, editor, virtualFile, gitRepositoryService).isEnable(repository)
     }
 
     private fun getGitRepository(project: Project, file: VirtualFile?): GitRepository? {
