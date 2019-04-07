@@ -1,6 +1,7 @@
 package com.github.shiraji.findpullrequest.menu;
 
 import com.github.shiraji.findpullrequest.model.FindPullRequestConfig;
+import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
@@ -12,31 +13,37 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 public class FindPullRequestMenu implements Configurable {
-    private ButtonGroup disableRadioButton;
     private JCheckBox disable;
     private JCheckBox debugMode;
     private JCheckBox jumpToFile;
     private JComboBox<Protocol> protocols;
     private JPanel root;
     private JCheckBox copyPopup;
+    private JComboBox<FindPullRequestHostingServices> hostingService;
     private PropertiesComponent config;
 
     private enum Protocol {
         https("https://"), http("http://");
         private String text;
+
         Protocol(String text) {
             this.text = text;
         }
 
-        @NotNull public String getText() {
+        @NotNull
+        public String getText() {
             return text;
         }
 
-        @Nullable public static Protocol findProtocolBy(String name) {
+        @Nullable
+        public static Protocol findProtocolBy(String name) {
             switch (name) {
-                case "https://": return https;
-                case "http://": return http;
-                default: return null;
+                case "https://":
+                    return https;
+                case "http://":
+                    return http;
+                default:
+                    return null;
             }
         }
     }
@@ -45,8 +52,8 @@ public class FindPullRequestMenu implements Configurable {
         super();
 
         config = PropertiesComponent.getInstance(project);
-        DefaultComboBoxModel<Protocol> protocolDefaultComboBoxModel = new DefaultComboBoxModel<>(Protocol.values());
-        protocols.setModel(protocolDefaultComboBoxModel);
+        protocols.setModel(new DefaultComboBoxModel<>(Protocol.values()));
+        hostingService.setModel(new DefaultComboBoxModel<>(FindPullRequestHostingServices.values()));
     }
 
     @Nls
@@ -69,17 +76,24 @@ public class FindPullRequestMenu implements Configurable {
 
     @Override
     public boolean isModified() {
-        Object selectedItem = protocols.getSelectedItem();
-        if (selectedItem instanceof Protocol) {
-            if (!FindPullRequestConfig.getProtocol(config).equals(((Protocol)selectedItem).getText())) {
-                return true;
-            }
-        }
-
-        return FindPullRequestConfig.isDebugMode(config) != debugMode.isSelected()
+        return isModifiedProtocol()
+                || isModifiedHostingService()
+                || FindPullRequestConfig.isDebugMode(config) != debugMode.isSelected()
                 || FindPullRequestConfig.isJumpToFile(config) != jumpToFile.isSelected()
                 || FindPullRequestConfig.isDisable(config) != disable.isSelected()
                 || FindPullRequestConfig.isPopupAfterCopy(config) != copyPopup.isSelected();
+    }
+
+    private boolean isModifiedProtocol() {
+        Object selectedItem = protocols.getSelectedItem();
+        return selectedItem instanceof Protocol && !FindPullRequestConfig.getProtocol(config).equals(
+                ((Protocol)selectedItem).getText());
+    }
+
+    private boolean isModifiedHostingService() {
+        Object selectedItem = hostingService.getSelectedItem();
+        return selectedItem instanceof FindPullRequestHostingServices
+                && !FindPullRequestConfig.getHosting(config).equals(((FindPullRequestHostingServices)selectedItem).name());
     }
 
     @Override
@@ -88,14 +102,35 @@ public class FindPullRequestMenu implements Configurable {
         FindPullRequestConfig.setDebugMode(config, debugMode.isSelected());
         FindPullRequestConfig.setJumpToFile(config, jumpToFile.isSelected());
         FindPullRequestConfig.setPopupAfterCopy(config, copyPopup.isSelected());
+        applyProtocol();
+        applyHostingService();
+    }
+
+    private void applyProtocol() {
         Object selectedItem = protocols.getSelectedItem();
         if (selectedItem instanceof Protocol) {
             FindPullRequestConfig.setProtocol(config, ((Protocol)selectedItem).getText());
         }
     }
 
+    private void applyHostingService() {
+        Object selectedItem = hostingService.getSelectedItem();
+        if (selectedItem instanceof FindPullRequestHostingServices) {
+            FindPullRequestConfig.setHosting(config, (FindPullRequestHostingServices) selectedItem);
+        }
+    }
+
     @Override
     public void reset() {
+        resetProtocols();
+        resetHostingServices();
+        disable.setSelected(FindPullRequestConfig.isDisable(config));
+        debugMode.setSelected(FindPullRequestConfig.isDebugMode(config));
+        jumpToFile.setSelected(FindPullRequestConfig.isJumpToFile(config));
+        copyPopup.setSelected(FindPullRequestConfig.isPopupAfterCopy(config));
+    }
+
+    private void resetProtocols() {
         String protocol = FindPullRequestConfig.getProtocol(config);
         Protocol protocolBy = Protocol.findProtocolBy(protocol);
         int selectedIndex = 0;
@@ -103,10 +138,13 @@ public class FindPullRequestMenu implements Configurable {
             selectedIndex = protocolBy.ordinal();
         }
         protocols.setSelectedIndex(selectedIndex);
-        disable.setSelected(FindPullRequestConfig.isDisable(config));
-        debugMode.setSelected(FindPullRequestConfig.isDebugMode(config));
-        jumpToFile.setSelected(FindPullRequestConfig.isJumpToFile(config));
-        copyPopup.setSelected(FindPullRequestConfig.isPopupAfterCopy(config));
+    }
+
+    private void resetHostingServices() {
+        String hostingServiceConf = FindPullRequestConfig.getHosting(config);
+        FindPullRequestHostingServices hostingServices = FindPullRequestHostingServices.findBy(hostingServiceConf);
+        int selectedIndex = hostingServices.ordinal();
+        hostingService.setSelectedIndex(selectedIndex);
     }
 
     @Override
