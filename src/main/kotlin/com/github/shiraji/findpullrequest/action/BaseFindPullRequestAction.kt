@@ -27,8 +27,9 @@ abstract class BaseFindPullRequestAction : AnAction() {
         val repository = getGitRepository(project, virtualFile) ?: return
         val config = PropertiesComponent.getInstance(project) ?: return
         val gitRepositoryService = GitRepositoryService()
+        val gitUrlService = GitRepositoryUrlService()
 
-        val model = FindPullRequestModel(project, editor, virtualFile, gitRepositoryService)
+        val model = FindPullRequestModel(project, editor, virtualFile, gitRepositoryService, gitUrlService)
         if (!model.isEnable(repository)) return
 
         val annotate = model.getFileAnnotation(repository)
@@ -87,8 +88,9 @@ abstract class BaseFindPullRequestAction : AnAction() {
         val virtualFile: VirtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
         val repository = getGitRepository(project, virtualFile) ?: return
         val gitRepositoryService = GitRepositoryService()
+        val gitUrlService = GitRepositoryUrlService()
 
-        e.presentation.isEnabledAndVisible = FindPullRequestModel(project, editor, virtualFile, gitRepositoryService).isEnable(repository)
+        e.presentation.isEnabledAndVisible = FindPullRequestModel(project, editor, virtualFile, gitRepositoryService, gitUrlService).isEnable(repository)
     }
 
     private fun getGitRepository(project: Project, file: VirtualFile?): GitRepository? {

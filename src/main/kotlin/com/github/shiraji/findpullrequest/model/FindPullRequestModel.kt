@@ -19,15 +19,9 @@ class FindPullRequestModel(
         private val editor: Editor,
         private val virtualFile: VirtualFile,
         private val gitRepositoryService: GitRepositoryService,
+        private val gitRepositoryUrlService: GitRepositoryUrlService,
         private val config: PropertiesComponent = PropertiesComponent.getInstance(project)
 ) {
-
-    /**
-     * The expected remote url format is
-     * * https://HOST/USER/REPO.git
-     * * git@HOST:USER/REPO.git
-     */
-    private val repoUserRegex = Regex(".*[/:](.*)/(.*).git")
 
     fun isEnable(
             repository: GitRepository,
@@ -48,11 +42,6 @@ class FindPullRequestModel(
     private fun Editor.getLine(offset: Int) = document.getLineNumber(offset)
 
     fun getFileAnnotation(repository: GitRepository) = repository.vcs?.annotationProvider?.annotate(virtualFile)
-
-    fun createWebRepoUrl(repository: GitRepository): String? {
-        val remoteUrl: String = gitRepositoryService.findUpstreamUrl(repository) ?: gitRepositoryService.findOriginUrl(repository) ?: return null
-        return makeWebRemoteRepoUrlFromRemoteUrl(remoteUrl, config.getProtocol())
-    }
 
     fun createRevisionHash(annotate: FileAnnotation): VcsRevisionNumber? {
         val lineNumber = editor.getLine(editor.selectionModel.selectionStart)
@@ -163,24 +152,12 @@ class FindPullRequestModel(
         return commitMessageTemplate.find(this.fullMessage)?.groups?.get(1)?.value?.toInt()
     }
 
-    private fun removeProtocolPrefix(url: String): String {
-        return if (url.contains("@")) url.substringAfter("@") else url.substringAfter("://")
-    }
-
-    private fun getUserAndRepositoryFromRemoteUrl(gitRemoteUrl: String): Pair<String, String>? {
-        val (username, repo) = repoUserRegex.find(gitRemoteUrl)?.destructured ?: return null
-        if (username.isBlank() || repo.isBlank()) return null
-        return Pair(username, repo)
-    }
-
-    private fun getHostFromUrl(url: String): String {
-        val path = removeProtocolPrefix(url).replace(':', '/')
-        return path.substringBefore("/")
-    }
-
-    private fun makeWebRemoteRepoUrlFromRemoteUrl(remoteUrl: String, protocol: String): String? {
-        val host = getHostFromUrl(remoteUrl)
-        val repo = getUserAndRepositoryFromRemoteUrl(remoteUrl) ?: return null
-        return "$protocol$host/${repo.first}/${repo.second}"
+    fun createWebRepoUrl(repository: GitRepository): String? {
+        val remoteUrl: String = gitRepositoryService.findUpstreamUrl(repository) ?: gitRepositoryService.findOriginUrl(repository) ?: return null
+        val host = gitRepositoryUrlService.getHostFromUrl(remoteUrl)
+        val username = gitRepositoryUrlService.getUserFromRemoteUrl(remoteUrl)
+        val repositoryName = gitRepositoryUrlService.getRepositoryFromRemoteUrl(remoteUrl)
+        if (username.isNullOrBlank() || repositoryName.isNullOrBlank()) return null
+        return "${config.getProtocol()}$host/$username/$repositoryName"
     }
 }
