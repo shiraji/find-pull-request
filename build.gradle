@@ -50,8 +50,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     testImplementation "io.mockk:mockk:1.8.6"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.0"
-    testRuntime "org.junit.jupiter:junit-jupiter-engine:5.3.0"
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.4.2'
 }
 
 sourceSets {
@@ -59,8 +58,10 @@ sourceSets {
 }
 
 test {
+    useJUnitPlatform()
     testLogging {
         showStandardStreams = true
+        events "skipped", "failed"
     }
 }
 
