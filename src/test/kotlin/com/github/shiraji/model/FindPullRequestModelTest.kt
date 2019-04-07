@@ -21,8 +21,9 @@ import git4idea.repo.GitRepository
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import junit.framework.TestCase.*
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class FindPullRequestModelTest {
 
@@ -74,7 +75,7 @@ class FindPullRequestModelTest {
     @MockK
     lateinit var fileAnnotation: FileAnnotation
 
-    @Before
+    @BeforeEach
     fun setUp() {
         MockKAnnotations.init(this)
 
@@ -198,7 +199,7 @@ class FindPullRequestModelTest {
         assertEquals("pull/$PR_NUMBER/files#diff-4c6e90faac2675aa89e2176d2eec7d8", path)
     }
 
-    @Test(expected = NoPullRequestFoundException::class)
+    @Test
     fun `No PR found if no PR and the commit is not squash commit`() {
         val prCommit1 = generateGitCommit(hashCode = HASH, fullMessage = "Merge pull request #$PR_NUMBER from")
 
@@ -206,8 +207,9 @@ class FindPullRequestModelTest {
         mockGitRepository(listOf(generateGitRemote()))
         mockHistory(closestPRCommits = emptyList(), mergeCommits = listOf(prCommit1))
 
-        model.createPullRequestPath(gitRepository, vcsRevisionNumber)
-        fail()
+        assertThrows<NoPullRequestFoundException> {
+            model.createPullRequestPath(gitRepository, vcsRevisionNumber)
+        }
     }
 
     @Test
@@ -242,7 +244,7 @@ class FindPullRequestModelTest {
         verify(exactly = 2) { GitHistoryUtils.history(project, virtualRoot, any()) }
     }
 
-    @Test(expected = NoPullRequestFoundException::class)
+    @Test
     fun `Found PR has different hash code and its commit message is not squash commit`() {
         val prCommit1 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #${PR_NUMBER} from")
         val prCommit2 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Foo (#${PR_NUMBER})")
@@ -267,8 +269,9 @@ class FindPullRequestModelTest {
             GitHistoryUtils.history(project, virtualRoot, any())
         } returnsMany listOf(listOf(prCommit2), listOf(prCommit3))
 
-        model.createPullRequestPath(gitRepository, vcsRevisionNumber)
-        fail()
+        assertThrows<NoPullRequestFoundException> {
+            model.createPullRequestPath(gitRepository, vcsRevisionNumber)
+        }
     }
 
     @Test

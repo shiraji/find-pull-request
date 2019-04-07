@@ -1,6 +1,5 @@
 package com.github.shiraji
 
-import git4idea.GitCommit
 import java.math.BigInteger
 import java.security.MessageDigest
 
