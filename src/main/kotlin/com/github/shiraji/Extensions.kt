@@ -1,6 +1,8 @@
 package com.github.shiraji
 
+import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices
 import com.intellij.openapi.editor.Editor
+import git4idea.GitCommit
 import java.math.BigInteger
 import java.security.MessageDigest
 
@@ -14,3 +16,11 @@ fun String.subtract(text: String) = this.replace(text, "")
 fun Editor.isPointSingleLine() = getLine(selectionModel.selectionStart) == getLine(selectionModel.selectionEnd)
 
 fun Editor.getLine(offset: Int) = document.getLineNumber(offset)
+
+fun GitCommit.isSquashPullRequestCommit(hostingServices: FindPullRequestHostingServices): Boolean {
+    return hostingServices.squashCommitMessage.containsMatchIn(this.fullMessage)
+}
+
+fun GitCommit.getNumberFromCommitMessage(commitMessageTemplate: Regex): Int? {
+    return commitMessageTemplate.find(this.fullMessage)?.groups?.get(1)?.value?.toInt()
+}

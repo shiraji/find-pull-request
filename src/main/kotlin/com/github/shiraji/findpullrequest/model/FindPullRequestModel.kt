@@ -2,7 +2,9 @@ package com.github.shiraji.findpullrequest.model
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
 import com.github.shiraji.getLine
+import com.github.shiraji.getNumberFromCommitMessage
 import com.github.shiraji.isPointSingleLine
+import com.github.shiraji.isSquashPullRequestCommit
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
@@ -140,14 +142,6 @@ class FindPullRequestModel(
             prNumber != null
         }
         return Pair(prNumber, targetHostingService)
-    }
-
-    private fun GitCommit.isSquashPullRequestCommit(hostingServices: FindPullRequestHostingServices): Boolean {
-        return hostingServices.squashCommitMessage.containsMatchIn(this.fullMessage)
-    }
-
-    private fun GitCommit.getNumberFromCommitMessage(commitMessageTemplate: Regex): Int? {
-        return commitMessageTemplate.find(this.fullMessage)?.groups?.get(1)?.value?.toInt()
     }
 
     fun createWebRepoUrl(repository: GitRepository): String? {
