@@ -1,6 +1,8 @@
 package com.github.shiraji.findpullrequest.model
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
+import com.github.shiraji.getLine
+import com.github.shiraji.isPointSingleLine
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
@@ -36,10 +38,6 @@ class FindPullRequestModel(
         }
         return editor.isPointSingleLine()
     }
-
-    private fun Editor.isPointSingleLine() = getLine(selectionModel.selectionStart) == getLine(selectionModel.selectionEnd)
-
-    private fun Editor.getLine(offset: Int) = document.getLineNumber(offset)
 
     fun getFileAnnotation(repository: GitRepository) = repository.vcs?.annotationProvider?.annotate(virtualFile)
 
