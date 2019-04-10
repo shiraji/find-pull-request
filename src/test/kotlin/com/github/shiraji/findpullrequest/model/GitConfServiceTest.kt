@@ -3,18 +3,17 @@ package com.github.shiraji.findpullrequest.model
 import git4idea.repo.GitRemote
 import git4idea.repo.GitRepository
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 
-class GitRepositoryServiceTest {
+class GitConfServiceTest {
 
     private val gitRepository: GitRepository = mockk()
 
-    private val target: GitRepositoryService = GitRepositoryService()
+    private val configService: GitConfService = GitConfService()
 
     @Nested
     inner class hasOriginOrUpstreamRepository {
@@ -25,7 +24,7 @@ class GitRepositoryServiceTest {
             every { gitRemote.firstUrl } returns "firstURL"
             every { gitRepository.remotes } returns listOf(gitRemote)
 
-            val got = target.hasOriginOrUpstreamRepository(gitRepository)
+            val got = configService.hasOriginOrUpstreamRepository(gitRepository)
 
             assertTrue(got)
         }
@@ -37,7 +36,7 @@ class GitRepositoryServiceTest {
             every { gitRemote.firstUrl } returns "firstURL"
             every { gitRepository.remotes } returns listOf(gitRemote)
 
-            val got = target.hasOriginOrUpstreamRepository(gitRepository)
+            val got = configService.hasOriginOrUpstreamRepository(gitRepository)
 
             assertTrue(got)
         }
@@ -48,7 +47,7 @@ class GitRepositoryServiceTest {
             every { gitRemote.name } returns "foo"
             every { gitRepository.remotes } returns listOf(gitRemote)
 
-            val got = target.hasOriginOrUpstreamRepository(gitRepository)
+            val got = configService.hasOriginOrUpstreamRepository(gitRepository)
 
             assertFalse(got)
         }
@@ -57,7 +56,7 @@ class GitRepositoryServiceTest {
         fun `Should return false if remotes are empty`() {
             every { gitRepository.remotes } returns emptyList()
 
-            val got = target.findUpstreamUrl(gitRepository)
+            val got = configService.findUpstreamUrl(gitRepository)
 
             assertNull(got)
         }
@@ -75,7 +74,7 @@ class GitRepositoryServiceTest {
             every { gitRemote.firstUrl } returns expect
             every { gitRepository.remotes } returns listOf(gitRemote)
 
-            val got = target.findOriginUrl(gitRepository)
+            val got = configService.findOriginUrl(gitRepository)
 
             assertEquals(expect, got)
         }
@@ -86,7 +85,7 @@ class GitRepositoryServiceTest {
             every { gitRemote.name } returns "origin2"
             every { gitRepository.remotes } returns listOf(gitRemote)
 
-            val got = target.findOriginUrl(gitRepository)
+            val got = configService.findOriginUrl(gitRepository)
 
             assertNull(got)
         }
@@ -95,7 +94,7 @@ class GitRepositoryServiceTest {
         fun `Should return null if remotes are empty`() {
             every { gitRepository.remotes } returns emptyList()
 
-            val got = target.findOriginUrl(gitRepository)
+            val got = configService.findOriginUrl(gitRepository)
 
             assertNull(got)
         }
@@ -111,7 +110,7 @@ class GitRepositoryServiceTest {
             every { gitRemote.firstUrl } returns expect
             every { gitRepository.remotes } returns listOf(gitRemote)
 
-            val got = target.findUpstreamUrl(gitRepository)
+            val got = configService.findUpstreamUrl(gitRepository)
 
             assertEquals(expect, got)
         }
@@ -122,7 +121,7 @@ class GitRepositoryServiceTest {
             every { gitRemote.name } returns "origin"
             every { gitRepository.remotes } returns listOf(gitRemote)
 
-            val got = target.findUpstreamUrl(gitRepository)
+            val got = configService.findUpstreamUrl(gitRepository)
 
             assertNull(got)
         }
@@ -131,7 +130,7 @@ class GitRepositoryServiceTest {
         fun `Should return null if remotes are empty`() {
             every { gitRepository.remotes } returns emptyList()
 
-            val got = target.findUpstreamUrl(gitRepository)
+            val got = configService.findUpstreamUrl(gitRepository)
 
             assertNull(got)
         }
