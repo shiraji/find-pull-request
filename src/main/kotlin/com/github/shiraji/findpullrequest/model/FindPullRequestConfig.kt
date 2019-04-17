@@ -26,6 +26,5 @@ fun PropertiesComponent.setProtocol(value: String) = setValue(PROTOCOL, value, "
 fun PropertiesComponent.isPopupAfterCopy() = getBoolean(POPUP_AFTER_COPY, false)
 fun PropertiesComponent.setPopupAfterCopy(value: Boolean) = setValue(POPUP_AFTER_COPY, value, false)
 
-fun PropertiesComponent.hasHostingConfig() = getValue(HOSTING) != null
 fun PropertiesComponent.getHosting() = getValue(HOSTING, "")
 fun PropertiesComponent.setHosting(hostingServices: FindPullRequestHostingServices) = setValue(HOSTING, hostingServices.name)

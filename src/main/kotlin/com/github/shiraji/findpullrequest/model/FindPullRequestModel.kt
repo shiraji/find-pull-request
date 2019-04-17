@@ -1,6 +1,10 @@
 package com.github.shiraji.findpullrequest.model
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
+import com.github.shiraji.getLine
+import com.github.shiraji.getNumberFromCommitMessage
+import com.github.shiraji.isPointSingleLine
+import com.github.shiraji.isSquashPullRequestCommit
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
@@ -10,7 +14,6 @@ import com.intellij.openapi.vcs.changes.ChangeListManager
 import com.intellij.openapi.vcs.history.VcsRevisionNumber
 import com.intellij.openapi.vfs.VirtualFile
 import git4idea.GitCommit
-import git4idea.history.GitHistoryUtils
 import git4idea.repo.GitRepository
 
 
@@ -18,16 +21,11 @@ class FindPullRequestModel(
         private val project: Project,
         private val editor: Editor,
         private val virtualFile: VirtualFile,
+        private val gitConfService: GitConfService,
+        private val gitRepositoryUrlService: GitRepositoryUrlService,
+        private val gitHistoryService: GitHistoryService,
         private val config: PropertiesComponent = PropertiesComponent.getInstance(project)
-
 ) {
-
-    /**
-     * The expected remote url format is
-     * * https://HOST/USER/REPO.git
-     * * git@HOST:USER/REPO.git
-     */
-    private val repoUserRegex = Regex(".*[/:](.*)/(.*).git")
 
     fun isEnable(
             repository: GitRepository,
@@ -35,23 +33,12 @@ class FindPullRequestModel(
     ): Boolean {
         if (config.isDisable()) return false
         if (project.isDisposed) return false
-        if (!hasOriginOrUpstreamRepository(repository)) return false
+        if (!gitConfService.hasOriginOrUpstreamRepository(repository)) return false
         if (changeListManager.isUnversioned(virtualFile)) return false
         changeListManager.getChange(virtualFile)?.let {
             if (it.type == Change.Type.NEW) return false
         }
         return editor.isPointSingleLine()
-    }
-
-    private fun Editor.isPointSingleLine() = getLine(selectionModel.selectionStart) == getLine(selectionModel.selectionEnd)
-
-    private fun Editor.getLine(offset: Int) = document.getLineNumber(offset)
-
-    fun getFileAnnotation(repository: GitRepository) = repository.vcs?.annotationProvider?.annotate(virtualFile)
-
-    fun createWebRepoUrl(repository: GitRepository): String? {
-        val remoteUrl: String = findUpstreamUrl(repository) ?: findOriginUrl(repository) ?: return null
-        return makeWebRemoteRepoUrlFromRemoteUrl(remoteUrl, config.getProtocol())
     }
 
     fun createRevisionHash(annotate: FileAnnotation): VcsRevisionNumber? {
@@ -67,54 +54,18 @@ class FindPullRequestModel(
                     .appendln(revisionHash.asString())
         }
 
-        fun findCommitLog(repository: GitRepository, revisionHash: VcsRevisionNumber)
-                = GitHistoryUtils.history(project, repository.root, "$revisionHash").first().also {
-            if (config.isDebugMode()) {
-                debugMessage.appendln("### Squash PR commit:")
-                debugMessage.appendln(it.id.asString())
-            }
-        }
-
-        fun findClosestPullRequestCommit(repository: GitRepository, revisionHash: VcsRevisionNumber): GitCommit? {
-            // I think there is a bug in history() since it does not keep the order correctly
-            // It seems GitLogUtil#readFullDetails is the place that store the results in list
-            val results = GitHistoryUtils.history(project, repository.root, "$revisionHash..HEAD", "--merges", "--ancestry-path", "--reverse")
-            val result = results.minBy { it.commitTime }
-            if (config.isDebugMode()) {
-                debugMessage.appendln("### PR commit:")
-                debugMessage.appendln(result?.id?.asString())
-            }
-            return result
-        }
-
-        fun listCommitsFromMergedCommit(repository: GitRepository, pullRequestCommit: GitCommit)
-                = GitHistoryUtils.history(project, repository.root, "${pullRequestCommit.id}^..${pullRequestCommit.id}").also {
-            if (config.isDebugMode()) {
-                debugMessage.appendln("### Merged commits lists:")
-                it.forEach { commit -> debugMessage.appendln(commit.id.asString()) }
-            }
-        }
-
-        fun hasCommitsFromRevisionNumber(commits: List<GitCommit>, revisionHash: VcsRevisionNumber)
-                = commits.any { it.id.asString() == revisionHash.asString() }.also {
-            if (config.isDebugMode()) {
-                debugMessage.appendln("### Result of `hasCommitsFromRevisionNumber`:")
-                debugMessage.appendln(it)
-            }
-        }
-
         fun createUrl(hostingServices: FindPullRequestHostingServices, path: String): String {
             return if (config.isJumpToFile()) {
-                val fileAnnotation = getFileAnnotation(repository) ?: return path
+                val fileAnnotation = gitConfService.getFileAnnotation(repository, virtualFile) ?: return path
                 path + hostingServices.createFileAnchorValue(repository, fileAnnotation)
             } else {
                 path
             }
         }
 
-        val pullRequestCommit = findClosestPullRequestCommit(repository, revisionHash)
+        val pullRequestCommit = gitHistoryService.findClosestPullRequestCommit(project, repository, revisionHash)
 
-        return if (pullRequestCommit != null && hasCommitsFromRevisionNumber(listCommitsFromMergedCommit(repository, pullRequestCommit), revisionHash)) {
+        return if (pullRequestCommit != null && gitHistoryService.hasCommitsFromRevisionNumber(gitHistoryService.listCommitsFromMergedCommit(project, repository, pullRequestCommit), revisionHash)) {
             val hosting = FindPullRequestHostingServices.findBy(config.getHosting())
             val prNumberUsingConfig = pullRequestCommit.getNumberFromCommitMessage(hosting.defaultMergeCommitMessage)
 
@@ -132,7 +83,7 @@ class FindPullRequestModel(
             val path = targetHostingService.urlPathFormat.format(prNumber)
             createUrl(targetHostingService, path)
         } else {
-            val commit = findCommitLog(repository, revisionHash)
+            val commit = gitHistoryService.findCommitLog(project, repository, revisionHash)
             val hostingServices = FindPullRequestHostingServices.values().firstOrNull {
                 commit.isSquashPullRequestCommit(it)
             }
@@ -155,48 +106,12 @@ class FindPullRequestModel(
         return Pair(prNumber, targetHostingService)
     }
 
-    private fun GitCommit.isSquashPullRequestCommit(hostingServices: FindPullRequestHostingServices): Boolean {
-        return hostingServices.squashCommitMessage.containsMatchIn(this.fullMessage)
-    }
-
-    private fun GitCommit.getNumberFromCommitMessage(commitMessageTemplate: Regex): Int? {
-        return commitMessageTemplate.find(this.fullMessage)?.groups?.get(1)?.value?.toInt()
-    }
-
-    private fun hasOriginOrUpstreamRepository(repository: GitRepository): Boolean {
-        return findOriginUrl(repository) != null || findUpstreamUrl(repository) != null
-    }
-
-    private fun findOriginUrl(repository: GitRepository): String? {
-        return findRemoteUrl(repository, "origin")
-    }
-
-    private fun findUpstreamUrl(repository: GitRepository): String? {
-        return findRemoteUrl(repository, "upstream")
-    }
-
-    private fun findRemoteUrl(repository: GitRepository, targetRemoteName: String): String? {
-        return repository.remotes.firstOrNull { it.name == targetRemoteName }?.firstUrl
-    }
-
-    private fun removeProtocolPrefix(url: String): String {
-        return if (url.contains("@")) url.substringAfter("@") else url.substringAfter("://")
-    }
-
-    private fun getUserAndRepositoryFromRemoteUrl(gitRemoteUrl: String): Pair<String, String>? {
-        val (username, repo) = repoUserRegex.find(gitRemoteUrl)?.destructured ?: return null
-        if (username.isBlank() || repo.isBlank()) return null
-        return Pair(username, repo)
-    }
-
-    private fun getHostFromUrl(url: String): String {
-        val path = removeProtocolPrefix(url).replace(':', '/')
-        return path.substringBefore("/")
-    }
-
-    private fun makeWebRemoteRepoUrlFromRemoteUrl(remoteUrl: String, protocol: String): String? {
-        val host = getHostFromUrl(remoteUrl)
-        val repo = getUserAndRepositoryFromRemoteUrl(remoteUrl) ?: return null
-        return "$protocol$host/${repo.first}/${repo.second}"
+    fun createWebRepoUrl(repository: GitRepository): String? {
+        val remoteUrl: String = gitConfService.findUpstreamUrl(repository) ?: gitConfService.findOriginUrl(repository) ?: return null
+        val host = gitRepositoryUrlService.getHostFromUrl(remoteUrl)
+        val username = gitRepositoryUrlService.getUserFromRemoteUrl(remoteUrl)
+        val repositoryName = gitRepositoryUrlService.getRepositoryFromRemoteUrl(remoteUrl)
+        if (username.isNullOrBlank() || repositoryName.isNullOrBlank()) return null
+        return "${config.getProtocol()}$host/$username/$repositoryName"
     }
 }

@@ -79,7 +79,7 @@ class FindPullRequestModelTest {
     fun setUp() {
         MockKAnnotations.init(this)
 
-        model = FindPullRequestModel(project, editor, virtualFile, conf)
+        model = FindPullRequestModel(project, editor, virtualFile, GitConfService(), GitRepositoryUrlService(), GitHistoryService(), conf)
     }
 
     private fun mockGitRepository(remotes: List<GitRemote>, root: VirtualFile = virtualRoot) {
