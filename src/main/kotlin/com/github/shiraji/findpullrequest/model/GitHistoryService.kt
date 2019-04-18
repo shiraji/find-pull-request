@@ -1,5 +1,6 @@
 package com.github.shiraji.findpullrequest.model
 
+import com.github.shiraji.getNumberFromCommitMessage
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.history.VcsRevisionNumber
 import git4idea.GitCommit
@@ -7,6 +8,11 @@ import git4idea.history.GitHistoryUtils
 import git4idea.repo.GitRepository
 
 class GitHistoryService {
+
+    fun findLatestMergeCommit(project: Project): GitCommit {
+        val results = GitHistoryUtils.history(project, project.baseDir, "--merges")
+        return results.first()
+    }
 
     fun findCommitLog(project: Project, repository: GitRepository, revisionHash: VcsRevisionNumber): GitCommit {
         return GitHistoryUtils.history(project, repository.root, "$revisionHash").first()
@@ -25,5 +31,14 @@ class GitHistoryService {
 
     fun hasCommitsFromRevisionNumber(commits: List<GitCommit>, revisionHash: VcsRevisionNumber): Boolean {
         return commits.any { it.id.asString() == revisionHash.asString() }
+    }
+
+    fun findPrNumberAndHostingService(pullRequestCommit: GitCommit): Pair<Int?, FindPullRequestHostingServices?> {
+        var prNumber: Int? = null
+        val targetHostingService = FindPullRequestHostingServices.values().firstOrNull {
+            prNumber = pullRequestCommit.getNumberFromCommitMessage(it.defaultMergeCommitMessage)
+            prNumber != null
+        }
+        return Pair(prNumber, targetHostingService)
     }
 }
