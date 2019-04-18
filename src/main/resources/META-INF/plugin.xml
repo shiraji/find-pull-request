@@ -28,6 +28,7 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <projectConfigurable instance="com.github.shiraji.findpullrequest.menu.FindPullRequestMenu" />
+    <postStartupActivity implementation="com.github.shiraji.findpullrequest.activity.DetectHostingServiceStartupActivity" />
   </extensions>
 
   <actions>

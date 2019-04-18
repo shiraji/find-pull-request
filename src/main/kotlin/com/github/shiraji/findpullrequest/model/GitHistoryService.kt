@@ -9,6 +9,11 @@ import git4idea.repo.GitRepository
 
 class GitHistoryService {
 
+    fun findLatestMergeCommit(project: Project): GitCommit {
+        val results = GitHistoryUtils.history(project, project.baseDir, "--merges")
+        return results.first()
+    }
+
     fun findCommitLog(project: Project, repository: GitRepository, revisionHash: VcsRevisionNumber): GitCommit {
         return GitHistoryUtils.history(project, repository.root, "$revisionHash").first()
     }
