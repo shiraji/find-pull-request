@@ -11,11 +11,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <p>1.4.0-SNAPSHOT</p>
+        <p>1.4.0.1-SNAPSHOT</p>
         <ul>
-          Support GitLab #52
-          Support Bitbucket #53
-          Detect hosting service on startup #75
+          <li>Support GitLab #52</li>
+          <li>Support Bitbucket #53</li>
+          <li>Detect hosting service on startup #75</li>
         </ul>
         <p>Older version changes are listed on <a href="https://github.com/shiraji/find-pull-request/blob/master/CHANGELOG.md">CHANGELOG.md</a></p>
     ]]>
