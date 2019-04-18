@@ -71,7 +71,7 @@ class FindPullRequestModel(
 
             val (prNumber, targetHostingService) = if (prNumberUsingConfig == null) {
                 // Check if the merge commit message comes from other supporting hosting service
-                findPrNumberAndHostingService(pullRequestCommit)
+                gitHistoryService.findPrNumberAndHostingService(pullRequestCommit)
             } else {
                 Pair(prNumberUsingConfig, hosting)
             }
@@ -95,15 +95,6 @@ class FindPullRequestModel(
                 throw NoPullRequestFoundException(debugMessage.toString())
             }
         }
-    }
-
-    private fun findPrNumberAndHostingService(pullRequestCommit: GitCommit): Pair<Int?, FindPullRequestHostingServices?> {
-        var prNumber: Int? = null
-        val targetHostingService = FindPullRequestHostingServices.values().firstOrNull {
-            prNumber = pullRequestCommit.getNumberFromCommitMessage(it.defaultMergeCommitMessage)
-            prNumber != null
-        }
-        return Pair(prNumber, targetHostingService)
     }
 
     fun createWebRepoUrl(repository: GitRepository): String? {
