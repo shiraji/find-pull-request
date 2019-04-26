@@ -29,11 +29,8 @@ class FindPullRequestAction : BaseFindPullRequestAction() {
         BrowserUtil.open(url)
     }
 
-    override fun update(e: AnActionEvent?) {
-        e ?: return
-        super.update(e)
-        val project: Project = e.getData(CommonDataKeys.PROJECT) ?: return
-        val config = PropertiesComponent.getInstance(project) ?: return
-        e.presentation.text = "Find ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName}"
+    override fun menuText(project: Project): String? {
+        val config = PropertiesComponent.getInstance(project) ?: return null
+        return "Find ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName}"
     }
 }
