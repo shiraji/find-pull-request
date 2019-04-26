@@ -60,12 +60,9 @@ class FindPullRequestCopyAction : BaseFindPullRequestAction() {
         CopyPasteManager.getInstance().setContents(TextTransferable(text))
     }
 
-    override fun update(e: AnActionEvent?) {
-        e ?: return
-        super.update(e)
-        val project: Project = e.getData(CommonDataKeys.PROJECT) ?: return
-        val config = PropertiesComponent.getInstance(project) ?: return
-        e.presentation.text = "Copy ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName} URL"
+    override fun menuText(project: Project): String? {
+        val config = PropertiesComponent.getInstance(project) ?: return null
+        return "Copy ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName} URL"
     }
 
 }

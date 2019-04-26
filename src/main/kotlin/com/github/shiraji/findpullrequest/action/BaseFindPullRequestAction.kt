@@ -19,6 +19,8 @@ abstract class BaseFindPullRequestAction : AnAction() {
 
     abstract fun actionPerform(e: AnActionEvent, url: String)
 
+    abstract fun menuText(project: Project): String?
+
     abstract fun actionPerformForNoPullRequestFount(e: AnActionEvent, ex: NoPullRequestFoundException, url: String)
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -84,15 +86,19 @@ abstract class BaseFindPullRequestAction : AnAction() {
     override fun update(e: AnActionEvent?) {
         e ?: return
         super.update(e)
+        e.presentation.isEnabledAndVisible = false
+
         val project: Project = e.getData(CommonDataKeys.PROJECT) ?: return
         val editor: Editor = e.getData(CommonDataKeys.EDITOR) ?: return
         val virtualFile: VirtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
         val repository = getGitRepository(project, virtualFile) ?: return
+        val text = menuText(project) ?: return
         val gitRepositoryService = GitConfService()
         val gitUrlService = GitRepositoryUrlService()
         val gitHistoryService = GitHistoryService()
 
         e.presentation.isEnabledAndVisible = FindPullRequestModel(project, editor, virtualFile, gitRepositoryService, gitUrlService, gitHistoryService).isEnable(repository)
+        e.presentation.text = text
     }
 
     private fun getGitRepository(project: Project, file: VirtualFile?): GitRepository? {
