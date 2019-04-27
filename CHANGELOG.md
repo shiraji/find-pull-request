@@ -1,3 +1,9 @@
+### [ver 1.4.0](https://github.com/shiraji/find-pull-request/releases/tag/1.4.0)
+
+* Support GitLab #52
+* Support Bitbucket #53
+* Detect hosting service on startup #75
+
 ### [ver 1.3.0](https://github.com/shiraji/find-pull-request/releases/tag/1.3.0)
 
 * Create copy action #62

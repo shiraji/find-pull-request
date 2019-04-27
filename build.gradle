@@ -36,7 +36,6 @@ intellij {
 publishPlugin {
     username 'shiraji'
     password System.getenv('PASSWORD')
-    channels 'beta'
 }
 
 group 'com.github.shiraji.findpullrequest'
