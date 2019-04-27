@@ -26,6 +26,14 @@ Intellij plugin that jumps to the pull request page (or GitHub commits page)
 * Right click
 * Click "Copy Pull Request URL"
 
+## Options
+
+This plugin automatically detects which hosting service this project is hosted when the project open.
+
+You can change "Hosting Service" setting in Preferences.
+
+![settings](website/images/settings.png)
+
 ## Requirement
 
 * Remote repo should be GitHub/GitLab/Bitbucket
