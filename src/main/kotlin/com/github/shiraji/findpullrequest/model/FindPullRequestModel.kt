@@ -46,21 +46,17 @@ class FindPullRequestModel(
         return annotate.originalRevision(lineNumber)
     }
 
+    fun createCommitUrl(repository: GitRepository, hostingServices: FindPullRequestHostingServices, webRepoUrl: String, revisionHash: VcsRevisionNumber): String {
+        val path = hostingServices.commitPathFormat.format(webRepoUrl, revisionHash)
+        return createUrl(repository, hostingServices, path)
+    }
+
     fun createPullRequestPath(repository: GitRepository, revisionHash: VcsRevisionNumber): String {
         val debugMessage = StringBuilder()
         if (config.isDebugMode()) {
             debugMessage
                     .appendln("### Revision hash:")
                     .appendln(revisionHash.asString())
-        }
-
-        fun createUrl(hostingServices: FindPullRequestHostingServices, path: String): String {
-            return if (config.isJumpToFile()) {
-                val fileAnnotation = gitConfService.getFileAnnotation(repository, virtualFile) ?: return path
-                path + hostingServices.createFileAnchorValue(repository, fileAnnotation)
-            } else {
-                path
-            }
         }
 
         val pullRequestCommit = gitHistoryService.findClosestPullRequestCommit(project, repository, revisionHash)
@@ -81,7 +77,7 @@ class FindPullRequestModel(
             }
 
             val path = targetHostingService.urlPathFormat.format(prNumber)
-            createUrl(targetHostingService, path)
+            createUrl(repository, targetHostingService, path)
         } else {
             val commit = gitHistoryService.findCommitLog(project, repository, revisionHash)
             val hostingServices = FindPullRequestHostingServices.values().firstOrNull {
@@ -90,10 +86,19 @@ class FindPullRequestModel(
 
             if (hostingServices != null) {
                 val path = hostingServices.urlPathFormat.format(commit.getNumberFromCommitMessage(hostingServices.squashCommitMessage))
-                createUrl(hostingServices, path)
+                createUrl(repository, hostingServices, path)
             } else {
                 throw NoPullRequestFoundException(debugMessage.toString())
             }
+        }
+    }
+
+    private fun createUrl(repository: GitRepository, hostingServices: FindPullRequestHostingServices, path: String): String {
+        return if (config.isJumpToFile()) {
+            val fileAnnotation = gitConfService.getFileAnnotation(repository, virtualFile) ?: return path
+            path + hostingServices.createFileAnchorValue(repository, fileAnnotation)
+        } else {
+            path
         }
     }
 
