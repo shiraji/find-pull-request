@@ -20,12 +20,19 @@ Intellij plugin that jumps to the pull request page (or GitHub commits page)
 * Open the pull request page if the plugin finds pull request
 * Open the commit page if no pull request found for the selected line
 
+## Copy Pull Request URL
+
+* Select/Choose a line
+* Right click
+* Click "Copy Pull Request URL"
+
 ## Requirement
 
-* Remote repo should be GitHub/GitHub Enterprise
+* Remote repo should be GitHub/GitLab/Bitbucket
+* Custom domain should work but not tested it
 * Repository must set upstream or origin remote url
  * if upstream is set, then use upstream remote url
-* Do not select multiple lines
+* Selecting multiple lines is not supported
 * Project that has multiple git repository may not work
 
 ## How to install
