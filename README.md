@@ -20,12 +20,27 @@ Intellij plugin that jumps to the pull request page (or GitHub commits page)
 * Open the pull request page if the plugin finds pull request
 * Open the commit page if no pull request found for the selected line
 
+## Copy Pull Request URL
+
+* Select/Choose a line
+* Right click
+* Click "Copy Pull Request URL"
+
+## Options
+
+This plugin automatically detects which hosting service this project is hosted when the project open.
+
+You can change "Hosting Service" setting in Preferences.
+
+![settings](website/images/settings.png)
+
 ## Requirement
 
-* Remote repo should be GitHub/GitHub Enterprise
+* Remote repo should be GitHub/GitLab/Bitbucket
+* Custom domain should work but not tested it
 * Repository must set upstream or origin remote url
  * if upstream is set, then use upstream remote url
-* Do not select multiple lines
+* Selecting multiple lines is not supported
 * Project that has multiple git repository may not work
 
 ## How to install
@@ -35,7 +50,7 @@ Use the IDE's plugin manager to install the latest version of the plugin.
 ## License
 
 ```
-Copyright 2018 Yoshinori Isogai
+Copyright 2019 Yoshinori Isogai
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
