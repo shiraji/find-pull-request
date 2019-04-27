@@ -56,30 +56,14 @@ abstract class BaseFindPullRequestAction : AnAction() {
 
         val hostingServices = FindPullRequestHostingServices.findBy(config.getHosting())
         try {
-            val path = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
-            val url = createUrl(config, hostingServices, path, repository, annotate)
+            val url = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
             actionPerform(e, url)
         } catch (ex: VcsException) {
             val name = FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.toLowerCase()
             showErrorNotification("Could not find the $name for $revisionHash : ${ex.message}")
         } catch (ex: NoPullRequestFoundException) {
-            val path = hostingServices.commitPathFormat.format(webRepoUrl, revisionHash)
-            val url = createUrl(config, hostingServices, path, repository, annotate)
+            val url = model.createCommitUrl(repository, hostingServices, webRepoUrl, revisionHash)
             actionPerformForNoPullRequestFount(e, ex, url = url)
-        }
-    }
-
-    private fun createUrl(
-            config: PropertiesComponent,
-            hostingServices: FindPullRequestHostingServices,
-            path: String,
-            repository: GitRepository,
-            fileAnnotation: FileAnnotation
-    ): String {
-        return if (config.isJumpToFile()) {
-            path + hostingServices.createFileAnchorValue(repository, fileAnnotation)
-        } else {
-            path
         }
     }
 

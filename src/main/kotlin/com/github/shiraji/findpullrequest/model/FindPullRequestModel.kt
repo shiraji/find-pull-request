@@ -46,6 +46,11 @@ class FindPullRequestModel(
         return annotate.originalRevision(lineNumber)
     }
 
+    fun createCommitUrl(repository: GitRepository, hostingServices: FindPullRequestHostingServices, webRepoUrl: String, revisionHash: VcsRevisionNumber): String {
+        val path = hostingServices.commitPathFormat.format(webRepoUrl, revisionHash)
+        return createUrl(repository, hostingServices, path)
+    }
+
     fun createPullRequestPath(repository: GitRepository, revisionHash: VcsRevisionNumber): String {
         val debugMessage = StringBuilder()
         if (config.isDebugMode()) {
