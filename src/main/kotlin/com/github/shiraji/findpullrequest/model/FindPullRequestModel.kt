@@ -54,15 +54,6 @@ class FindPullRequestModel(
                     .appendln(revisionHash.asString())
         }
 
-        fun createUrl(hostingServices: FindPullRequestHostingServices, path: String): String {
-            return if (config.isJumpToFile()) {
-                val fileAnnotation = gitConfService.getFileAnnotation(repository, virtualFile) ?: return path
-                path + hostingServices.createFileAnchorValue(repository, fileAnnotation)
-            } else {
-                path
-            }
-        }
-
         val pullRequestCommit = gitHistoryService.findClosestPullRequestCommit(project, repository, revisionHash)
 
         return if (pullRequestCommit != null && gitHistoryService.hasCommitsFromRevisionNumber(gitHistoryService.listCommitsFromMergedCommit(project, repository, pullRequestCommit), revisionHash)) {
@@ -81,7 +72,7 @@ class FindPullRequestModel(
             }
 
             val path = targetHostingService.urlPathFormat.format(prNumber)
-            createUrl(targetHostingService, path)
+            createUrl(repository, targetHostingService, path)
         } else {
             val commit = gitHistoryService.findCommitLog(project, repository, revisionHash)
             val hostingServices = FindPullRequestHostingServices.values().firstOrNull {
@@ -90,10 +81,19 @@ class FindPullRequestModel(
 
             if (hostingServices != null) {
                 val path = hostingServices.urlPathFormat.format(commit.getNumberFromCommitMessage(hostingServices.squashCommitMessage))
-                createUrl(hostingServices, path)
+                createUrl(repository, hostingServices, path)
             } else {
                 throw NoPullRequestFoundException(debugMessage.toString())
             }
+        }
+    }
+
+    private fun createUrl(repository: GitRepository, hostingServices: FindPullRequestHostingServices, path: String): String {
+        return if (config.isJumpToFile()) {
+            val fileAnnotation = gitConfService.getFileAnnotation(repository, virtualFile) ?: return path
+            path + hostingServices.createFileAnchorValue(repository, fileAnnotation)
+        } else {
+            path
         }
     }
 
