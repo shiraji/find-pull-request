@@ -4,9 +4,9 @@
   <vendor email="isogai.shiraji@gmail.com" url="https://github.com/shiraji">Shiraji</vendor>
 
     <description><![CDATA[
-      This plugin find the pull request of the selected line. <br/><img src="https://raw.githubusercontent.com/shiraji/find-pull-request/master/website/images/screenshot.gif"/><br/>If there is no pull request for the line, then open Github commit page which the line is added.<br/>
+      This plugin find the pull request or the merge request of the selected line. The supported git hosting services are GitHub, GitLab, Bitbucket.<br/><img src="https://raw.githubusercontent.com/shiraji/find-pull-request/master/website/images/screenshot.gif"/><br/>If there is no pull request for the line, then open Github commit page which the line is added.<br/>
       <br/>
-      <a href="https://github.com/shiraji/find-pull-request">GitHub</a> |
+      <a href="https://github.com/shiraji/find-pull-request">Source</a> |
       <a href="https://github.com/shiraji/find-pull-request/issues">Issues</a>
     ]]></description>
 
