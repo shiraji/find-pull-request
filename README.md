@@ -7,7 +7,7 @@
 [![Version](https://img.shields.io/jetbrains/plugin/v/8262-find-pull-request.svg)](https://plugins.jetbrains.com/plugin/8262-find-pull-request)
 [![Download](https://img.shields.io/jetbrains/plugin/d/8262-find-pull-request.svg)](https://plugins.jetbrains.com/plugin/8262-find-pull-request)
 
-Intellij plugin that jumps to the pull request page (or GitHub commits page)
+Intellij plugin that jumps to the pull request page or commits page. This plugin supports GitHub, GitLab, Bitbucket.
 
 ## How to use
 
