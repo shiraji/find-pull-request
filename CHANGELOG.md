@@ -1,3 +1,7 @@
+### [ver 1.4.1](https://github.com/shiraji/find-pull-request/releases/tag/1.4.1)
+
+* Fix NoSuchElementException with IDEA 2019.1 #94 Thanks for @ofry for reporting
+
 ### [ver 1.4.0](https://github.com/shiraji/find-pull-request/releases/tag/1.4.0)
 
 * Support GitLab #52
