@@ -14,12 +14,14 @@ import com.intellij.openapi.vcs.annotate.FileAnnotation
 import com.intellij.openapi.vfs.VirtualFile
 import git4idea.GitUtil
 import git4idea.repo.GitRepository
+import javax.swing.Icon
 
 abstract class BaseFindPullRequestAction : AnAction() {
 
     abstract fun actionPerform(e: AnActionEvent, url: String)
 
     abstract fun menuText(project: Project): String?
+    abstract fun menuIcon(project: Project): Icon?
 
     abstract fun actionPerformForNoPullRequestFount(e: AnActionEvent, ex: NoPullRequestFoundException, url: String)
 
@@ -67,8 +69,7 @@ abstract class BaseFindPullRequestAction : AnAction() {
         }
     }
 
-    override fun update(e: AnActionEvent?) {
-        e ?: return
+    override fun update(e: AnActionEvent) {
         super.update(e)
         e.presentation.isEnabledAndVisible = false
 
@@ -77,12 +78,14 @@ abstract class BaseFindPullRequestAction : AnAction() {
         val virtualFile: VirtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
         val repository = getGitRepository(project, virtualFile) ?: return
         val text = menuText(project) ?: return
+        val icon = menuIcon(project)
         val gitRepositoryService = GitConfService()
         val gitUrlService = GitRepositoryUrlService()
         val gitHistoryService = GitHistoryService()
 
         e.presentation.isEnabledAndVisible = FindPullRequestModel(project, editor, virtualFile, gitRepositoryService, gitUrlService, gitHistoryService).isEnable(repository)
         e.presentation.text = text
+        icon?.let { e.presentation.icon = it }
     }
 
     private fun getGitRepository(project: Project, file: VirtualFile?): GitRepository? {

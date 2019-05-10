@@ -6,11 +6,15 @@ import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices
 import com.github.shiraji.findpullrequest.model.getHosting
 import com.github.shiraji.findpullrequest.model.isDebugMode
 import com.intellij.ide.BrowserUtil
+import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.application.ApplicationInfo
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import java.net.URLEncoder
+import javax.swing.Icon
 
 class FindPullRequestAction : BaseFindPullRequestAction() {
     override fun actionPerformForNoPullRequestFount(e: AnActionEvent, ex: NoPullRequestFoundException, url: String) {
@@ -32,5 +36,10 @@ class FindPullRequestAction : BaseFindPullRequestAction() {
     override fun menuText(project: Project): String? {
         val config = PropertiesComponent.getInstance(project) ?: return null
         return "Find ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName}"
+    }
+
+    override fun menuIcon(project: Project): Icon? {
+        val config = PropertiesComponent.getInstance(project) ?: return null
+        return FindPullRequestHostingServices.findBy(config.getHosting()).icon
     }
 }

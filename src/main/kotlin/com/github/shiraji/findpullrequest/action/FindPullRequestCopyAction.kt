@@ -17,6 +17,7 @@ import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
 import com.intellij.util.ui.TextTransferable
 import java.net.URLEncoder
+import javax.swing.Icon
 import javax.swing.event.HyperlinkEvent
 
 class FindPullRequestCopyAction : BaseFindPullRequestAction() {
@@ -65,4 +66,5 @@ class FindPullRequestCopyAction : BaseFindPullRequestAction() {
         return "Copy ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName} URL"
     }
 
+    override fun menuIcon(project: Project): Icon? = null
 }
