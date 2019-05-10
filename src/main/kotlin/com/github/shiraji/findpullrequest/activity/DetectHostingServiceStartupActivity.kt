@@ -12,7 +12,7 @@ class DetectHostingServiceStartupActivity : StartupActivity {
         if (config.hasHosting()) return
         if (GitUtil.getRepositoryManager(project).repositories.isEmpty()) return
         val gitHistoryService = GitHistoryService()
-        val mergeCommit = gitHistoryService.findLatestMergeCommit(project)
+        val mergeCommit = gitHistoryService.findLatestMergeCommit(project) ?: return
         val hostingService = gitHistoryService.findPrNumberAndHostingService(mergeCommit).second ?: return
         config.setHosting(hostingService)
     }
