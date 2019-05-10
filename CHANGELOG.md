@@ -1,3 +1,8 @@
+### [ver 1.4.2](https://github.com/shiraji/find-pull-request/releases/tag/1.4.2)
+
+* Change menu icon #90
+* Add plugin icon #93
+
 ### [ver 1.4.1](https://github.com/shiraji/find-pull-request/releases/tag/1.4.1)
 
 * Fix NoSuchElementException with IDEA 2019.1 #94 Thanks for @ofry for reporting
