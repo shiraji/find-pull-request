@@ -2,7 +2,7 @@
 
 [![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/shiraji/find-pull-request/blob/master/LICENSE)
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-find--pull--request-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3353)
-[![Build Status](https://travis-ci.org/shiraji/find-pull-request.svg?branch=master)](https://travis-ci.org/shiraji/find-pull-request)
+[![CircleCI](https://circleci.com/gh/shiraji/find-pull-request.svg?style=svg)](https://circleci.com/gh/shiraji/find-pull-request)
 [![codecov](https://codecov.io/gh/shiraji/find-pull-request/branch/master/graph/badge.svg)](https://codecov.io/gh/shiraji/find-pull-request)
 [![Version](https://img.shields.io/jetbrains/plugin/v/8262-find-pull-request.svg)](https://plugins.jetbrains.com/plugin/8262-find-pull-request)
 [![Download](https://img.shields.io/jetbrains/plugin/d/8262-find-pull-request.svg)](https://plugins.jetbrains.com/plugin/8262-find-pull-request)
