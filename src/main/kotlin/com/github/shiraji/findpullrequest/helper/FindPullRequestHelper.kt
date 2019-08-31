@@ -5,8 +5,8 @@ import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
 
-fun showInfoNotification(message: String)
-        = Notifications.Bus.notify(Notification("FindPullRequest.Info", "Find Pull Request", message, NotificationType.INFORMATION, NotificationListener.URL_OPENING_LISTENER))
+fun showInfoNotification(message: String) =
+        Notifications.Bus.notify(Notification("FindPullRequest.Info", "Find Pull Request", message, NotificationType.INFORMATION, NotificationListener.URL_OPENING_LISTENER))
 
-fun showErrorNotification(message: String)
-        = Notifications.Bus.notify(Notification("FindPullRequest.Error", "Find Pull Request", message, NotificationType.ERROR))
+fun showErrorNotification(message: String) =
+        Notifications.Bus.notify(Notification("FindPullRequest.Error", "Find Pull Request", message, NotificationType.ERROR))

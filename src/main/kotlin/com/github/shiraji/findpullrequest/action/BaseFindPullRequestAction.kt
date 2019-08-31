@@ -2,7 +2,12 @@ package com.github.shiraji.findpullrequest.action
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
 import com.github.shiraji.findpullrequest.helper.showErrorNotification
-import com.github.shiraji.findpullrequest.model.*
+import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices
+import com.github.shiraji.findpullrequest.model.FindPullRequestModel
+import com.github.shiraji.findpullrequest.model.GitConfService
+import com.github.shiraji.findpullrequest.model.GitHistoryService
+import com.github.shiraji.findpullrequest.model.GitRepositoryUrlService
+import com.github.shiraji.findpullrequest.model.getHosting
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -10,7 +15,6 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.VcsException
-import com.intellij.openapi.vcs.annotate.FileAnnotation
 import com.intellij.openapi.vfs.VirtualFile
 import git4idea.GitUtil
 import git4idea.repo.GitRepository
@@ -91,7 +95,7 @@ abstract class BaseFindPullRequestAction : AnAction() {
     private fun getGitRepository(project: Project, file: VirtualFile?): GitRepository? {
         val manager = GitUtil.getRepositoryManager(project)
         val repositories = manager.repositories
-        return when(repositories.size) {
+        return when (repositories.size) {
             0 -> null
             1 -> repositories[0]
             else -> {

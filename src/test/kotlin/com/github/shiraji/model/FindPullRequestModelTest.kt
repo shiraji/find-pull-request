@@ -1,7 +1,15 @@
 package com.github.shiraji.model
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
-import com.github.shiraji.findpullrequest.model.*
+import com.github.shiraji.findpullrequest.model.FindPullRequestModel
+import com.github.shiraji.findpullrequest.model.GitConfService
+import com.github.shiraji.findpullrequest.model.GitHistoryService
+import com.github.shiraji.findpullrequest.model.GitRepositoryUrlService
+import com.github.shiraji.findpullrequest.model.getHosting
+import com.github.shiraji.findpullrequest.model.getProtocol
+import com.github.shiraji.findpullrequest.model.isDebugMode
+import com.github.shiraji.findpullrequest.model.isDisable
+import com.github.shiraji.findpullrequest.model.isJumpToFile
 import com.github.shiraji.subtract
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.editor.Document
@@ -18,9 +26,16 @@ import git4idea.GitCommit
 import git4idea.history.GitHistoryUtils
 import git4idea.repo.GitRemote
 import git4idea.repo.GitRepository
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import junit.framework.TestCase.*
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.verify
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertNull
+import junit.framework.TestCase.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -88,13 +103,12 @@ class FindPullRequestModelTest {
     }
 
     private fun generateGitRemote(
-            name: String = "origin",
-            urls: List<String> = listOf("git@github.com:shiraji/find-pull-request.git"),
-            pushUrls: Collection<String> = listOf(""),
-            fetchRefSpecs: List<String> = listOf(""),
-            pushRefSpecs: List<String> = listOf("")
+        name: String = "origin",
+        urls: List<String> = listOf("git@github.com:shiraji/find-pull-request.git"),
+        pushUrls: Collection<String> = listOf(""),
+        fetchRefSpecs: List<String> = listOf(""),
+        pushRefSpecs: List<String> = listOf("")
     ) = GitRemote(name, urls, pushUrls, fetchRefSpecs, pushRefSpecs)
-
 
     private fun mockIsUnversioned(result: Boolean = false) {
         every { changeListManager.isUnversioned(virtualFile) } returns result
@@ -215,8 +229,8 @@ class FindPullRequestModelTest {
     @Test
     fun `Found PR has different hash code but the commit is squash commit`() {
         val prCommit1 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #${PR_NUMBER + 1} from")
-        val prCommit2 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Foo (#${PR_NUMBER})")
-        val prCommit3 = generateGitCommit(hashCode = HASH, fullMessage = "Foo (#${PR_NUMBER})")
+        val prCommit2 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Foo (#$PR_NUMBER)")
+        val prCommit3 = generateGitCommit(hashCode = HASH, fullMessage = "Foo (#$PR_NUMBER)")
 
         mockConfig()
         mockGitRepository(listOf(generateGitRemote()))
@@ -246,9 +260,9 @@ class FindPullRequestModelTest {
 
     @Test
     fun `Found PR has different hash code and its commit message is not squash commit`() {
-        val prCommit1 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #${PR_NUMBER} from")
-        val prCommit2 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Foo (#${PR_NUMBER})")
-        val prCommit3 = generateGitCommit(hashCode = HASH, fullMessage = "Merge pull request #${PR_NUMBER} from")
+        val prCommit1 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #$PR_NUMBER from")
+        val prCommit2 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Foo (#$PR_NUMBER)")
+        val prCommit3 = generateGitCommit(hashCode = HASH, fullMessage = "Merge pull request #$PR_NUMBER from")
 
         mockConfig()
         mockGitRepository(listOf(generateGitRemote()))
@@ -459,5 +473,4 @@ class FindPullRequestModelTest {
 
         assertEquals("https://gitlab.com/shiraji/find-pull-request", result)
     }
-
 }

@@ -13,23 +13,21 @@ import com.intellij.openapi.vcs.changes.Change
 import com.intellij.openapi.vcs.changes.ChangeListManager
 import com.intellij.openapi.vcs.history.VcsRevisionNumber
 import com.intellij.openapi.vfs.VirtualFile
-import git4idea.GitCommit
 import git4idea.repo.GitRepository
 
-
 class FindPullRequestModel(
-        private val project: Project,
-        private val editor: Editor,
-        private val virtualFile: VirtualFile,
-        private val gitConfService: GitConfService,
-        private val gitRepositoryUrlService: GitRepositoryUrlService,
-        private val gitHistoryService: GitHistoryService,
-        private val config: PropertiesComponent = PropertiesComponent.getInstance(project)
+    private val project: Project,
+    private val editor: Editor,
+    private val virtualFile: VirtualFile,
+    private val gitConfService: GitConfService,
+    private val gitRepositoryUrlService: GitRepositoryUrlService,
+    private val gitHistoryService: GitHistoryService,
+    private val config: PropertiesComponent = PropertiesComponent.getInstance(project)
 ) {
 
     fun isEnable(
-            repository: GitRepository,
-            changeListManager: ChangeListManager = ChangeListManager.getInstance(project)
+        repository: GitRepository,
+        changeListManager: ChangeListManager = ChangeListManager.getInstance(project)
     ): Boolean {
         if (config.isDisable()) return false
         if (project.isDisposed) return false
