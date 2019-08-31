@@ -10,16 +10,6 @@
       <a href="https://github.com/shiraji/find-pull-request/issues">Issues</a>
     ]]></description>
 
-    <change-notes><![CDATA[
-        <p>1.4.2</p>
-        <ul>
-          <li>Change menu icon #90</li>
-          <li>Add plugin icon #93</li>
-        </ul>
-        <p>Older version changes are listed on <a href="https://github.com/shiraji/find-pull-request/blob/master/CHANGELOG.md">CHANGELOG.md</a></p>
-    ]]>
-    </change-notes>
-
   <idea-version since-build="143"/>
 
   <depends>com.intellij.modules.lang</depends>
