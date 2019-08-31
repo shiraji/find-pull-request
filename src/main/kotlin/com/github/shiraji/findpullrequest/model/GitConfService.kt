@@ -25,5 +25,4 @@ class GitConfService {
     fun getFileAnnotation(repository: GitRepository, virtualFile: VirtualFile): FileAnnotation? {
         return repository.vcs?.annotationProvider?.annotate(virtualFile)
     }
-
 }

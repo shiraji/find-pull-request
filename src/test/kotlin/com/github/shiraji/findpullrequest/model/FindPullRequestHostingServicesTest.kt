@@ -1,7 +1,6 @@
 package com.github.shiraji.findpullrequest.model
 
 import com.github.shiraji.subtract
-import com.github.shiraji.toSHA1
 import com.intellij.openapi.vcs.annotate.FileAnnotation
 import git4idea.repo.GitRepository
 import io.mockk.every

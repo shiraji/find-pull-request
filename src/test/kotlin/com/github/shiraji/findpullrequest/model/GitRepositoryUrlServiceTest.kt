@@ -1,9 +1,9 @@
 package com.github.shiraji.findpullrequest.model
 
-import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 
 internal class GitRepositoryUrlServiceTest {
 
@@ -56,7 +56,6 @@ internal class GitRepositoryUrlServiceTest {
 
             assertNull(got)
         }
-
     }
 
     @Nested

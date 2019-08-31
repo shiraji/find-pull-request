@@ -28,5 +28,4 @@ class GitRepositoryUrlService {
     private fun removeProtocolPrefix(url: String): String {
         return if (url.contains("@")) url.substringAfter("@") else url.substringAfter("://")
     }
-
 }

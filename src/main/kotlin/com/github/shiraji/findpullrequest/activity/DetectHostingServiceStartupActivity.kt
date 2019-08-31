@@ -1,6 +1,8 @@
 package com.github.shiraji.findpullrequest.activity
 
-import com.github.shiraji.findpullrequest.model.*
+import com.github.shiraji.findpullrequest.model.GitHistoryService
+import com.github.shiraji.findpullrequest.model.hasHosting
+import com.github.shiraji.findpullrequest.model.setHosting
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity

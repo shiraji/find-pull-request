@@ -6,12 +6,9 @@ import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices
 import com.github.shiraji.findpullrequest.model.getHosting
 import com.github.shiraji.findpullrequest.model.isDebugMode
 import com.intellij.ide.BrowserUtil
-import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.application.ApplicationInfo
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import java.net.URLEncoder
 import javax.swing.Icon

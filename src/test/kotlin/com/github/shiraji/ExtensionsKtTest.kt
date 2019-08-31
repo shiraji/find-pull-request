@@ -21,5 +21,4 @@ class ExtensionsKtTest {
         val text = "aaabbbccc"
         assertEquals("aaaccc", text.subtract("bbb"))
     }
-
 }
