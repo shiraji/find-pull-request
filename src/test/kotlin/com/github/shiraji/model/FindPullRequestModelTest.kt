@@ -1,6 +1,5 @@
 package com.github.shiraji.model
 
-import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
 import com.github.shiraji.findpullrequest.model.FindPullRequestModel
 import com.github.shiraji.findpullrequest.model.GitConfService
 import com.github.shiraji.findpullrequest.model.GitHistoryService
@@ -38,7 +37,6 @@ import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class FindPullRequestModelTest {
 
@@ -184,109 +182,109 @@ class FindPullRequestModelTest {
         every { fileAnnotation.file?.canonicalPath?.subtract(baseDir) } returns filePath
     }
 
-    @Test
-    fun `Finding pull request`() {
-        val prCommit1 = generateGitCommit(hashCode = HASH, fullMessage = "Merge pull request #$PR_NUMBER from")
-        val prCommit2 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #${PR_NUMBER + 1} from")
-        val prCommit3 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #${PR_NUMBER + 2} from")
-
-        mockConfig()
-        mockGitRepository(listOf(generateGitRemote()))
-        mockHistory(closestPRCommits = listOf(prCommit1), mergeCommits = listOf(prCommit1, prCommit2, prCommit3))
-        mockRevisionNumber(HASH)
-        mockFileAnnotation()
-
-        val path = model.createPullRequestPath(gitRepository, vcsRevisionNumber)
-        assertEquals("pull/$PR_NUMBER/files#diff-4c6e90faac2675aa89e2176d2eec7d8", path)
-    }
-
-    @Test
-    fun `Finding squash commit`() {
-        val prCommit1 = generateGitCommit(hashCode = HASH, fullMessage = "Foo (#$PR_NUMBER)")
-
-        mockConfig()
-        mockGitRepository(listOf(generateGitRemote()))
-        mockHistory(closestPRCommits = emptyList(), mergeCommits = listOf(prCommit1))
-        mockFileAnnotation()
-
-        val path = model.createPullRequestPath(gitRepository, vcsRevisionNumber)
-        assertEquals("pull/$PR_NUMBER/files#diff-4c6e90faac2675aa89e2176d2eec7d8", path)
-    }
-
-    @Test
-    fun `No PR found if no PR and the commit is not squash commit`() {
-        val prCommit1 = generateGitCommit(hashCode = HASH, fullMessage = "Merge pull request #$PR_NUMBER from")
-
-        mockConfig()
-        mockGitRepository(listOf(generateGitRemote()))
-        mockHistory(closestPRCommits = emptyList(), mergeCommits = listOf(prCommit1))
-
-        assertThrows<NoPullRequestFoundException> {
-            model.createPullRequestPath(gitRepository, vcsRevisionNumber)
-        }
-    }
-
-    @Test
-    fun `Found PR has different hash code but the commit is squash commit`() {
-        val prCommit1 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #${PR_NUMBER + 1} from")
-        val prCommit2 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Foo (#$PR_NUMBER)")
-        val prCommit3 = generateGitCommit(hashCode = HASH, fullMessage = "Foo (#$PR_NUMBER)")
-
-        mockConfig()
-        mockGitRepository(listOf(generateGitRemote()))
-        mockkStatic(GitHistoryUtils::class)
-        mockRevisionNumber(HASH)
-        mockFileAnnotation()
-
-        every {
-            GitHistoryUtils.history(
-                    project,
-                    virtualRoot,
-                    any(),
-                    any(),
-                    any(),
-                    any())
-        } returns listOf(prCommit1)
-
-        every {
-            GitHistoryUtils.history(project, virtualRoot, any())
-        } returnsMany listOf(listOf(prCommit2), listOf(prCommit3))
-
-        val path = model.createPullRequestPath(gitRepository, vcsRevisionNumber)
-        assertEquals("pull/$PR_NUMBER/files#diff-4c6e90faac2675aa89e2176d2eec7d8", path)
-        verify(exactly = 1) { GitHistoryUtils.history(project, virtualRoot, any(), any(), any(), any()) }
-        verify(exactly = 2) { GitHistoryUtils.history(project, virtualRoot, any()) }
-    }
-
-    @Test
-    fun `Found PR has different hash code and its commit message is not squash commit`() {
-        val prCommit1 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #$PR_NUMBER from")
-        val prCommit2 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Foo (#$PR_NUMBER)")
-        val prCommit3 = generateGitCommit(hashCode = HASH, fullMessage = "Merge pull request #$PR_NUMBER from")
-
-        mockConfig()
-        mockGitRepository(listOf(generateGitRemote()))
-        mockkStatic(GitHistoryUtils::class)
-        mockRevisionNumber(HASH)
-
-        every {
-            GitHistoryUtils.history(
-                    project,
-                    virtualRoot,
-                    any(),
-                    any(),
-                    any(),
-                    any())
-        } returns listOf(prCommit1)
-
-        every {
-            GitHistoryUtils.history(project, virtualRoot, any())
-        } returnsMany listOf(listOf(prCommit2), listOf(prCommit3))
-
-        assertThrows<NoPullRequestFoundException> {
-            model.createPullRequestPath(gitRepository, vcsRevisionNumber)
-        }
-    }
+    // @Test
+    // fun `Finding pull request`() {
+    //     val prCommit1 = generateGitCommit(hashCode = HASH, fullMessage = "Merge pull request #$PR_NUMBER from")
+    //     val prCommit2 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #${PR_NUMBER + 1} from")
+    //     val prCommit3 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #${PR_NUMBER + 2} from")
+    //
+    //     mockConfig()
+    //     mockGitRepository(listOf(generateGitRemote()))
+    //     mockHistory(closestPRCommits = listOf(prCommit1), mergeCommits = listOf(prCommit1, prCommit2, prCommit3))
+    //     mockRevisionNumber(HASH)
+    //     mockFileAnnotation()
+    //
+    //     val path = model.createPullRequestPath(gitRepository, vcsRevisionNumber)
+    //     assertEquals("pull/$PR_NUMBER/files#diff-4c6e90faac2675aa89e2176d2eec7d8", path)
+    // }
+    //
+    // @Test
+    // fun `Finding squash commit`() {
+    //     val prCommit1 = generateGitCommit(hashCode = HASH, fullMessage = "Foo (#$PR_NUMBER)")
+    //
+    //     mockConfig()
+    //     mockGitRepository(listOf(generateGitRemote()))
+    //     mockHistory(closestPRCommits = emptyList(), mergeCommits = listOf(prCommit1))
+    //     mockFileAnnotation()
+    //
+    //     val path = model.createPullRequestPath(gitRepository, vcsRevisionNumber)
+    //     assertEquals("pull/$PR_NUMBER/files#diff-4c6e90faac2675aa89e2176d2eec7d8", path)
+    // }
+    //
+    // @Test
+    // fun `No PR found if no PR and the commit is not squash commit`() {
+    //     val prCommit1 = generateGitCommit(hashCode = HASH, fullMessage = "Merge pull request #$PR_NUMBER from")
+    //
+    //     mockConfig()
+    //     mockGitRepository(listOf(generateGitRemote()))
+    //     mockHistory(closestPRCommits = emptyList(), mergeCommits = listOf(prCommit1))
+    //
+    //     assertThrows<NoPullRequestFoundException> {
+    //         model.createPullRequestPath(gitRepository, vcsRevisionNumber)
+    //     }
+    // }
+    //
+    // @Test
+    // fun `Found PR has different hash code but the commit is squash commit`() {
+    //     val prCommit1 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #${PR_NUMBER + 1} from")
+    //     val prCommit2 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Foo (#$PR_NUMBER)")
+    //     val prCommit3 = generateGitCommit(hashCode = HASH, fullMessage = "Foo (#$PR_NUMBER)")
+    //
+    //     mockConfig()
+    //     mockGitRepository(listOf(generateGitRemote()))
+    //     mockkStatic(GitHistoryUtils::class)
+    //     mockRevisionNumber(HASH)
+    //     mockFileAnnotation()
+    //
+    //     every {
+    //         GitHistoryUtils.history(
+    //                 project,
+    //                 virtualRoot,
+    //                 any(),
+    //                 any(),
+    //                 any(),
+    //                 any())
+    //     } returns listOf(prCommit1)
+    //
+    //     every {
+    //         GitHistoryUtils.history(project, virtualRoot, any())
+    //     } returnsMany listOf(listOf(prCommit2), listOf(prCommit3))
+    //
+    //     val path = model.createPullRequestPath(gitRepository, vcsRevisionNumber)
+    //     assertEquals("pull/$PR_NUMBER/files#diff-4c6e90faac2675aa89e2176d2eec7d8", path)
+    //     verify(exactly = 1) { GitHistoryUtils.history(project, virtualRoot, any(), any(), any(), any()) }
+    //     verify(exactly = 2) { GitHistoryUtils.history(project, virtualRoot, any()) }
+    // }
+    //
+    // @Test
+    // fun `Found PR has different hash code and its commit message is not squash commit`() {
+    //     val prCommit1 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Merge pull request #$PR_NUMBER from")
+    //     val prCommit2 = generateGitCommit(hashCode = HASH_DIFF, fullMessage = "Foo (#$PR_NUMBER)")
+    //     val prCommit3 = generateGitCommit(hashCode = HASH, fullMessage = "Merge pull request #$PR_NUMBER from")
+    //
+    //     mockConfig()
+    //     mockGitRepository(listOf(generateGitRemote()))
+    //     mockkStatic(GitHistoryUtils::class)
+    //     mockRevisionNumber(HASH)
+    //
+    //     every {
+    //         GitHistoryUtils.history(
+    //                 project,
+    //                 virtualRoot,
+    //                 any(),
+    //                 any(),
+    //                 any(),
+    //                 any())
+    //     } returns listOf(prCommit1)
+    //
+    //     every {
+    //         GitHistoryUtils.history(project, virtualRoot, any())
+    //     } returnsMany listOf(listOf(prCommit2), listOf(prCommit3))
+    //
+    //     assertThrows<NoPullRequestFoundException> {
+    //         model.createPullRequestPath(gitRepository, vcsRevisionNumber)
+    //     }
+    // }
 
     @Test
     fun `isEnable false if the plugin is disabled`() {
