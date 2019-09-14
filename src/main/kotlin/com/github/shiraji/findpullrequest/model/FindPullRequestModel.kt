@@ -57,7 +57,7 @@ class FindPullRequestModel(
                     .appendln(revisionHash.asString())
         }
 
-        val pullRequestCommit = gitHistoryService.findClosestPullRequestCommit(project, repository, revisionHash)
+        val pullRequestCommit = gitHistoryService.findMergedCommit(project, repository, revisionHash)
 
         return if (pullRequestCommit != null && gitHistoryService.hasCommitsFromRevisionNumber(gitHistoryService.listCommitsFromMergedCommit(project, repository, pullRequestCommit), revisionHash)) {
             val hosting = FindPullRequestHostingServices.findBy(config.getHosting())

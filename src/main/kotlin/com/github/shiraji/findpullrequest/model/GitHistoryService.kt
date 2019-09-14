@@ -18,11 +18,18 @@ class GitHistoryService {
         return GitHistoryUtils.history(project, repository.root, "$revisionHash").first()
     }
 
-    fun findClosestPullRequestCommit(project: Project, repository: GitRepository, revisionHash: VcsRevisionNumber): GitCommit? {
+    fun findMergedCommit(project: Project, repository: GitRepository, revisionHash: VcsRevisionNumber): GitCommit? {
+        // See https://stackoverflow.com/questions/8475448/find-merge-commit-which-include-a-specific-commit
+        //
         // I think there is a bug in history() since it does not keep the order correctly
         // It seems GitLogUtil#readFullDetails is the place that store the results in list
-        val results = GitHistoryUtils.history(project, repository.root, "$revisionHash..HEAD", "--merges", "--ancestry-path", "--reverse")
-        return results.minBy { it.commitTime }
+        val ancestryPathCommits =
+            GitHistoryUtils.history(project, repository.root, "$revisionHash..HEAD", "--merges", "--ancestry-path")
+                .sortedBy { it.commitTime }
+        val firstParentsCommits =
+            GitHistoryUtils.history(project, repository.root, "$revisionHash..HEAD", "--merges", "--first-parent")
+                .sortedBy { it.commitTime }
+        return ancestryPathCommits.firstOrNull { firstParentsCommits.contains(it) }
     }
 
     fun listCommitsFromMergedCommit(project: Project, repository: GitRepository, pullRequestCommit: GitCommit): List<GitCommit> {
