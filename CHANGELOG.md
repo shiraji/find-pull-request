@@ -1,3 +1,7 @@
+### [ver 1.5.0](https://github.com/shiraji/find-pull-request/releases/tag/release-1.5.0)
+
+* Support git-flow #102
+
 ### [ver 1.4.2](https://github.com/shiraji/find-pull-request/releases/tag/1.4.2)
 
 * Change menu icon #90

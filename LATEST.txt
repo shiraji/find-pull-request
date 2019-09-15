@@ -1,6 +1,5 @@
-<p>1.4.2</p>
+<p>1.5.0</p>
 <ul>
-  <li>Change menu icon #90</li>
-  <li>Add plugin icon #93</li>
+  <li>Support git-flow #102</li>
 </ul>
 <p>Older version changes are listed on <a href="https://github.com/shiraji/find-pull-request/blob/master/CHANGELOG.md">CHANGELOG.md</a></p>
