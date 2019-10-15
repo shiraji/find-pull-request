@@ -1,6 +1,7 @@
 package com.github.shiraji.findpullrequest.action
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
+import com.github.shiraji.findpullrequest.helper.root
 import com.github.shiraji.findpullrequest.helper.showErrorNotification
 import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices
 import com.github.shiraji.findpullrequest.model.FindPullRequestModel
@@ -103,7 +104,8 @@ abstract class BaseFindPullRequestAction : AnAction() {
                     val repository = manager.getRepositoryForFile(file)
                     if (repository != null) return repository
                 }
-                manager.getRepositoryForFile(project.baseDir)
+                val root = project.root ?: return null
+                manager.getRepositoryForFile(root)
             }
         }
     }

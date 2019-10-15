@@ -1,5 +1,6 @@
 package com.github.shiraji.findpullrequest.model
 
+import com.github.shiraji.findpullrequest.helper.root
 import com.github.shiraji.subtract
 import com.github.shiraji.toMd5
 import com.github.shiraji.toSHA1
@@ -24,7 +25,7 @@ enum class FindPullRequestHostingServices(val defaultMergeCommitMessage: Regex, 
     }
 
     fun createFileAnchorValue(repository: GitRepository, annotate: FileAnnotation): String? {
-        val projectDir = repository.project.baseDir.canonicalPath?.plus("/") ?: return null
+        val projectDir = repository.project.root?.canonicalPath?.plus("/") ?: return null
         val filePath = annotate.file?.canonicalPath?.subtract(projectDir) ?: return null
         return when (this) {
             GitHub -> "#diff-${filePath.toMd5()}"

@@ -1,11 +1,16 @@
 package com.github.shiraji.findpullrequest.model
 
+import com.github.shiraji.findpullrequest.helper.root
 import com.github.shiraji.subtract
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.annotate.FileAnnotation
+import com.intellij.openapi.vfs.LocalFileSystem
 import git4idea.repo.GitRepository
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
@@ -13,12 +18,20 @@ class FindPullRequestHostingServicesTest {
 
     @Nested
     inner class createFileAnchorValue {
+        val project: Project = mockk()
+        val repository: GitRepository = mockk()
+
+        @BeforeEach
+        fun setUp() {
+            mockkStatic(LocalFileSystem::class)
+            every { LocalFileSystem.getInstance().findFileByPath(any()) } returns null
+            every { project.basePath } returns ""
+            every { project.root?.canonicalPath } returns ""
+            every { repository.project } returns project
+        }
+
         @Test
         fun `Should create GitHub style of file anchor`() {
-
-            val repository: GitRepository = mockk()
-            every { repository.project.baseDir.canonicalPath } returns ""
-
             val annotate: FileAnnotation = mockk()
             every { annotate.file?.canonicalPath?.subtract("") } returns "aaa"
 
@@ -29,10 +42,6 @@ class FindPullRequestHostingServicesTest {
 
         @Test
         fun `Should create GitLab style of file anchor`() {
-
-            val repository: GitRepository = mockk()
-            every { repository.project.baseDir.canonicalPath } returns ""
-
             val annotate: FileAnnotation = mockk()
             every { annotate.file?.canonicalPath?.subtract("") } returns "aaa"
 
@@ -43,10 +52,6 @@ class FindPullRequestHostingServicesTest {
 
         @Test
         fun `Should create Bitbucket style of file anchor`() {
-
-            val repository: GitRepository = mockk()
-            every { repository.project.baseDir.canonicalPath } returns ""
-
             val annotate: FileAnnotation = mockk()
             every { annotate.file?.canonicalPath?.subtract("") } returns "aaa"
 
