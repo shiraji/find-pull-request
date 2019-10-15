@@ -4,14 +4,14 @@ import com.github.shiraji.findpullrequest.helper.root
 import com.github.shiraji.subtract
 import com.github.shiraji.toMd5
 import com.github.shiraji.toSHA1
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.vcs.annotate.FileAnnotation
 import git4idea.repo.GitRepository
 import icons.FindPullRequestIcons
-import icons.GithubIcons
 import javax.swing.Icon
 
 enum class FindPullRequestHostingServices(val defaultMergeCommitMessage: Regex, val squashCommitMessage: Regex, val urlPathFormat: String, val commitPathFormat: String, val pullRequestName: String, val icon: Icon) {
-    GitHub("Merge pull request #(\\d*)".toRegex(), ".*\\(#(\\d*)\\)".toRegex(), "pull/%d/files", "%s/commit/%s", "Pull Request", GithubIcons.Github_icon),
+    GitHub("Merge pull request #(\\d*)".toRegex(), ".*\\(#(\\d*)\\)".toRegex(), "pull/%d/files", "%s/commit/%s", "Pull Request", AllIcons.Vcs.Vendors.Github),
     GitLab("See merge request .*!(\\d*)".toRegex(), "See merge request .*!(\\d*)".toRegex(), "merge_requests/%d/diffs", "%s/commit/%s", "Merge Request", FindPullRequestIcons.gitLabIcon),
     Bitbucket("\\(pull request #(\\d*)\\)".toRegex(), "\\(pull request #(\\d*)\\)".toRegex(), "pull-requests/%d/diff", "%s/commits/%s", "Pull Request", FindPullRequestIcons.bitbucketIcon),
 
