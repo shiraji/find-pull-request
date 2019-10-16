@@ -49,7 +49,7 @@ repositories {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version = "2019.1"
-    setPlugins("git4idea")
+    setPlugins("github", "git4idea")
     updateSinceUntilBuild = false
 }
 
