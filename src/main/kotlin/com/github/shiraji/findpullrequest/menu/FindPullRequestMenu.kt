@@ -11,14 +11,14 @@ import org.jetbrains.annotations.Nls
 import javax.swing.*
 
 class FindPullRequestMenu internal constructor(project: Project) : Configurable {
-    private val disable: JCheckBox? = null
-    private val debugMode: JCheckBox? = null
-    private val jumpToFile: JCheckBox? = null
-    private val protocols: JComboBox<Protocol>? = null
-    private val root: JPanel? = null
-    private val copyPopup: JCheckBox? = null
-    private val hostingService: JComboBox<FindPullRequestHostingServices>? = null
-    private val config: PropertiesComponent
+    private var disable: JCheckBox? = null
+    private var debugMode: JCheckBox? = null
+    private var jumpToFile: JCheckBox? = null
+    private var protocols: JComboBox<Protocol>? = null
+    private var root: JPanel? = null
+    private var copyPopup: JCheckBox? = null
+    private var hostingService: JComboBox<FindPullRequestHostingServices>? = null
+    private var config: PropertiesComponent = PropertiesComponent.getInstance(project)
 
     private val isModifiedProtocol: Boolean
         get() {
@@ -48,8 +48,6 @@ class FindPullRequestMenu internal constructor(project: Project) : Configurable 
     }
 
     init {
-
-        config = PropertiesComponent.getInstance(project)
         protocols!!.model = DefaultComboBoxModel(Protocol.values())
         hostingService!!.model = DefaultComboBoxModel(FindPullRequestHostingServices.values())
     }
@@ -128,4 +126,5 @@ class FindPullRequestMenu internal constructor(project: Project) : Configurable 
 
     override fun disposeUIResources() {
     }
+
 }
