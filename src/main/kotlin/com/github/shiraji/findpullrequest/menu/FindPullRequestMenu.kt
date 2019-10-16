@@ -1,14 +1,28 @@
 package com.github.shiraji.findpullrequest.menu
 
-import com.github.shiraji.findpullrequest.model.*
 import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices
+import com.github.shiraji.findpullrequest.model.getHosting
+import com.github.shiraji.findpullrequest.model.getProtocol
+import com.github.shiraji.findpullrequest.model.isDebugMode
+import com.github.shiraji.findpullrequest.model.isDisable
+import com.github.shiraji.findpullrequest.model.isJumpToFile
+import com.github.shiraji.findpullrequest.model.isPopupAfterCopy
+import com.github.shiraji.findpullrequest.model.setDebugMode
+import com.github.shiraji.findpullrequest.model.setDisable
+import com.github.shiraji.findpullrequest.model.setHosting
+import com.github.shiraji.findpullrequest.model.setJumpToFile
+import com.github.shiraji.findpullrequest.model.setPopupAfterCopy
+import com.github.shiraji.findpullrequest.model.setProtocol
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.project.Project
 import org.jetbrains.annotations.Nls
-
-import javax.swing.*
+import javax.swing.DefaultComboBoxModel
+import javax.swing.JCheckBox
+import javax.swing.JComboBox
+import javax.swing.JComponent
+import javax.swing.JPanel
 
 class FindPullRequestMenu internal constructor(project: Project) : Configurable {
     private var disable: JCheckBox? = null
@@ -32,16 +46,16 @@ class FindPullRequestMenu internal constructor(project: Project) : Configurable 
             return selectedItem is FindPullRequestHostingServices && config.getHosting() != selectedItem.name
         }
 
-    private enum class Protocol private constructor(val text: String) {
+    private enum class Protocol constructor(val text: String) {
         https("https://"), http("http://");
 
         companion object {
 
             fun findProtocolBy(name: String): Protocol? {
-                when (name) {
-                    "https://" -> return https
-                    "http://" -> return http
-                    else -> return null
+                return when (name) {
+                    "https://" -> https
+                    "http://" -> http
+                    else -> null
                 }
             }
         }
@@ -66,12 +80,12 @@ class FindPullRequestMenu internal constructor(project: Project) : Configurable 
     }
 
     override fun isModified(): Boolean {
-        return (isModifiedProtocol
-            || isModifiedHostingService
-            || config.isDebugMode() != debugMode!!.isSelected
-            || config.isJumpToFile() != jumpToFile!!.isSelected
-            || config.isDisable() != disable!!.isSelected
-            || config.isPopupAfterCopy() != copyPopup!!.isSelected)
+        return (isModifiedProtocol ||
+            isModifiedHostingService ||
+            config.isDebugMode() != debugMode!!.isSelected ||
+            config.isJumpToFile() != jumpToFile!!.isSelected ||
+            config.isDisable() != disable!!.isSelected ||
+            config.isPopupAfterCopy() != copyPopup!!.isSelected)
     }
 
     @Throws(ConfigurationException::class)
@@ -126,5 +140,4 @@ class FindPullRequestMenu internal constructor(project: Project) : Configurable 
 
     override fun disposeUIResources() {
     }
-
 }
