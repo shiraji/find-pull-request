@@ -25,7 +25,7 @@
     <action id="com.github.shiraji.findpullrequest.action.FindPullRequestAction"
             class="com.github.shiraji.findpullrequest.action.FindPullRequestAction"
             text="Find Pull Request"
-            icon="GithubIcons.Github_icon">
+            icon="AllIcons.Vcs.Vendors.Github">
       <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="Github.Open.In.Browser"/>
     </action>
 
