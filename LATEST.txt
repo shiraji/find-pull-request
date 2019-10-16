@@ -1,5 +1,6 @@
-<p>1.5.0</p>
+<p>1.6.0</p>
 <ul>
-  <li>Support git-flow #102</li>
+  <li>Fix Freeze on project opening #105 Thanks @nisnevich for reporting</li>
+  <li>Better performance #106 This plugin ends support of IntelliJ version lower than 2019.1</li>
 </ul>
 <p>Older version changes are listed on <a href="https://github.com/shiraji/find-pull-request/blob/master/CHANGELOG.md">CHANGELOG.md</a></p>
