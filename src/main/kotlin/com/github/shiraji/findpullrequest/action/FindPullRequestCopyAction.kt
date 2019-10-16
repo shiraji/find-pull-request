@@ -52,7 +52,8 @@ class FindPullRequestCopyAction : BaseFindPullRequestAction() {
     override fun actionPerform(e: AnActionEvent, url: String) {
         copy(url)
 
-        val config = PropertiesComponent.getInstance(e.project)
+        val project = e.project ?: return
+        val config = PropertiesComponent.getInstance(project)
         if (config.isPopupAfterCopy())
             showInfoNotification("Copied!")
     }

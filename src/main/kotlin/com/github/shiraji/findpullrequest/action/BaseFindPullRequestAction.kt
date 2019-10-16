@@ -1,6 +1,7 @@
 package com.github.shiraji.findpullrequest.action
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
+import com.github.shiraji.findpullrequest.helper.root
 import com.github.shiraji.findpullrequest.helper.showErrorNotification
 import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices
 import com.github.shiraji.findpullrequest.model.FindPullRequestModel
@@ -12,6 +13,7 @@ import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.VcsException
@@ -62,8 +64,10 @@ abstract class BaseFindPullRequestAction : AnAction() {
 
         val hostingServices = FindPullRequestHostingServices.findBy(config.getHosting())
         try {
-            val url = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
-            actionPerform(e, url)
+            ApplicationManager.getApplication().executeOnPooledThread {
+                val url = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
+                actionPerform(e, url)
+            }
         } catch (ex: VcsException) {
             val name = FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.toLowerCase()
             showErrorNotification("Could not find the $name for $revisionHash : ${ex.message}")
@@ -103,7 +107,8 @@ abstract class BaseFindPullRequestAction : AnAction() {
                     val repository = manager.getRepositoryForFile(file)
                     if (repository != null) return repository
                 }
-                manager.getRepositoryForFile(project.baseDir)
+                val root = project.root ?: return null
+                manager.getRepositoryForFile(root)
             }
         }
     }
