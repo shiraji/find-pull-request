@@ -1,3 +1,8 @@
+### [ver 1.6.0](https://github.com/shiraji/find-pull-request/releases/tag/release-1.6.0)
+
+* Fix Freeze on project opening #105 Thanks @nisnevich for reporting
+* Better performance #106 This plugin ends support of IntelliJ version lower than 2019.1 
+
 ### [ver 1.5.0](https://github.com/shiraji/find-pull-request/releases/tag/release-1.5.0)
 
 * Support git-flow #102
@@ -9,7 +14,7 @@
 
 ### [ver 1.4.1](https://github.com/shiraji/find-pull-request/releases/tag/1.4.1)
 
-* Fix NoSuchElementException with IDEA 2019.1 #94 Thanks for @ofry for reporting
+* Fix NoSuchElementException with IDEA 2019.1 #94 Thanks @ofry for reporting
 
 ### [ver 1.4.0](https://github.com/shiraji/find-pull-request/releases/tag/1.4.0)
 
