@@ -60,17 +60,17 @@ abstract class BaseFindPullRequestAction : AnAction() {
         }
 
         val hostingServices = FindPullRequestHostingServices.findBy(config.getHosting())
-        try {
-            ApplicationManager.getApplication().executeOnPooledThread {
+        ApplicationManager.getApplication().executeOnPooledThread {
+            try {
                 val url = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
                 actionPerform(e, url)
+            } catch (ex: VcsException) {
+                val name = FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.toLowerCase()
+                showErrorNotification("Could not find the $name for $revisionHash : ${ex.message}")
+            } catch (ex: NoPullRequestFoundException) {
+                val url = model.createCommitUrl(repository, hostingServices, webRepoUrl, revisionHash)
+                actionPerformForNoPullRequestFount(e, ex, url = url)
             }
-        } catch (ex: VcsException) {
-            val name = FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.toLowerCase()
-            showErrorNotification("Could not find the $name for $revisionHash : ${ex.message}")
-        } catch (ex: NoPullRequestFoundException) {
-            val url = model.createCommitUrl(repository, hostingServices, webRepoUrl, revisionHash)
-            actionPerformForNoPullRequestFount(e, ex, url = url)
         }
     }
 
