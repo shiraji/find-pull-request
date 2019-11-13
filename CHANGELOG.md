@@ -1,4 +1,8 @@
-### [ver 1.6.0](https://github.com/shiraji/find-pull-request/releases/tag/release-1.6.0)
+### [ver 1.6.2](https://github.com/shiraji/find-pull-request/releases/tag/release-1.6.2)
+
+* Fix Plugin crash when the code is editing. #111
+
+### [ver 1.6.1](https://github.com/shiraji/find-pull-request/releases/tag/release-1.6.1)
 
 * Fix Freeze on project opening #105 Thanks @nisnevich for reporting
 * Better performance #106 This plugin ends support of IntelliJ version lower than 2019.1 
