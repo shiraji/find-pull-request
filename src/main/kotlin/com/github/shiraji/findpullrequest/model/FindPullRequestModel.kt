@@ -1,14 +1,12 @@
 package com.github.shiraji.findpullrequest.model
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
-import com.github.shiraji.getLine
 import com.github.shiraji.getNumberFromCommitMessage
 import com.github.shiraji.isPointSingleLine
 import com.github.shiraji.isSquashPullRequestCommit
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vcs.annotate.FileAnnotation
 import com.intellij.openapi.vcs.changes.Change
 import com.intellij.openapi.vcs.changes.ChangeListManager
 import com.intellij.openapi.vcs.history.VcsRevisionNumber
@@ -37,11 +35,6 @@ class FindPullRequestModel(
             if (it.type == Change.Type.NEW) return false
         }
         return editor.isPointSingleLine()
-    }
-
-    fun createRevisionHash(annotate: FileAnnotation): VcsRevisionNumber? {
-        val lineNumber = editor.getLine(editor.selectionModel.selectionStart)
-        return annotate.originalRevision(lineNumber)
     }
 
     fun createCommitUrl(repository: GitRepository, hostingServices: FindPullRequestHostingServices, webRepoUrl: String, revisionHash: VcsRevisionNumber): String {

@@ -2,11 +2,18 @@ package com.github.shiraji.findpullrequest.model
 
 import com.github.shiraji.getNumberFromCommitMessage
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vcs.VcsException
 import com.intellij.openapi.vcs.history.VcsRevisionNumber
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.vcsUtil.VcsUtil
 import git4idea.GitCommit
+import git4idea.GitRevisionNumber
+import git4idea.commands.GitBinaryHandler
+import git4idea.commands.GitCommand
 import git4idea.history.GitHistoryUtils
 import git4idea.repo.GitRepository
+import java.nio.charset.StandardCharsets
 
 class GitHistoryService {
 
@@ -56,5 +63,18 @@ class GitHistoryService {
             prNumber != null
         }
         return Pair(prNumber, targetHostingService)
+    }
+
+    @Throws(VcsException::class)
+    fun findRevisionHash(project: Project, repository: GitRepository, virtualFile: VirtualFile, lineNumber: Int): GitRevisionNumber {
+        val filePath = VcsUtil.getLastCommitPath(project, VcsUtil.getFilePath(virtualFile))
+        val handler = GitBinaryHandler(project, repository.root, GitCommand.BLAME)
+        handler.setStdoutSuppressed(true)
+        handler.addParameters("-l", "-t", "-c", "--encoding=UTF-8")
+        handler.endOptions()
+        handler.addRelativePaths(filePath)
+        val output = String(handler.run(), StandardCharsets.UTF_8)
+        val revisionString = output.split("\n")[lineNumber].split(Regex("\\s"))[0]
+        return GitRevisionNumber.resolve(project, repository.root, revisionString)
     }
 }

@@ -9,6 +9,7 @@ import com.github.shiraji.findpullrequest.model.GitConfService
 import com.github.shiraji.findpullrequest.model.GitHistoryService
 import com.github.shiraji.findpullrequest.model.GitRepositoryUrlService
 import com.github.shiraji.findpullrequest.model.getHosting
+import com.github.shiraji.getLine
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -44,14 +45,10 @@ abstract class BaseFindPullRequestAction : AnAction() {
         val model = FindPullRequestModel(project, editor, virtualFile, gitRepositoryService, gitUrlService, gitHistoryService)
         if (!model.isEnable(repository)) return
 
-        val annotate = gitRepositoryService.getFileAnnotation(repository, virtualFile)
-        if (annotate == null) {
-            showErrorNotification("Could not load file annotations.")
-            return
-        }
-
-        val revisionHash = model.createRevisionHash(annotate)
-        if (revisionHash == null) {
+        val lineNumber = editor.getLine(editor.selectionModel.selectionStart)
+        val revisionHash = try {
+            gitHistoryService.findRevisionHash(project, repository, virtualFile, lineNumber)
+        } catch (e: VcsException) {
             showErrorNotification("Could not find revision hash")
             return
         }
@@ -63,17 +60,17 @@ abstract class BaseFindPullRequestAction : AnAction() {
         }
 
         val hostingServices = FindPullRequestHostingServices.findBy(config.getHosting())
-        try {
-            ApplicationManager.getApplication().executeOnPooledThread {
+        ApplicationManager.getApplication().executeOnPooledThread {
+            try {
                 val url = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
                 actionPerform(e, url)
+            } catch (ex: VcsException) {
+                val name = FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.toLowerCase()
+                showErrorNotification("Could not find the $name for $revisionHash : ${ex.message}")
+            } catch (ex: NoPullRequestFoundException) {
+                val url = model.createCommitUrl(repository, hostingServices, webRepoUrl, revisionHash)
+                actionPerformForNoPullRequestFount(e, ex, url = url)
             }
-        } catch (ex: VcsException) {
-            val name = FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.toLowerCase()
-            showErrorNotification("Could not find the $name for $revisionHash : ${ex.message}")
-        } catch (ex: NoPullRequestFoundException) {
-            val url = model.createCommitUrl(repository, hostingServices, webRepoUrl, revisionHash)
-            actionPerformForNoPullRequestFount(e, ex, url = url)
         }
     }
 
