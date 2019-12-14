@@ -10,15 +10,15 @@
          <li>Copy the pull request or the merge request URL</li>
          <li>List the pull request or the merge request number</li>
        </ul>
-      The supported git hosting services are GitHub, GitLab, Bitbucket.<br/>
+      The supported git hosting services are GitHub, GitLab, Bitbucket.<br/><br/>
 
-      Find Pull Request
+      <h3>1. Find Pull Request</h3>
       <img src="https://raw.githubusercontent.com/shiraji/find-pull-request/master/website/images/find-pr.gif"/><br/>
 
-      Copy Pull Request URL
+      <h3>2. Copy Pull Request URL</h3>
       <img src="https://raw.githubusercontent.com/shiraji/find-pull-request/master/website/images/copy-pr.gif"/><br/>
 
-      List Pull Request
+      <h3>3. List Pull Request</h3>
       <img src="https://raw.githubusercontent.com/shiraji/find-pull-request/master/website/images/list-pr.gif"/><br/>
 
       <br/>
