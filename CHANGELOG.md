@@ -1,3 +1,7 @@
+### [ver 1.7.0](https://github.com/shiraji/find-pull-request/releases/tag/release-1.7.0)
+
+* List all PR like annotate #113
+
 ### [ver 1.6.2](https://github.com/shiraji/find-pull-request/releases/tag/release-1.6.2)
 
 * Fix Plugin crash when the code is editing. #111

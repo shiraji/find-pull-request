@@ -1,5 +1,5 @@
-<p>1.6.2</p>
+<p>1.7.0</p>
 <ul>
-  <li>Fix Plugin crash when the code is editing. #111</li>
+  <li>List all PR like annotate #113</li>
 </ul>
 <p>Older version changes are listed on <a href="https://github.com/shiraji/find-pull-request/blob/master/CHANGELOG.md">CHANGELOG.md</a></p>

@@ -13,20 +13,35 @@ Intellij plugin that jumps to the pull request page or commits page. This plugin
 
 ## How to use
 
+### Find Pull Request
+
 * Select/Choose a line
 * Right click
 * Click "Find Pull Request"
 
-![screenshot](website/images/screenshot.gif)
+![find-pr](website/images/find-pr.gif)
 
 * Open the pull request page if the plugin finds pull request
 * Open the commit page if no pull request found for the selected line
 
-## Copy Pull Request URL
+### Copy Pull Request URL
 
 * Select/Choose a line
 * Right click
 * Click "Copy Pull Request URL"
+
+![copy-pr](website/images/copy-pr.gif)
+
+### List Pull Request
+
+* Right click editor's left part (Editor Gutter)
+* Click "List Pull Request"
+
+![list-pr](website/images/list-pr.gif)
+
+* This plugin lists PR number and commit hash if no PR found
+* Click PR number jump to PR page
+* Click commit hash jump to commit page
 
 ## Options
 
