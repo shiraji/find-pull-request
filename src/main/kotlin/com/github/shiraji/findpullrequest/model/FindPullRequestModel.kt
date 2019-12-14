@@ -84,7 +84,7 @@ class FindPullRequestModel(
         }
     }
 
-    private fun createUrl(repository: GitRepository, hostingServices: FindPullRequestHostingServices, path: String): String {
+    fun createUrl(repository: GitRepository, hostingServices: FindPullRequestHostingServices, path: String): String {
         return if (config.isJumpToFile()) {
             val fileAnnotation = gitConfService.getFileAnnotation(repository, virtualFile) ?: return path
             path + hostingServices.createFileAnchorValue(repository, fileAnnotation)

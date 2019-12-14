@@ -66,7 +66,7 @@ class GitHistoryService {
     }
 
     @Throws(VcsException::class)
-    fun findRevisionHash(project: Project, repository: GitRepository, virtualFile: VirtualFile, lineNumber: Int): GitRevisionNumber {
+    fun findRevisionHashes(project: Project, repository: GitRepository, virtualFile: VirtualFile): List<String> {
         val filePath = VcsUtil.getLastCommitPath(project, VcsUtil.getFilePath(virtualFile))
         val handler = GitBinaryHandler(project, repository.root, GitCommand.BLAME)
         handler.setStdoutSuppressed(true)
@@ -74,7 +74,13 @@ class GitHistoryService {
         handler.endOptions()
         handler.addRelativePaths(filePath)
         val output = String(handler.run(), StandardCharsets.UTF_8)
-        val revisionString = output.split("\n")[lineNumber].split(Regex("\\s"))[0]
+        return output.split("\n").map { it.split(Regex("\\s"))[0] }
+    }
+
+    @Throws(VcsException::class)
+    fun findRevisionHash(project: Project, repository: GitRepository, virtualFile: VirtualFile, lineNumber: Int): GitRevisionNumber {
+        val revisions = findRevisionHashes(project, repository, virtualFile)
+        val revisionString = revisions[lineNumber]
         return GitRevisionNumber.resolve(project, repository.root, revisionString)
     }
 }
