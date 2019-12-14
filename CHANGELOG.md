@@ -1,6 +1,8 @@
 ### [ver 1.7.0](https://github.com/shiraji/find-pull-request/releases/tag/release-1.7.0)
 
 * List all PR like annotate #113
+* Ends support version lower than 2019.2 #116
+* Fix the problem of closing "Annotate" when the plugin closes "List pull request" #117
 
 ### [ver 1.6.2](https://github.com/shiraji/find-pull-request/releases/tag/release-1.6.2)
 
