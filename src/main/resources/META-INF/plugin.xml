@@ -35,6 +35,11 @@
             icon="AllIcons.Actions.Copy">
       <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.github.shiraji.findpullrequest.action.FindPullRequestAction"/>
     </action>
+
+    <action id="com.github.shiraji.findpullrequest.action.ListPullRequestToggleAction"
+            class="com.github.shiraji.findpullrequest.action.ListPullRequestToggleAction" text="List Pull Requests" description="List the pull request for each line.">
+      <add-to-group group-id="EditorGutterVcsPopupMenu" relative-to-action="Annotate" anchor="after"/>
+    </action>
   </actions>
 
 </idea-plugin>
