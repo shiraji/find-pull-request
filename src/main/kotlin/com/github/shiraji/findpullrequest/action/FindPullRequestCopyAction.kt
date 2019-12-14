@@ -59,7 +59,7 @@ class FindPullRequestCopyAction : BaseFindPullRequestAction() {
     }
 
     private fun copy(text: String) {
-        CopyPasteManager.getInstance().setContents(TextTransferable(text))
+        CopyPasteManager.getInstance().setContents(TextTransferable(text as CharSequence))
     }
 
     override fun menuText(project: Project): String? {
