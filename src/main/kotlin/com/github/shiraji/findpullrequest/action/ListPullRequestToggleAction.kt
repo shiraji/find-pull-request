@@ -16,8 +16,11 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.ToggleAction
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vcs.ProjectLevelVcsManager
@@ -29,6 +32,8 @@ import git4idea.GitUtil
 import git4idea.repo.GitRepository
 
 class ListPullRequestToggleAction : ToggleAction() {
+
+    private var provider: ListPullRequestTextAnnotationGutterProvider? = null
 
     override fun isSelected(e: AnActionEvent): Boolean {
         val editor: Editor = e.getData(CommonDataKeys.EDITOR) ?: return false
@@ -44,8 +49,7 @@ class ListPullRequestToggleAction : ToggleAction() {
             listPRs(e)
         } else {
             val editor: Editor = e.getData(CommonDataKeys.EDITOR) ?: return
-            // IntelliJ's limitation. I mean, I think I can close only this plugin's annotation but let's wait they support closing each annotation.
-            editor.gutter.closeAllAnnotations()
+            editor.gutter.closeTextAnnotations(listOf(provider))
         }
     }
 
@@ -61,74 +65,83 @@ class ListPullRequestToggleAction : ToggleAction() {
         val gitUrlService = GitRepositoryUrlService()
         val model = FindPullRequestModel(project, editor, virtualFile, gitRepositoryService, gitUrlService, gitHistoryService)
         val map = hashMapOf<String, GitPullRequestInfo>()
-        val fileAnnotation = GitConfService().getFileAnnotation(repository, virtualFile) ?: return
-        fileAnnotation.setCloser {
-            UIUtil.invokeLaterIfNeeded {
-                if (!project.isDisposed) editor.gutter.closeAllAnnotations()
-            }
-        }
-        fileAnnotation.setReloader { newFileAnnotation ->
-            println(newFileAnnotation)
-        }
 
-        if (fileAnnotation.isClosed) return
-
-        val disposable = Disposable { fileAnnotation.dispose() }
-
-        if (fileAnnotation.file != null && fileAnnotation.file!!.isInLocalFileSystem) {
-            val changesListener = ProjectLevelVcsManager.getInstance(project).annotationLocalChangesListener
-            changesListener.registerAnnotation(fileAnnotation.file, fileAnnotation)
-            Disposer.register(disposable, Disposable {
-                    changesListener.unregisterAnnotation(fileAnnotation.file, fileAnnotation)
-            })
-        }
-
-        // Not sure why but fileAnnotation.revisions does not return local commits.
-        // To resolve that, this plugin uses gitHistoryService.findRevisionHashes() to list all hashes of current file
-        revisionHashes.distinct().forEach { hash ->
-            if (map.containsKey(hash)) return@forEach
-            val revisionNumber = try {
-                GitRevisionNumber.resolve(project, repository.root, hash)
-            } catch (e: VcsException) {
-                return@forEach
-            }
-            val pullRequestCommit = gitHistoryService.findMergedCommit(project, repository, revisionNumber)
-            val pair = if (pullRequestCommit != null && gitHistoryService.hasCommitsFromRevisionNumber(
-                    gitHistoryService.listCommitsFromMergedCommit(
-                        project,
-                        repository,
-                        pullRequestCommit
-                    ), revisionNumber
-                )
-            ) {
-                val hosting = FindPullRequestHostingServices.findBy(config.getHosting())
-                val prNumberUsingConfig =
-                    pullRequestCommit.getNumberFromCommitMessage(hosting.defaultMergeCommitMessage)
-
-                if (prNumberUsingConfig == null) {
-                    // Check if the merge commit message comes from other supporting hosting service
-                    gitHistoryService.findPrNumberAndHostingService(pullRequestCommit)
-                } else {
-                    Pair(prNumberUsingConfig, hosting)
+        object : Task.Backgroundable(project, "Listing Pull Request...") {
+            override fun run(indicator: ProgressIndicator) {
+                val fileAnnotation = GitConfService().getFileAnnotation(repository, virtualFile) ?: return
+                fileAnnotation.setCloser {
+                    UIUtil.invokeLaterIfNeeded {
+                        if (!project.isDisposed && provider != null) {
+                            editor.gutter.closeTextAnnotations(listOf(provider))
+                        }
+                    }
                 }
-            } else {
-                val commit = gitHistoryService.findCommitLog(project, repository, revisionNumber)
-                val hostingServices = FindPullRequestHostingServices.values().firstOrNull {
-                    commit.isSquashPullRequestCommit(it)
+                fileAnnotation.setReloader { newFileAnnotation ->
+                    // println(newFileAnnotation)
                 }
 
-                if (hostingServices != null) {
-                    Pair(commit.getNumberFromCommitMessage(hostingServices.squashCommitMessage), hostingServices)
-                } else {
-                    Pair(null, FindPullRequestHostingServices.findBy(config.getHosting()))
+                if (fileAnnotation.isClosed) return
+
+                val disposable = Disposable { fileAnnotation.dispose() }
+
+                if (fileAnnotation.file != null && fileAnnotation.file!!.isInLocalFileSystem) {
+                    val changesListener = ProjectLevelVcsManager.getInstance(project).annotationLocalChangesListener
+                    changesListener.registerAnnotation(fileAnnotation.file, fileAnnotation)
+                    Disposer.register(disposable, Disposable {
+                        changesListener.unregisterAnnotation(fileAnnotation.file, fileAnnotation)
+                    })
+                }
+
+                // Not sure why but fileAnnotation.revisions does not return local commits.
+                // To resolve that, this plugin uses gitHistoryService.findRevisionHashes() to list all hashes of current file
+                revisionHashes.distinct().forEach { hash ->
+                    if (map.containsKey(hash)) return@forEach
+                    val revisionNumber = try {
+                        GitRevisionNumber.resolve(project, repository.root, hash)
+                    } catch (e: VcsException) {
+                        return@forEach
+                    }
+                    val pullRequestCommit = gitHistoryService.findMergedCommit(project, repository, revisionNumber)
+                    val pair = if (pullRequestCommit != null && gitHistoryService.hasCommitsFromRevisionNumber(
+                            gitHistoryService.listCommitsFromMergedCommit(
+                                project,
+                                repository,
+                                pullRequestCommit
+                            ), revisionNumber
+                        )
+                    ) {
+                        val hosting = FindPullRequestHostingServices.findBy(config.getHosting())
+                        val prNumberUsingConfig =
+                            pullRequestCommit.getNumberFromCommitMessage(hosting.defaultMergeCommitMessage)
+
+                        if (prNumberUsingConfig == null) {
+                            // Check if the merge commit message comes from other supporting hosting service
+                            gitHistoryService.findPrNumberAndHostingService(pullRequestCommit)
+                        } else {
+                            Pair(prNumberUsingConfig, hosting)
+                        }
+                    } else {
+                        val commit = gitHistoryService.findCommitLog(project, repository, revisionNumber)
+                        val hostingServices = FindPullRequestHostingServices.values().firstOrNull {
+                            commit.isSquashPullRequestCommit(it)
+                        }
+
+                        if (hostingServices != null) {
+                            Pair(commit.getNumberFromCommitMessage(hostingServices.squashCommitMessage), hostingServices)
+                        } else {
+                            Pair(null, FindPullRequestHostingServices.findBy(config.getHosting()))
+                        }
+                    }
+
+                    map[hash] = GitPullRequestInfo(prNumber = pair.first, revisionNumber = revisionNumber, hostingServices = pair.second)
+                }
+
+                ApplicationManager.getApplication().invokeLater {
+                    provider = ListPullRequestTextAnnotationGutterProvider(map, virtualFile, fileAnnotation, model, repository)
+                    editor.gutter.registerTextAnnotation(provider!!, provider!!)
                 }
             }
-
-            map[hash] = GitPullRequestInfo(prNumber = pair.first, revisionNumber = revisionNumber, hostingServices = pair.second)
-        }
-
-        val provider = ListPullRequestTextAnnotationGutterProvider(map, virtualFile, fileAnnotation, model, repository)
-        editor.gutter.registerTextAnnotation(provider, provider)
+        }.queue()
     }
 
     private fun getGitRepository(project: Project, file: VirtualFile?): GitRepository? {
