@@ -16,6 +16,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.VcsException
 import com.intellij.openapi.vfs.VirtualFile
@@ -46,32 +48,35 @@ abstract class BaseFindPullRequestAction : AnAction() {
         if (!model.isEnable(repository)) return
 
         val lineNumber = editor.getLine(editor.selectionModel.selectionStart)
-        val revisionHash = try {
-            gitHistoryService.findRevisionHash(project, repository, virtualFile, lineNumber)
-        } catch (e: VcsException) {
-            showErrorNotification("Could not find revision hash")
-            return
-        }
 
-        val webRepoUrl = model.createWebRepoUrl(repository)
-        if (webRepoUrl == null) {
-            showErrorNotification("Could not find GitHub repository url")
-            return
-        }
+        object : Task.Backgroundable(project, "Finding Pull Request...") {
+            override fun run(indicator: ProgressIndicator) {
+                val revisionHash = try {
+                    gitHistoryService.findRevisionHash(project, repository, virtualFile, lineNumber)
+                } catch (e: VcsException) {
+                    showErrorNotification("Could not find revision hash")
+                    return
+                }
 
-        val hostingServices = FindPullRequestHostingServices.findBy(config.getHosting())
-        ApplicationManager.getApplication().executeOnPooledThread {
-            try {
-                val url = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
-                actionPerform(e, url)
-            } catch (ex: VcsException) {
-                val name = FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.toLowerCase()
-                showErrorNotification("Could not find the $name for $revisionHash : ${ex.message}")
-            } catch (ex: NoPullRequestFoundException) {
-                val url = model.createCommitUrl(repository, hostingServices, webRepoUrl, revisionHash)
-                actionPerformForNoPullRequestFount(e, ex, url = url)
+                val webRepoUrl = model.createWebRepoUrl(repository)
+                if (webRepoUrl == null) {
+                    showErrorNotification("Could not find GitHub repository url")
+                    return
+                }
+
+                val hostingServices = FindPullRequestHostingServices.findBy(config.getHosting())
+                try {
+                    val url = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
+                    actionPerform(e, url)
+                } catch (ex: VcsException) {
+                    val name = FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.toLowerCase()
+                    showErrorNotification("Could not find the $name for $revisionHash : ${ex.message}")
+                } catch (ex: NoPullRequestFoundException) {
+                    val url = model.createCommitUrl(repository, hostingServices, webRepoUrl, revisionHash)
+                    actionPerformForNoPullRequestFount(e, ex, url = url)
+                }
             }
-        }
+        }.queue()
     }
 
     override fun update(e: AnActionEvent) {
@@ -88,7 +93,18 @@ abstract class BaseFindPullRequestAction : AnAction() {
         val gitUrlService = GitRepositoryUrlService()
         val gitHistoryService = GitHistoryService()
 
-        e.presentation.isEnabledAndVisible = FindPullRequestModel(project, editor, virtualFile, gitRepositoryService, gitUrlService, gitHistoryService).isEnable(repository)
+        e.presentation.isEnabledAndVisible = if (ApplicationManager.getApplication().isReadAccessAllowed) {
+            FindPullRequestModel(
+                project,
+                editor,
+                virtualFile,
+                gitRepositoryService,
+                gitUrlService,
+                gitHistoryService
+            ).isEnable(repository)
+        } else {
+            false
+        }
         e.presentation.text = text
         icon?.let { e.presentation.icon = it }
     }
