@@ -33,6 +33,22 @@ import git4idea.repo.GitRepository
 
 class ListPullRequestToggleAction : ToggleAction() {
 
+    private fun isEnabled(e: AnActionEvent): Boolean {
+        val project = e.getData(CommonDataKeys.PROJECT)
+        if (project == null || project.isDisposed) return false
+
+        val selectedFiles = e.getData(CommonDataKeys.VIRTUAL_FILE_ARRAY)
+        if (selectedFiles == null || selectedFiles.size != 1) return false
+
+        val file = selectedFiles[0]
+        return !file.isDirectory && !file.fileType.isBinary && file.isInLocalFileSystem
+    }
+
+    override fun update(e: AnActionEvent) {
+        super.update(e)
+        e.presentation.isEnabled = isEnabled(e)
+    }
+
     override fun isSelected(e: AnActionEvent): Boolean {
         val editor: Editor = e.getData(CommonDataKeys.EDITOR) ?: return false
         val virtualFile: VirtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return false
