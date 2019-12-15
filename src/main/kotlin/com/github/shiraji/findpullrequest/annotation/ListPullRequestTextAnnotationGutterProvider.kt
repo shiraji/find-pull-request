@@ -10,6 +10,8 @@ import com.intellij.openapi.editor.TextAnnotationGutterProvider
 import com.intellij.openapi.editor.colors.ColorKey
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorFontType
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.vcs.annotate.FileAnnotation
 import com.intellij.openapi.vcs.impl.UpToDateLineNumberProviderImpl
 import com.intellij.openapi.vfs.VirtualFile
@@ -58,21 +60,26 @@ class ListPullRequestTextAnnotationGutterProvider constructor(
     }
 
     override fun doAction(lineNum: Int) {
-        val hash = fileAnnotation.getLineRevisionNumber(lineNum)?.asString() ?: ""
-        val gitPullRequestInfo = gitHashesMap[hash] ?: return
-        val hostingService = gitPullRequestInfo.hostingServices ?: return
-        val webRepoUrl = model.createWebRepoUrl(repository) ?: return
+        object : Task.Backgroundable(fileAnnotation.project, "Opening Pull Request...") {
+            override fun run(indicator: ProgressIndicator) {
+                val hash = fileAnnotation.getLineRevisionNumber(lineNum)?.asString() ?: ""
+                val gitPullRequestInfo = gitHashesMap[hash] ?: return
+                val hostingService = gitPullRequestInfo.hostingServices ?: return
+                val webRepoUrl = model.createWebRepoUrl(repository) ?: return
 
-        if (gitPullRequestInfo.prNumber == null) {
-            val url = model.createCommitUrl(repository, hostingService, webRepoUrl, gitPullRequestInfo.revisionNumber)
+                if (gitPullRequestInfo.prNumber == null) {
+                    val url =
+                        model.createCommitUrl(repository, hostingService, webRepoUrl, gitPullRequestInfo.revisionNumber)
 
-            BrowserUtil.open(url)
-        } else {
-            val path = hostingService.urlPathFormat.format(gitPullRequestInfo.prNumber)
-            val url = model.createUrl(repository, hostingService, path)
+                    BrowserUtil.open(url)
+                } else {
+                    val path = hostingService.urlPathFormat.format(gitPullRequestInfo.prNumber)
+                    val url = model.createUrl(repository, hostingService, path)
 
-            BrowserUtil.open("$webRepoUrl/$url")
-        }
+                    BrowserUtil.open("$webRepoUrl/$url")
+                }
+            }
+        }.queue()
     }
 
     override fun getCursor(lineNum: Int): Cursor {
