@@ -48,9 +48,8 @@ repositories {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = "2019.2"
+    version = "2019.1"
     setPlugins("github", "git4idea")
-    updateSinceUntilBuild = false
 }
 
 val patchPluginXml: PatchPluginXmlTask by tasks

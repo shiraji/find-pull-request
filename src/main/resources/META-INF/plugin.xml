@@ -26,7 +26,7 @@
       <a href="https://github.com/shiraji/find-pull-request/issues">Issues</a>
     ]]></description>
 
-  <idea-version since-build="192.5728"/>
+  <idea-version since-build="191" until-build="192.5727"/>
 
   <depends>com.intellij.modules.lang</depends>
   <depends>org.jetbrains.plugins.github</depends>

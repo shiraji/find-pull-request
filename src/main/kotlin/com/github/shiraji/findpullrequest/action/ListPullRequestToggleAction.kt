@@ -69,12 +69,7 @@ class ListPullRequestToggleAction : ToggleAction() {
     }
 
     private fun closeListPullRequestTextAnnotationGutterProvider(editor: Editor, virtualFile: VirtualFile) {
-        val closeProviders =
-            editor.gutter.textAnnotations.filterIsInstance(ListPullRequestTextAnnotationGutterProvider::class.java)
-                .filter { it.virtualFile == virtualFile }
-        if (closeProviders.isNotEmpty()) {
-            editor.gutter.closeTextAnnotations(closeProviders)
-        }
+        editor.gutter.closeAllAnnotations()
     }
 
     private fun listPRs(e: AnActionEvent) {
