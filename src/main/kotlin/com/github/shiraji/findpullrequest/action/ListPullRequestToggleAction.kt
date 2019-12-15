@@ -33,8 +33,6 @@ import git4idea.repo.GitRepository
 
 class ListPullRequestToggleAction : ToggleAction() {
 
-    private var provider: ListPullRequestTextAnnotationGutterProvider? = null
-
     override fun isSelected(e: AnActionEvent): Boolean {
         val editor: Editor = e.getData(CommonDataKeys.EDITOR) ?: return false
         val virtualFile: VirtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return false
@@ -49,7 +47,17 @@ class ListPullRequestToggleAction : ToggleAction() {
             listPRs(e)
         } else {
             val editor: Editor = e.getData(CommonDataKeys.EDITOR) ?: return
-            editor.gutter.closeTextAnnotations(listOf(provider))
+            val virtualFile: VirtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
+            closeListPullRequestTextAnnotationGutterProvider(editor, virtualFile)
+        }
+    }
+
+    private fun closeListPullRequestTextAnnotationGutterProvider(editor: Editor, virtualFile: VirtualFile) {
+        val closeProviders =
+            editor.gutter.textAnnotations.filterIsInstance(ListPullRequestTextAnnotationGutterProvider::class.java)
+                .filter { it.virtualFile == virtualFile }
+        if (closeProviders.isNotEmpty()) {
+            editor.gutter.closeTextAnnotations(closeProviders)
         }
     }
 
@@ -63,7 +71,8 @@ class ListPullRequestToggleAction : ToggleAction() {
         val revisionHashes = gitHistoryService.findRevisionHashes(project, repository, virtualFile)
         val gitRepositoryService = GitConfService()
         val gitUrlService = GitRepositoryUrlService()
-        val model = FindPullRequestModel(project, editor, virtualFile, gitRepositoryService, gitUrlService, gitHistoryService)
+        val model =
+            FindPullRequestModel(project, editor, virtualFile, gitRepositoryService, gitUrlService, gitHistoryService)
         val map = hashMapOf<String, GitPullRequestInfo>()
 
         object : Task.Backgroundable(project, "Listing Pull Request...") {
@@ -71,8 +80,8 @@ class ListPullRequestToggleAction : ToggleAction() {
                 val fileAnnotation = GitConfService().getFileAnnotation(repository, virtualFile) ?: return
                 fileAnnotation.setCloser {
                     UIUtil.invokeLaterIfNeeded {
-                        if (!project.isDisposed && provider != null) {
-                            editor.gutter.closeTextAnnotations(listOf(provider))
+                        if (!project.isDisposed) {
+                            closeListPullRequestTextAnnotationGutterProvider(editor, virtualFile)
                         }
                     }
                 }
@@ -127,18 +136,26 @@ class ListPullRequestToggleAction : ToggleAction() {
                         }
 
                         if (hostingServices != null) {
-                            Pair(commit.getNumberFromCommitMessage(hostingServices.squashCommitMessage), hostingServices)
+                            Pair(
+                                commit.getNumberFromCommitMessage(hostingServices.squashCommitMessage),
+                                hostingServices
+                            )
                         } else {
                             Pair(null, FindPullRequestHostingServices.findBy(config.getHosting()))
                         }
                     }
 
-                    map[hash] = GitPullRequestInfo(prNumber = pair.first, revisionNumber = revisionNumber, hostingServices = pair.second)
+                    map[hash] = GitPullRequestInfo(
+                        prNumber = pair.first,
+                        revisionNumber = revisionNumber,
+                        hostingServices = pair.second
+                    )
                 }
 
                 ApplicationManager.getApplication().invokeLater {
-                    provider = ListPullRequestTextAnnotationGutterProvider(map, virtualFile, fileAnnotation, model, repository)
-                    editor.gutter.registerTextAnnotation(provider!!, provider!!)
+                    val provider =
+                        ListPullRequestTextAnnotationGutterProvider(map, virtualFile, fileAnnotation, model, repository)
+                    editor.gutter.registerTextAnnotation(provider, provider)
                 }
             }
         }.queue()
