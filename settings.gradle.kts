@@ -1,7 +1,5 @@
 rootProject.name = "find-pull-request"
 
-enableFeaturePreview("STABLE_PUBLISHING")
-
 pluginManagement {
     resolutionStrategy {
         val kotlinVersion: String by settings

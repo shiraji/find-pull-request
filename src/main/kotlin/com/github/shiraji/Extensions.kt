@@ -1,6 +1,6 @@
 package com.github.shiraji
 
-import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices
+import com.github.shiraji.findpullrequest.domain.HostingService
 import com.intellij.openapi.editor.Editor
 import git4idea.GitCommit
 import java.math.BigInteger
@@ -16,7 +16,7 @@ fun Editor.isPointSingleLine() = getLine(selectionModel.selectionStart) == getLi
 
 fun Editor.getLine(offset: Int) = document.getLineNumber(offset)
 
-fun GitCommit.isSquashPullRequestCommit(hostingServices: FindPullRequestHostingServices): Boolean {
+fun GitCommit.isSquashPullRequestCommit(hostingServices: HostingService): Boolean {
     return hostingServices.squashCommitMessage.containsMatchIn(this.fullMessage)
 }
 

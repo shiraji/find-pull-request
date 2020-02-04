@@ -68,6 +68,10 @@ dependencies {
     val kotlinVersion: String by project
     compile("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
 
+    val koinVersion: String by project
+    implementation("org.koin:koin-core:$koinVersion")
+
+    testImplementation("org.koin:koin-test:$koinVersion")
     testImplementation("io.mockk:mockk:1.8.6")
     testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
 }
