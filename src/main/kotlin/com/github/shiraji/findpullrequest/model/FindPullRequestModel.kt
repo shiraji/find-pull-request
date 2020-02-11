@@ -95,10 +95,7 @@ class FindPullRequestModel(
 
     fun createWebRepoUrl(repository: GitRepository): String? {
         val remoteUrl: String = gitConfService.findUpstreamUrl(repository) ?: gitConfService.findOriginUrl(repository) ?: return null
-        val host = gitRepositoryUrlService.getHostFromUrl(remoteUrl)
-        val username = gitRepositoryUrlService.getUserFromRemoteUrl(remoteUrl)
-        val repositoryName = gitRepositoryUrlService.getRepositoryFromRemoteUrl(remoteUrl)
-        if (username.isNullOrBlank() || repositoryName.isNullOrBlank()) return null
-        return "${config.getProtocol()}$host/$username/$repositoryName"
+        val path = gitRepositoryUrlService.toURLPath(remoteUrl)
+        return "${config.getProtocol()}$path"
     }
 }
