@@ -1,3 +1,8 @@
+### [ver 1.7.1](https://github.com/shiraji/find-pull-request/releases/tag/release-1.7.1)
+
+* GitLab MR URL missing group/org #125 Thanks @P15223971 for reporting
+* Fix startup crash #127
+
 ### [ver 1.7.0](https://github.com/shiraji/find-pull-request/releases/tag/release-1.7.0)
 
 * List all PR like annotate #113

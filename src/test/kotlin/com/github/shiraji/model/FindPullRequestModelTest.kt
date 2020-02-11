@@ -437,18 +437,6 @@ class FindPullRequestModelTest {
     }
 
     @Test
-    fun `createWebRepoUrl returns null if the format is no user name`() {
-        mockConfig()
-        mockGitRepository(listOf(generateGitRemote(
-                urls = listOf("https://github.enterprise.local/shiraji/find-pull-request")
-        )))
-
-        val result = model.createWebRepoUrl(gitRepository)
-
-        assertNull(result)
-    }
-
-    @Test
     fun `createWebRepoUrl returns correct https url if url is https format for bitbucket`() {
         mockConfig()
         mockGitRepository(listOf(generateGitRemote(
