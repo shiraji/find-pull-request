@@ -1,7 +1,6 @@
-<p>1.7.0</p>
+<p>1.7.1</p>
 <ul>
-  <li>List all PR like annotate #113</li>
-  <li>Ends support version lower than 2019.2 #116</li>
-  <li>Fix the problem of closing "Annotate" when the plugin closes "List pull request" #117</li>
+  <li>GitLab MR URL missing group/org #125 Thanks @P15223971 for reportingFix startup crash #127</li>
+  <li>Fix startup crash #127</li>
 </ul>
 <p>Older version changes are listed on <a href="https://github.com/shiraji/find-pull-request/blob/master/CHANGELOG.md">CHANGELOG.md</a></p>
