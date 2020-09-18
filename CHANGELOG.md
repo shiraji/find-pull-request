@@ -1,3 +1,7 @@
+### [ver 1.7.2](https://github.com/shiraji/find-pull-request/releases/tag/release-1.7.2)
+
+* Fix Throwable: Do not call synchronous repository update in EDT #130 Thanks @Spurlos for repoting
+
 ### [ver 1.7.1](https://github.com/shiraji/find-pull-request/releases/tag/release-1.7.1)
 
 * GitLab MR URL missing group/org #125 Thanks @P15223971 for reporting

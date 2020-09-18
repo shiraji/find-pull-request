@@ -1,6 +1,5 @@
-<p>1.7.1</p>
+<p>1.7.2</p>
 <ul>
-  <li>GitLab MR URL missing group/org #125 Thanks @P15223971 for reportingFix startup crash #127</li>
-  <li>Fix startup crash #127</li>
+  <li>Fix Throwable: Do not call synchronous repository update in EDT #130 Thanks @Spurlos for repoting</li>
 </ul>
 <p>Older version changes are listed on <a href="https://github.com/shiraji/find-pull-request/blob/master/CHANGELOG.md">CHANGELOG.md</a></p>
