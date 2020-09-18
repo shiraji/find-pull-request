@@ -111,18 +111,8 @@ abstract class BaseFindPullRequestAction : AnAction() {
 
     private fun getGitRepository(project: Project, file: VirtualFile?): GitRepository? {
         val manager = GitUtil.getRepositoryManager(project)
-        val repositories = manager.repositories
-        return when (repositories.size) {
-            0 -> null
-            1 -> repositories[0]
-            else -> {
-                if (file != null) {
-                    val repository = manager.getRepositoryForFile(file)
-                    if (repository != null) return repository
-                }
-                val root = project.root ?: return null
-                manager.getRepositoryForFile(root)
-            }
-        }
+        val targetFile = file ?: project.root ?: return null
+        @Suppress("DEPRECATION") // will remove deprecated annotation in 2020
+        return manager.getRepositoryForFileQuick(targetFile)
     }
 }
