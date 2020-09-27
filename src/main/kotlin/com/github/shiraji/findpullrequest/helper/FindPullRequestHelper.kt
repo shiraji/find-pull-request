@@ -17,5 +17,5 @@ fun showErrorNotification(message: String) =
 val Project.root: VirtualFile?
         get() {
                 val basePath = basePath ?: return null
-                return LocalFileSystem.getInstance().findFileByPath(basePath) ?: return null
+                return LocalFileSystem.getInstance().findFileByPath(basePath)
         }

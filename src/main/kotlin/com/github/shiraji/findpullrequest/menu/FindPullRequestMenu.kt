@@ -1,18 +1,16 @@
 package com.github.shiraji.findpullrequest.menu
 
-import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices
-import com.github.shiraji.findpullrequest.model.getHosting
-import com.github.shiraji.findpullrequest.model.getProtocol
-import com.github.shiraji.findpullrequest.model.isDebugMode
-import com.github.shiraji.findpullrequest.model.isDisable
-import com.github.shiraji.findpullrequest.model.isJumpToFile
-import com.github.shiraji.findpullrequest.model.isPopupAfterCopy
-import com.github.shiraji.findpullrequest.model.setDebugMode
-import com.github.shiraji.findpullrequest.model.setDisable
-import com.github.shiraji.findpullrequest.model.setHosting
-import com.github.shiraji.findpullrequest.model.setJumpToFile
-import com.github.shiraji.findpullrequest.model.setPopupAfterCopy
-import com.github.shiraji.findpullrequest.model.setProtocol
+import com.github.shiraji.findpullrequest.config.getHosting
+import com.github.shiraji.findpullrequest.config.getProtocol
+import com.github.shiraji.findpullrequest.config.isDisable
+import com.github.shiraji.findpullrequest.config.isJumpToFile
+import com.github.shiraji.findpullrequest.config.isPopupAfterCopy
+import com.github.shiraji.findpullrequest.config.setDisable
+import com.github.shiraji.findpullrequest.config.setHosting
+import com.github.shiraji.findpullrequest.config.setJumpToFile
+import com.github.shiraji.findpullrequest.config.setPopupAfterCopy
+import com.github.shiraji.findpullrequest.config.setProtocol
+import com.github.shiraji.findpullrequest.domain.HostingService
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.options.ConfigurationException
@@ -26,12 +24,11 @@ import javax.swing.JPanel
 
 class FindPullRequestMenu internal constructor(project: Project) : Configurable {
     private var disable: JCheckBox? = null
-    private var debugMode: JCheckBox? = null
     private var jumpToFile: JCheckBox? = null
     private var protocols: JComboBox<Protocol>? = null
     private var root: JPanel? = null
     private var copyPopup: JCheckBox? = null
-    private var hostingService: JComboBox<FindPullRequestHostingServices>? = null
+    private var hostingService: JComboBox<HostingService>? = null
     private var config: PropertiesComponent = PropertiesComponent.getInstance(project)
 
     private val isModifiedProtocol: Boolean
@@ -43,7 +40,7 @@ class FindPullRequestMenu internal constructor(project: Project) : Configurable 
     private val isModifiedHostingService: Boolean
         get() {
             val selectedItem = hostingService!!.selectedItem
-            return selectedItem is FindPullRequestHostingServices && config.getHosting() != selectedItem.name
+            return selectedItem is HostingService && config.getHosting() != selectedItem.name
         }
 
     private enum class Protocol constructor(val text: String) {
@@ -63,7 +60,7 @@ class FindPullRequestMenu internal constructor(project: Project) : Configurable 
 
     init {
         protocols!!.model = DefaultComboBoxModel(Protocol.values())
-        hostingService!!.model = DefaultComboBoxModel(FindPullRequestHostingServices.values())
+        hostingService!!.model = DefaultComboBoxModel(HostingService.values())
     }
 
     @Nls
@@ -82,7 +79,6 @@ class FindPullRequestMenu internal constructor(project: Project) : Configurable 
     override fun isModified(): Boolean {
         return (isModifiedProtocol ||
             isModifiedHostingService ||
-            config.isDebugMode() != debugMode!!.isSelected ||
             config.isJumpToFile() != jumpToFile!!.isSelected ||
             config.isDisable() != disable!!.isSelected ||
             config.isPopupAfterCopy() != copyPopup!!.isSelected)
@@ -91,7 +87,6 @@ class FindPullRequestMenu internal constructor(project: Project) : Configurable 
     @Throws(ConfigurationException::class)
     override fun apply() {
         config.setDisable(disable!!.isSelected)
-        config.setDebugMode(debugMode!!.isSelected)
         config.setJumpToFile(jumpToFile!!.isSelected)
         config.setPopupAfterCopy(copyPopup!!.isSelected)
         applyProtocol()
@@ -107,7 +102,7 @@ class FindPullRequestMenu internal constructor(project: Project) : Configurable 
 
     private fun applyHostingService() {
         val selectedItem = hostingService!!.selectedItem
-        if (selectedItem is FindPullRequestHostingServices) {
+        if (selectedItem is HostingService) {
             config.setHosting(selectedItem)
         }
     }
@@ -116,7 +111,6 @@ class FindPullRequestMenu internal constructor(project: Project) : Configurable 
         resetProtocols()
         resetHostingServices()
         disable!!.isSelected = config.isDisable()
-        debugMode!!.isSelected = config.isDebugMode()
         jumpToFile!!.isSelected = config.isJumpToFile()
         copyPopup!!.isSelected = config.isPopupAfterCopy()
     }
@@ -133,7 +127,7 @@ class FindPullRequestMenu internal constructor(project: Project) : Configurable 
 
     private fun resetHostingServices() {
         val hostingServiceConf = config.getHosting()
-        val hostingServices = FindPullRequestHostingServices.findBy(hostingServiceConf)
+        val hostingServices = HostingService.findBy(hostingServiceConf)
         val selectedIndex = hostingServices.ordinal
         hostingService!!.selectedIndex = selectedIndex
     }

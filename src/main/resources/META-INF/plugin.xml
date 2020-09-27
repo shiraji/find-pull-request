@@ -34,26 +34,26 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <projectConfigurable instance="com.github.shiraji.findpullrequest.menu.FindPullRequestMenu" />
-    <postStartupActivity implementation="com.github.shiraji.findpullrequest.activity.DetectHostingServiceStartupActivity" />
+    <postStartupActivity implementation="com.github.shiraji.findpullrequest.presentation.activity.DetectHostingServiceStartupActivity" />
   </extensions>
 
   <actions>
-    <action id="com.github.shiraji.findpullrequest.action.FindPullRequestAction"
-            class="com.github.shiraji.findpullrequest.action.FindPullRequestAction"
+    <action id="com.github.shiraji.findpullrequest.presentation.action.FindPullRequestAction"
+            class="com.github.shiraji.findpullrequest.presentation.action.FindPullRequestAction"
             text="Find Pull Request"
             icon="AllIcons.Vcs.Vendors.Github">
       <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="Github.Open.In.Browser"/>
     </action>
 
-    <action id="com.github.shiraji.findpullrequest.action.FindPullRequestCopyAction"
-            class="com.github.shiraji.findpullrequest.action.FindPullRequestCopyAction"
+    <action id="com.github.shiraji.findpullrequest.presentation.action.FindPullRequestCopyAction"
+            class="com.github.shiraji.findpullrequest.presentation.action.FindPullRequestCopyAction"
             text="Copy Pull Request URL"
             icon="AllIcons.Actions.Copy">
-      <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.github.shiraji.findpullrequest.action.FindPullRequestAction"/>
+      <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.github.shiraji.findpullrequest.presentation.action.FindPullRequestAction"/>
     </action>
 
-    <action id="com.github.shiraji.findpullrequest.action.ListPullRequestToggleAction"
-            class="com.github.shiraji.findpullrequest.action.ListPullRequestToggleAction" text="List Pull Requests" description="List the pull request for each line.">
+    <action id="com.github.shiraji.findpullrequest.presentation.action.ListPullRequestToggleAction"
+            class="com.github.shiraji.findpullrequest.presentation.action.ListPullRequestToggleAction" text="List Pull Requests" description="List the pull request for each line.">
       <add-to-group group-id="EditorGutterVcsPopupMenu" relative-to-action="Annotate" anchor="after"/>
     </action>
   </actions>

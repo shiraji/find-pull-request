@@ -3,6 +3,7 @@
 .DS_Store
 /build/
 !gradle/wrapper/gradle-wrapper.jar
+local.properties
 
 ### STS ###
 .apt_generated
