@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.6.10"
     id("jacoco")
@@ -13,13 +11,6 @@ val test by tasks.getting(Test::class) {
     useJUnitPlatform()
     maxHeapSize = "3g"
 }
-
-// tasks.withType<KotlinCompile> {
-//     kotlinOptions {
-//         jvmTarget = "1.8"
-//         freeCompilerArgs = listOf("-Xjsr305=strict")
-//     }
-// }
 
 jacoco {
     toolVersion = "0.8.2"
