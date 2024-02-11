@@ -1,6 +1,5 @@
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.6.10"
-    id("jacoco")
     id("org.jetbrains.intellij") version "1.3.0"
 }
 
@@ -10,17 +9,6 @@ version = System.getProperty("VERSION") ?: "0.0.1"
 val test by tasks.getting(Test::class) {
     useJUnitPlatform()
     maxHeapSize = "3g"
-}
-
-jacoco {
-    toolVersion = "0.8.2"
-}
-
-val jacocoTestReport by tasks.existing(JacocoReport::class) {
-    reports {
-        xml.isEnabled = true
-        html.isEnabled = true
-    }
 }
 
 repositories {
