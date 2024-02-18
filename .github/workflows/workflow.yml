@@ -1,0 +1,84 @@
+name: CI-test
+
+on: [push, pull_request]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    - uses: actions/cache@v3
+      with:
+        path: ~/.gradle/caches
+        key: v1-gradle-caches-${{ hashFiles('settings.gradle.kts') }}-${{ hashFiles('build.gradle.kts') }}-${{ hashFiles('gradle.properties') }}
+    - uses: actions/cache@v3
+      with:
+        path: ~/.gradle/wrapper
+        key: v1-gradle-wrapper-${{ hashFiles('settings.gradle.kts') }}-${{ hashFiles('build.gradle.kts') }}-${{ hashFiles('gradle.properties') }}
+    - name: verify plugin
+      run: ./gradlew verifyPlugin --no-daemon --max-workers 2
+    - name: test
+      run: ./gradlew test --no-daemon --max-workers 2
+    - name: Store reports
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: reports
+        path: |
+          **/build/reports/
+          **/build/test-results/
+
+  beta-release:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: startswith(github.ref, 'refs/tags/beta-')
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: v1-gradle-caches-${{ hashFiles('settings.gradle.kts') }}-${{ hashFiles('build.gradle.kts') }}-${{ hashFiles('gradle.properties') }}
+      - uses: actions/cache@v3
+        with:
+          path: ~/.gradle/wrapper
+          key: v1-gradle-wrapper-${{ hashFiles('settings.gradle.kts') }}-${{ hashFiles('build.gradle.kts') }}-${{ hashFiles('gradle.properties') }}
+      - name: Release
+        env:
+          TAG_NAME: ${{ github.ref }}
+          HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
+        run: ./gradlew buildPlugin publishPlugin -DVERSION=${TAG_NAME#refs/tags/beta-} -DCHANNELS=beta
+
+  release:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/release-')
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: v1-gradle-caches-${{ hashFiles('settings.gradle.kts') }}-${{ hashFiles('build.gradle.kts') }}-${{ hashFiles('gradle.properties') }}
+      - uses: actions/cache@v3
+        with:
+          path: ~/.gradle/wrapper
+          key: v1-gradle-wrapper-${{ hashFiles('settings.gradle.kts') }}-${{ hashFiles('build.gradle.kts') }}-${{ hashFiles('gradle.properties') }}
+      - name: Release
+        env:
+          TAG_NAME: ${{ github.ref }}
+          HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
+        run: ./gradlew buildPlugin publishPlugin -DVERSION=${TAG_NAME#refs/tags/release-} -DCHANNELS=default

@@ -101,9 +101,6 @@ class ListPullRequestToggleAction : ToggleAction() {
                         }
                     }
                 }
-                fileAnnotation.setReloader { newFileAnnotation ->
-                    // println(newFileAnnotation)
-                }
 
                 if (fileAnnotation.isClosed) return
 
@@ -111,10 +108,10 @@ class ListPullRequestToggleAction : ToggleAction() {
 
                 if (fileAnnotation.file != null && fileAnnotation.file!!.isInLocalFileSystem) {
                     val changesListener = ProjectLevelVcsManager.getInstance(project).annotationLocalChangesListener
-                    changesListener.registerAnnotation(fileAnnotation.file, fileAnnotation)
-                    Disposer.register(disposable, Disposable {
-                        changesListener.unregisterAnnotation(fileAnnotation.file, fileAnnotation)
-                    })
+                    changesListener.registerAnnotation(fileAnnotation)
+                    Disposer.register(disposable) {
+                        changesListener.unregisterAnnotation(fileAnnotation)
+                    }
                 }
 
                 // Not sure why but fileAnnotation.revisions does not return local commits.
