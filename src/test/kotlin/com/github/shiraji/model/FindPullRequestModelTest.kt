@@ -175,13 +175,13 @@ class FindPullRequestModelTest {
         } returns mergeCommits
     }
 
-    private fun mockFileAnnotation(filePath: String = "README.md") {
-        val baseDir = ""
-        every { gitRepository.project.baseDir.canonicalPath?.plus("/") } returns baseDir
-        every { gitRepository.vcs?.annotationProvider?.annotate(virtualFile) } returns fileAnnotation
-        every { fileAnnotation.file?.canonicalPath?.subtract(baseDir) } returns filePath
-    }
-
+    // private fun mockFileAnnotation(filePath: String = "README.md") {
+    //     val baseDir = ""
+    //     every { gitRepository.project.baseDir.canonicalPath?.plus("/") } returns baseDir
+    //     every { gitRepository.vcs?.annotationProvider?.annotate(virtualFile) } returns fileAnnotation
+    //     every { fileAnnotation.file?.canonicalPath?.subtract(baseDir) } returns filePath
+    // }
+    //
     // @Test
     // fun `Finding pull request`() {
     //     val prCommit1 = generateGitCommit(hashCode = HASH, fullMessage = "Merge pull request #$PR_NUMBER from")

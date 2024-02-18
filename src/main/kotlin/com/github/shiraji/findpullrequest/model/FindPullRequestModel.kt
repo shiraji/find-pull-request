@@ -46,8 +46,8 @@ class FindPullRequestModel(
         val debugMessage = StringBuilder()
         if (config.isDebugMode()) {
             debugMessage
-                    .appendln("### Revision hash:")
-                    .appendln(revisionHash.asString())
+                .appendLine("### Revision hash:")
+                .appendLine(revisionHash.asString())
         }
 
         val pullRequestCommit = gitHistoryService.findMergedCommit(project, repository, revisionHash)

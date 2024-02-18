@@ -1,6 +1,6 @@
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.10"
-    id("org.jetbrains.intellij") version "1.16.0"
+    id("org.jetbrains.intellij") version "1.17.1"
 }
 
 group = "com.github.shiraji.findpullrequest"
@@ -14,8 +14,8 @@ repositories {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version.set("2021.1")
-    plugins.set(listOf("github", "git4idea"))
+    version.set("2022.3")
+    plugins.set(listOf("vcs-github", "vcs-git"))
     updateSinceUntilBuild.set(false)
 }
 

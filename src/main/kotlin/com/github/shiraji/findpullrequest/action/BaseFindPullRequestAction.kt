@@ -23,6 +23,7 @@ import com.intellij.openapi.vcs.VcsException
 import com.intellij.openapi.vfs.VirtualFile
 import git4idea.GitUtil
 import git4idea.repo.GitRepository
+import java.util.Locale
 import javax.swing.Icon
 
 abstract class BaseFindPullRequestAction : AnAction() {
@@ -69,7 +70,7 @@ abstract class BaseFindPullRequestAction : AnAction() {
                     val url = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
                     actionPerform(e, url)
                 } catch (ex: VcsException) {
-                    val name = FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.toLowerCase()
+                    val name = FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.lowercase(Locale.getDefault())
                     showErrorNotification("Could not find the $name for $revisionHash : ${ex.message}")
                 } catch (ex: NoPullRequestFoundException) {
                     val url = model.createCommitUrl(repository, hostingServices, webRepoUrl, revisionHash)
