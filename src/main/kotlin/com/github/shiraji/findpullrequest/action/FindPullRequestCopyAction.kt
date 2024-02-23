@@ -69,8 +69,6 @@ class FindPullRequestCopyAction : BaseFindPullRequestAction() {
 
     override fun menuText(project: Project): String? {
         val config = PropertiesComponent.getInstance(project) ?: return null
-        return "Copy ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName} URL"
+        return "Copy Link to ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName}"
     }
-
-    override fun menuIcon(project: Project): Icon? = null
 }

@@ -31,7 +31,11 @@ abstract class BaseFindPullRequestAction : AnAction() {
     abstract fun actionPerform(e: AnActionEvent, url: String)
 
     abstract fun menuText(project: Project): String?
-    abstract fun menuIcon(project: Project): Icon?
+
+    private fun menuIcon(project: Project): Icon? {
+        val config = PropertiesComponent.getInstance(project) ?: return null
+        return FindPullRequestHostingServices.findBy(config.getHosting()).icon
+    }
 
     abstract fun actionPerformForNoPullRequestFount(e: AnActionEvent, ex: NoPullRequestFoundException, url: String)
 
@@ -113,7 +117,6 @@ abstract class BaseFindPullRequestAction : AnAction() {
     private fun getGitRepository(project: Project, file: VirtualFile?): GitRepository? {
         val manager = GitUtil.getRepositoryManager(project)
         val targetFile = file ?: project.root ?: return null
-        @Suppress("DEPRECATION") // will remove deprecated annotation in 2020
         return manager.getRepositoryForFileQuick(targetFile)
     }
 }
