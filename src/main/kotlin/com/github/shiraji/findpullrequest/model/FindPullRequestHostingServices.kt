@@ -4,6 +4,7 @@ import com.github.shiraji.findpullrequest.helper.root
 import com.github.shiraji.subtract
 import com.github.shiraji.toMd5
 import com.github.shiraji.toSHA1
+import com.github.shiraji.toSHA256
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.vcs.annotate.FileAnnotation
 import git4idea.repo.GitRepository
@@ -28,7 +29,7 @@ enum class FindPullRequestHostingServices(val defaultMergeCommitMessage: Regex, 
         val projectDir = repository.project.root?.canonicalPath?.plus("/") ?: return null
         val filePath = annotate.file?.canonicalPath?.subtract(projectDir) ?: return null
         return when (this) {
-            GitHub -> "#diff-${filePath.toMd5()}"
+            GitHub -> "#diff-${filePath.toSHA256()}"
             GitLab -> "#${filePath.toSHA1()}"
             Bitbucket -> "#chg-$filePath"
         }
