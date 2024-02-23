@@ -37,7 +37,7 @@ class FindPullRequestHostingServicesTest {
 
             val got = FindPullRequestHostingServices.GitHub.createFileAnchorValue(repository, annotate)
 
-            assertEquals("#diff-47bce5c74f589f4867dbd57e9ca9f808", got)
+            assertEquals("#diff-9834876dcfb05cb167a5c24953eba58c4ac89b1adf57f28f2f9d09af107ee8f0", got)
         }
 
         @Test
