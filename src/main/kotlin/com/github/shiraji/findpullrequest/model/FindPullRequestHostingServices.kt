@@ -11,17 +11,49 @@ import git4idea.repo.GitRepository
 import icons.FindPullRequestIcons
 import javax.swing.Icon
 
-enum class FindPullRequestHostingServices(val defaultMergeCommitMessage: Regex, val squashCommitMessage: Regex, val urlPathFormat: String, val commitPathFormat: String, val pullRequestName: String, val icon: Icon) {
-    GitHub("Merge pull request #(\\d*)".toRegex(), ".*\\(#(\\d*)\\)".toRegex(), "pull/%d/files", "%s/commit/%s", "Pull Request", AllIcons.Vcs.Vendors.Github),
-    GitLab("See merge request .*!(\\d*)".toRegex(), "See merge request .*!(\\d*)".toRegex(), "merge_requests/%d/diffs", "%s/commit/%s", "Merge Request", FindPullRequestIcons.gitLabIcon),
-    Bitbucket("\\(pull request #(\\d*)\\)".toRegex(), "\\(pull request #(\\d*)\\)".toRegex(), "pull-requests/%d/diff", "%s/commits/%s", "Pull Request", FindPullRequestIcons.bitbucketIcon),
+enum class FindPullRequestHostingServices(
+    val defaultMergeCommitMessage: Regex,
+    val squashCommitMessage: Regex,
+    val urlPathFormat: String,
+    val urlPathForDiff: String,
+    val commitPathFormat: String,
+    val pullRequestName: String,
+    val icon: Icon
+) {
+    GitHub(
+        defaultMergeCommitMessage = "Merge pull request #(\\d*)".toRegex(),
+        squashCommitMessage = ".*\\(#(\\d*)\\)".toRegex(),
+        urlPathFormat = "pull/%d",
+        urlPathForDiff = "/files",
+        commitPathFormat = "%s/commit/%s",
+        pullRequestName = "Pull Request",
+        icon = AllIcons.Vcs.Vendors.Github
+    ),
+    GitLab(
+        defaultMergeCommitMessage = "See merge request .*!(\\d*)".toRegex(),
+        squashCommitMessage = "See merge request .*!(\\d*)".toRegex(),
+        urlPathFormat = "merge_requests/%d",
+        urlPathForDiff = "/diffs",
+        commitPathFormat = "%s/commit/%s",
+        pullRequestName = "Merge Request",
+        icon = FindPullRequestIcons.gitLabIcon
+    ),
+    Bitbucket(
+        defaultMergeCommitMessage = "\\(pull request #(\\d*)\\)".toRegex(),
+        squashCommitMessage = "\\(pull request #(\\d*)\\)".toRegex(),
+        urlPathFormat = "pull-requests/%d",
+        urlPathForDiff = "/diff",
+        commitPathFormat = "%s/commits/%s",
+        pullRequestName = "Pull Request",
+        icon = FindPullRequestIcons.bitbucketIcon
+    ),
 
     ;
 
     companion object {
         @JvmStatic
         fun findBy(name: String): FindPullRequestHostingServices {
-            return values().firstOrNull { it.name == name } ?: GitHub
+            return entries.firstOrNull { it.name == name } ?: GitHub
         }
     }
 
