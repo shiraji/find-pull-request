@@ -42,14 +42,14 @@
             class="com.github.shiraji.findpullrequest.action.FindPullRequestAction"
             text="Find Pull Request"
             icon="AllIcons.Vcs.Vendors.Github">
-      <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="Github.Open.In.Browser"/>
+      <add-to-group group-id="RevealGroup" anchor="after" relative-to-action="Github.Open.In.Browser"/>
     </action>
 
     <action id="com.github.shiraji.findpullrequest.action.FindPullRequestCopyAction"
             class="com.github.shiraji.findpullrequest.action.FindPullRequestCopyAction"
-            text="Copy Pull Request URL"
-            icon="AllIcons.Actions.Copy">
-      <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="com.github.shiraji.findpullrequest.action.FindPullRequestAction"/>
+            text="Copy Link to Pull Request URL"
+            icon="AllIcons.Vcs.Vendors.Github">
+      <add-to-group group-id="Copy.Paste.Special" anchor="before" relative-to-action="EditorPasteSimple" />
     </action>
 
     <action id="com.github.shiraji.findpullrequest.action.ListPullRequestToggleAction"

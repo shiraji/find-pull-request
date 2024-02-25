@@ -43,11 +43,6 @@ class FindPullRequestAction : BaseFindPullRequestAction() {
 
     override fun menuText(project: Project): String? {
         val config = PropertiesComponent.getInstance(project) ?: return null
-        return "Find ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName}"
-    }
-
-    override fun menuIcon(project: Project): Icon? {
-        val config = PropertiesComponent.getInstance(project) ?: return null
-        return FindPullRequestHostingServices.findBy(config.getHosting()).icon
+        return FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName
     }
 }
