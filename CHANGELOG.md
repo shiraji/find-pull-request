@@ -1,3 +1,11 @@
+### [ver 2.0.0](https://github.com/shiraji/find-pull-request/releases/tag/release-2.0.0)
+
+* GitHub diff-xxx now use sha256 not MD5 #138
+* Change menu position #146
+* Option to open the main PR page instead of the files page #140 Thanks @gmolau for suggesting
+* Update libs
+* Add description to copy/find actions
+
 ### [ver 1.7.2](https://github.com/shiraji/find-pull-request/releases/tag/release-1.7.2)
 
 * Fix Throwable: Do not call synchronous repository update in EDT #130 Thanks @Spurlos for repoting
