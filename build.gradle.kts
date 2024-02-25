@@ -33,6 +33,12 @@ tasks {
         changeNotes.set(project.file("LATEST.txt").readText())
     }
 
+    signPlugin {
+        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
+        privateKey.set(System.getenv("PRIVATE_KEY"))
+        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
+    }
+
     publishPlugin {
         token.set(System.getenv("HUB_TOKEN"))
         channels.set(listOf(System.getProperty("CHANNELS") ?: "beta"))
