@@ -49,6 +49,8 @@ You can change "Hosting Service" setting in Preferences.
 
 ![settings](website/images/settings.png)
 
+Unchecking "Jump to File when PR page open" will jump to the discussion page of the PR.
+
 ## Requirement
 
 * Remote repo should be GitHub/GitLab/Bitbucket
