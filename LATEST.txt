@@ -1,5 +1,9 @@
-<p>1.7.2</p>
+<p>2.0.0</p>
 <ul>
-  <li>Fix Throwable: Do not call synchronous repository update in EDT #130 Thanks @Spurlos for repoting</li>
+  <li>GitHub diff-xxx now use sha256 not MD5 #138</li>
+  <li>Change menu position #146</li>
+  <li>Option to open the main PR page instead of the files page #140 Thanks @gmolau for suggesting</li>
+  <li>Update libs</li>
+  <li>Add description to copy/find actions</li>
 </ul>
 <p>Older version changes are listed on <a href="https://github.com/shiraji/find-pull-request/blob/master/CHANGELOG.md">CHANGELOG.md</a></p>
