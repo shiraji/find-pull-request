@@ -15,7 +15,7 @@ Intellij plugin that jumps to the pull request page or commits page. This plugin
 
 * Select/Choose a line
 * Right click
-* Click "Find Pull Request"
+* Click "Open In | Pull Request"
 
 ![find-pr](website/images/find-pr.gif)
 
@@ -26,7 +26,7 @@ Intellij plugin that jumps to the pull request page or commits page. This plugin
 
 * Select/Choose a line
 * Right click
-* Click "Copy Pull Request URL"
+* Click "Copy / Paste Special | Copy Link to Pull Request"
 
 ![copy-pr](website/images/copy-pr.gif)
 
