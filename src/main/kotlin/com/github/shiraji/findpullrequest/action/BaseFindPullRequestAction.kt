@@ -37,6 +37,8 @@ abstract class BaseFindPullRequestAction : AnAction() {
         return FindPullRequestHostingServices.findBy(config.getHosting()).icon
     }
 
+    abstract fun description(project: Project, editor: Editor, virtualFile: VirtualFile): String?
+
     abstract fun actionPerformForNoPullRequestFount(e: AnActionEvent, ex: NoPullRequestFoundException, url: String)
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -94,6 +96,7 @@ abstract class BaseFindPullRequestAction : AnAction() {
         val repository = getGitRepository(project, virtualFile) ?: return
         val text = menuText(project) ?: return
         val icon = menuIcon(project)
+        val description = description(project, editor, virtualFile)
         val gitRepositoryService = GitConfService()
         val gitUrlService = GitRepositoryUrlService()
         val gitHistoryService = GitHistoryService()
@@ -111,6 +114,7 @@ abstract class BaseFindPullRequestAction : AnAction() {
             false
         }
         e.presentation.text = text
+        e.presentation.description = description
         icon?.let { e.presentation.icon = it }
     }
 

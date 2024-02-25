@@ -1,10 +1,13 @@
 package com.github.shiraji.findpullrequest.action
 
 import com.github.shiraji.findpullrequest.exceptions.NoPullRequestFoundException
+import com.github.shiraji.findpullrequest.helper.root
 import com.github.shiraji.findpullrequest.model.FindPullRequestHostingServices
 import com.github.shiraji.findpullrequest.model.getHosting
 import com.github.shiraji.findpullrequest.model.isDebugMode
 import com.github.shiraji.findpullrequest.model.isPopupAfterCopy
+import com.github.shiraji.getLine
+import com.github.shiraji.subtract
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationListener
@@ -12,8 +15,10 @@ import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.ui.TextTransferable
 import java.net.URLEncoder
 import java.util.Locale
@@ -70,5 +75,11 @@ class FindPullRequestCopyAction : BaseFindPullRequestAction() {
     override fun menuText(project: Project): String? {
         val config = PropertiesComponent.getInstance(project) ?: return null
         return "Copy Link to ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName}"
+    }
+
+    override fun description(project: Project, editor: Editor, virtualFile: VirtualFile): String? {
+        val config = PropertiesComponent.getInstance(project) ?: return null
+        val path = virtualFile.canonicalPath?.subtract(project.root?.parent?.path ?: "") ?: virtualFile.name
+        return "Copy ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName} link for the selected line of $path at line ${editor.getLine(editor.selectionModel.selectionStart)}"
     }
 }
