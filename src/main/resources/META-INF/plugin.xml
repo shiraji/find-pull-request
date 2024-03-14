@@ -36,6 +36,10 @@
     <projectConfigurable instance="com.github.shiraji.findpullrequest.menu.FindPullRequestMenu" />
     <postStartupActivity implementation="com.github.shiraji.findpullrequest.activity.DetectHostingServiceStartupActivity" />
   </extensions>
+  
+  <applicationListeners>
+    <listener class="com.github.shiraji.findpullrequest.listener.FindPullRequestDynamicPluginListener" topic="com.intellij.ide.plugins.DynamicPluginListener" />
+  </applicationListeners>
 
   <actions>
     <action id="com.github.shiraji.findpullrequest.action.FindPullRequestAction"
