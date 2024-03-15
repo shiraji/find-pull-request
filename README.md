@@ -1,6 +1,6 @@
 # find-pull-request
 
-[![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/shiraji/find-pull-request/blob/master/LICENSE)
+[![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/shiraji/find-pull-request/blob/main/LICENSE)
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-find--pull--request-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3353)
 [![Version](https://img.shields.io/jetbrains/plugin/v/8262-find-pull-request.svg)](https://plugins.jetbrains.com/plugin/8262-find-pull-request)
 [![Download](https://img.shields.io/jetbrains/plugin/d/8262-find-pull-request.svg)](https://plugins.jetbrains.com/plugin/8262-find-pull-request)
