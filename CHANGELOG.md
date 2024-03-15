@@ -1,3 +1,8 @@
+### [ver 2.0.1](https://github.com/shiraji/find-pull-request/releases/tag/release-2.0.1)
+
+* Support dynamic plugins
+* Fix plugin desc's screenshots #156
+
 ### [ver 2.0.0](https://github.com/shiraji/find-pull-request/releases/tag/release-2.0.0)
 
 * GitHub diff-xxx now use sha256 not MD5 #138
@@ -28,7 +33,7 @@
 ### [ver 1.6.1](https://github.com/shiraji/find-pull-request/releases/tag/release-1.6.1)
 
 * Fix Freeze on project opening #105 Thanks @nisnevich for reporting
-* Better performance #106 This plugin ends support of IntelliJ version lower than 2019.1 
+* Better performance #106 This plugin ends support of IntelliJ version lower than 2019.1
 
 ### [ver 1.5.0](https://github.com/shiraji/find-pull-request/releases/tag/release-1.5.0)
 
