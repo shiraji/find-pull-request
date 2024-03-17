@@ -11,6 +11,7 @@ import com.github.shiraji.findpullrequest.model.GitRepositoryUrlService
 import com.github.shiraji.findpullrequest.model.getHosting
 import com.github.shiraji.getLine
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -30,7 +31,7 @@ abstract class BaseFindPullRequestAction : AnAction() {
 
     abstract fun actionPerform(e: AnActionEvent, url: String)
 
-    abstract fun menuText(project: Project): String?
+    abstract fun menuText(project: Project, useShortName: Boolean): String?
 
     private fun menuIcon(project: Project): Icon? {
         val config = PropertiesComponent.getInstance(project) ?: return null
@@ -94,7 +95,8 @@ abstract class BaseFindPullRequestAction : AnAction() {
         val editor: Editor = e.getData(CommonDataKeys.EDITOR) ?: return
         val virtualFile: VirtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
         val repository = getGitRepository(project, virtualFile) ?: return
-        val text = menuText(project) ?: return
+        val useShortName = ActionPlaces.EDITOR_POPUP == e.place
+        val text = menuText(project, useShortName) ?: return
         val icon = menuIcon(project)
         val description = description(project, editor, virtualFile)
         val gitRepositoryService = GitConfService()

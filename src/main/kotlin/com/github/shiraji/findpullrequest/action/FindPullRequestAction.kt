@@ -20,7 +20,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import java.net.URLEncoder
 import java.util.Locale
-import javax.swing.Icon
 
 class FindPullRequestAction : BaseFindPullRequestAction() {
     override fun actionPerformForNoPullRequestFount(e: AnActionEvent, ex: NoPullRequestFoundException, url: String) {
@@ -46,9 +45,13 @@ class FindPullRequestAction : BaseFindPullRequestAction() {
         BrowserUtil.open(url)
     }
 
-    override fun menuText(project: Project): String? {
+    override fun menuText(project: Project, useShortName: Boolean): String? {
         val config = PropertiesComponent.getInstance(project) ?: return null
-        return FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName
+        return if (useShortName) {
+            FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName
+        } else {
+            "Go to ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName} page"
+        }
     }
 
     override fun description(project: Project, editor: Editor, virtualFile: VirtualFile): String? {

@@ -42,22 +42,30 @@
   </applicationListeners>
 
   <actions>
+    <!-- text will be replaced in the action -->
+    <!-- Find Action somehow cache this text for searching the action, therefore, we put both pull request/merge request here for all users -->
     <action id="com.github.shiraji.findpullrequest.action.FindPullRequestAction"
             class="com.github.shiraji.findpullrequest.action.FindPullRequestAction"
-            text="Find Pull Request"
+            text="Find Pull Request/Merge Request"
             icon="AllIcons.Vcs.Vendors.Github">
+      <!--suppress PluginXmlCapitalization -->
+      <synonym text="find go to merge pull request github gitlab bitbucket page" />
       <add-to-group group-id="RevealGroup" anchor="after" relative-to-action="Github.Open.In.Browser"/>
     </action>
 
     <action id="com.github.shiraji.findpullrequest.action.FindPullRequestCopyAction"
             class="com.github.shiraji.findpullrequest.action.FindPullRequestCopyAction"
-            text="Copy Link to Pull Request URL"
+            text="Copy Link to Pull Request/Merge Request URL"
             icon="AllIcons.Vcs.Vendors.Github">
+      <!--suppress PluginXmlCapitalization -->
+      <synonym text="copy link to merge pull request github gitlab bitbucket url" />
       <add-to-group group-id="Copy.Paste.Special" anchor="before" relative-to-action="EditorPasteSimple" />
     </action>
 
     <action id="com.github.shiraji.findpullrequest.action.ListPullRequestToggleAction"
-            class="com.github.shiraji.findpullrequest.action.ListPullRequestToggleAction" text="List Pull Requests" description="List the pull request for each line.">
+            class="com.github.shiraji.findpullrequest.action.ListPullRequestToggleAction"
+            text="List Pull Requests/Merge Requests"
+            description="List the pull request for each line.">
       <add-to-group group-id="EditorGutterVcsPopupMenu" relative-to-action="Annotate" anchor="after"/>
     </action>
   </actions>

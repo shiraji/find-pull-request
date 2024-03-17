@@ -22,7 +22,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.ui.TextTransferable
 import java.net.URLEncoder
 import java.util.Locale
-import javax.swing.Icon
 import javax.swing.event.HyperlinkEvent
 
 class FindPullRequestCopyAction : BaseFindPullRequestAction() {
@@ -72,9 +71,13 @@ class FindPullRequestCopyAction : BaseFindPullRequestAction() {
         CopyPasteManager.getInstance().setContents(TextTransferable(text as CharSequence))
     }
 
-    override fun menuText(project: Project): String? {
+    override fun menuText(project: Project, useShortName: Boolean): String? {
         val config = PropertiesComponent.getInstance(project) ?: return null
-        return "Copy Link to ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName}"
+        return if (useShortName) {
+            "Copy Link to ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName}"
+        } else {
+            "Copy Link to ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName} URL"
+        }
     }
 
     override fun description(project: Project, editor: Editor, virtualFile: VirtualFile): String? {
