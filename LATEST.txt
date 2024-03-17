@@ -1,6 +1,5 @@
-<p>2.0.0</p>
+<p>2.0.2</p>
 <ul>
-  <li>Support dynamic plugins</li>
-  <li>Fix plugin desc's screenshots #156</li>
+  <li>Fix The action "Pull Request" is not easy to find from cmd+shift+a #157 Thanks @gmolau for suggesting</li>
 </ul>
 <p>Older version changes are listed on <a href="https://github.com/shiraji/find-pull-request/blob/main/CHANGELOG.md">CHANGELOG.md</a></p>
