@@ -1,3 +1,7 @@
+### [ver 2.0.3](https://github.com/shiraji/find-pull-request/releases/tag/release-2.0.3)
+
+* Fix list pr actions name
+
 ### [ver 2.0.2](https://github.com/shiraji/find-pull-request/releases/tag/release-2.0.2)
 
 * Fix The action "Pull Request" is not easy to find from cmd+shift+a #157 Thanks @gmolau for suggesting
