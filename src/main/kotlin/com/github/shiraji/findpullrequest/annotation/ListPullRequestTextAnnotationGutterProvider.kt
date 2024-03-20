@@ -19,12 +19,13 @@ import git4idea.repo.GitRepository
 import java.awt.Color
 import java.awt.Cursor
 
-class ListPullRequestTextAnnotationGutterProvider constructor(
+class ListPullRequestTextAnnotationGutterProvider(
     private val gitHashesMap: HashMap<String, GitPullRequestInfo>,
     val virtualFile: VirtualFile,
     private val fileAnnotation: FileAnnotation,
     private val model: FindPullRequestModel,
-    private val repository: GitRepository
+    private val repository: GitRepository,
+    private val upToDateLineNumberProvider: UpToDateLineNumberProviderImpl,
 ) : TextAnnotationGutterProvider, EditorGutterAction {
 
     override fun getPopupActions(line: Int, editor: Editor?): MutableList<AnAction> {
@@ -36,7 +37,6 @@ class ListPullRequestTextAnnotationGutterProvider constructor(
     }
 
     override fun getLineText(line: Int, editor: Editor?): String? {
-        val upToDateLineNumberProvider = UpToDateLineNumberProviderImpl(editor?.document, editor?.project)
         val currentLine = upToDateLineNumberProvider.getLineNumber(line)
         if (currentLine < 0) return ""
         val hash = fileAnnotation.getLineRevisionNumber(currentLine)?.asString() ?: ""
@@ -62,7 +62,8 @@ class ListPullRequestTextAnnotationGutterProvider constructor(
     override fun doAction(lineNum: Int) {
         object : Task.Backgroundable(fileAnnotation.project, "Opening Pull Request...") {
             override fun run(indicator: ProgressIndicator) {
-                val hash = fileAnnotation.getLineRevisionNumber(lineNum)?.asString() ?: ""
+                val currentLine = upToDateLineNumberProvider.getLineNumber(lineNum)
+                val hash = fileAnnotation.getLineRevisionNumber(currentLine)?.asString() ?: ""
                 val gitPullRequestInfo = gitHashesMap[hash] ?: return
                 val hostingService = gitPullRequestInfo.hostingServices ?: return
                 val webRepoUrl = model.createWebRepoUrl(repository) ?: return
