@@ -33,10 +33,7 @@ import git4idea.repo.GitRepository
 
 class ListPullRequestToggleAction : ToggleAction() {
 
-    private fun isEnabled(e: AnActionEvent): Boolean {
-        val project = e.getData(CommonDataKeys.PROJECT)
-        if (project == null || project.isDisposed) return false
-
+    private fun isEnabled(e: AnActionEvent, project: Project): Boolean {
         val selectedFiles = e.getData(CommonDataKeys.VIRTUAL_FILE_ARRAY)
         if (selectedFiles == null || selectedFiles.size != 1) return false
 
@@ -46,7 +43,11 @@ class ListPullRequestToggleAction : ToggleAction() {
 
     override fun update(e: AnActionEvent) {
         super.update(e)
-        e.presentation.isEnabled = isEnabled(e)
+        val project = e.project ?: return
+        if (project.isDisposed) return
+        val config = PropertiesComponent.getInstance(project) ?: return
+        e.presentation.isEnabled = isEnabled(e, project)
+        e.presentation.text = "List ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName}"
     }
 
     override fun isSelected(e: AnActionEvent): Boolean {
