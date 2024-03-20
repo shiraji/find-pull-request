@@ -25,6 +25,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vcs.ProjectLevelVcsManager
 import com.intellij.openapi.vcs.VcsException
+import com.intellij.openapi.vcs.impl.UpToDateLineNumberProviderImpl
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.ui.UIUtil
 import git4idea.GitRevisionNumber
@@ -167,8 +168,15 @@ class ListPullRequestToggleAction : ToggleAction() {
                 }
 
                 ApplicationManager.getApplication().invokeLater {
-                    val provider =
-                        ListPullRequestTextAnnotationGutterProvider(map, virtualFile, fileAnnotation, model, repository)
+                    val upToDateLineNumberProvider = UpToDateLineNumberProviderImpl(editor.document, project)
+                    val provider = ListPullRequestTextAnnotationGutterProvider(
+                        map,
+                        virtualFile,
+                        fileAnnotation,
+                        model,
+                        repository,
+                        upToDateLineNumberProvider
+                    )
                     editor.gutter.registerTextAnnotation(provider, provider)
                 }
             }
