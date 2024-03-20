@@ -1,5 +1,5 @@
-<p>2.0.2</p>
+<p>2.0.3</p>
 <ul>
-  <li>Fix The action "Pull Request" is not easy to find from cmd+shift+a #157 Thanks @gmolau for suggesting</li>
+  <li>Fix list pr actions name</li>
 </ul>
 <p>Older version changes are listed on <a href="https://github.com/shiraji/find-pull-request/blob/main/CHANGELOG.md">CHANGELOG.md</a></p>
