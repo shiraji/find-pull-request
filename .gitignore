@@ -57,6 +57,9 @@
 .idea/modules.xml
 *.iml
 
+# GitHub copilot
+.idea/copilot/
+
 # CMake
 cmake-build-*/
 

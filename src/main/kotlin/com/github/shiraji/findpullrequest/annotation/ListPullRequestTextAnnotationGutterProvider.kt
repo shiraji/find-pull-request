@@ -1,9 +1,12 @@
 package com.github.shiraji.findpullrequest.annotation
 
+import com.github.shiraji.findpullrequest.action.FindPullRequestAction
+import com.github.shiraji.findpullrequest.action.FindPullRequestCopyAction
 import com.github.shiraji.findpullrequest.domain.GitPullRequestInfo
 import com.github.shiraji.findpullrequest.model.FindPullRequestModel
 import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.Separator
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorGutterAction
 import com.intellij.openapi.editor.TextAnnotationGutterProvider
@@ -29,7 +32,20 @@ class ListPullRequestTextAnnotationGutterProvider(
 ) : TextAnnotationGutterProvider, EditorGutterAction {
 
     override fun getPopupActions(line: Int, editor: Editor?): MutableList<AnAction> {
-        return mutableListOf()
+        val actions = mutableListOf<AnAction>()
+        val currentLine = upToDateLineNumberProvider.getLineNumber(line)
+        if (currentLine < 0) return actions
+        val hash = fileAnnotation.getLineRevisionNumber(currentLine)?.asString() ?: ""
+        val prNumber = gitHashesMap[hash]?.prNumber
+        if (prNumber != null) {
+            actions.add(Separator())
+            actions.add(FindPullRequestAction(prNumber))
+            actions.add(FindPullRequestCopyAction(prNumber))
+        } else {
+            // copy commit hash
+            // open commit page
+        }
+        return actions
     }
 
     override fun getColor(line: Int, editor: Editor?): ColorKey? {
@@ -84,6 +100,14 @@ class ListPullRequestTextAnnotationGutterProvider(
     }
 
     override fun getCursor(lineNum: Int): Cursor {
-        return Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+        val currentLine = upToDateLineNumberProvider.getLineNumber(lineNum)
+        if (currentLine < 0) return Cursor.getDefaultCursor()
+        val hash = fileAnnotation.getLineRevisionNumber(currentLine)?.asString() ?: ""
+        val prNumber = gitHashesMap[hash]?.prNumber
+        return if (prNumber != null || gitHashesMap[hash]?.revisionNumber?.shortRev != null) {
+            Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+        } else {
+            Cursor.getDefaultCursor()
+        }
     }
 }

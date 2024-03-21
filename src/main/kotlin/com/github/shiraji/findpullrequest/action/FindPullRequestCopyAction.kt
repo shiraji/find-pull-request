@@ -13,6 +13,7 @@ import com.intellij.notification.Notification
 import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.editor.Editor
@@ -24,7 +25,11 @@ import java.net.URLEncoder
 import java.util.Locale
 import javax.swing.event.HyperlinkEvent
 
-class FindPullRequestCopyAction : BaseFindPullRequestAction() {
+class FindPullRequestCopyAction @JvmOverloads constructor(currentLine: Int? = null) : BaseFindPullRequestAction(currentLine) {
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.BGT
+    }
 
     inner class CopyNotificationAdapter : NotificationListener.Adapter() {
         override fun hyperlinkActivated(notification: Notification, e: HyperlinkEvent) {
@@ -71,12 +76,16 @@ class FindPullRequestCopyAction : BaseFindPullRequestAction() {
         CopyPasteManager.getInstance().setContents(TextTransferable(text as CharSequence))
     }
 
-    override fun menuText(project: Project, useShortName: Boolean): String? {
+    override fun menuText(project: Project, useShortName: Boolean, prNumber: Int?): String? {
         val config = PropertiesComponent.getInstance(project) ?: return null
         return if (useShortName) {
             "Copy Link to ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName}"
         } else {
-            "Copy Link to ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName} URL"
+            if (prNumber != null) {
+                "Copy Link to ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName}(#$prNumber) URL"
+            } else {
+                "Copy Link to ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName} URL"
+            }
         }
     }
 

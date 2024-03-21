@@ -21,18 +21,22 @@ class FindPullRequestCopyActionTest {
         val config: PropertiesComponent?,
         val useShortName: Boolean,
         val hosting: String,
+        val prNumber: Int?,
         val expected: String?,
         private val testName: String,
     ) {
-        C1(null, true, "GitHub", null, "Should return null when PropertiesComponent is null"),
-        C2(mockk(), true, "GitHub", "Copy Link to ${FindPullRequestHostingServices.GitHub.pullRequestName}", "Should return short name if useShortName is true"),
-        C3(mockk(), true, "Bitbucket", "Copy Link to ${FindPullRequestHostingServices.Bitbucket.pullRequestName}", "Should return short name if useShortName is true for Bitbucket"),
-        C4(mockk(), true, "GitLab", "Copy Link to ${FindPullRequestHostingServices.GitLab.pullRequestName}", "Should return short name if useShortName is true for GitLab"),
-        C5(mockk(), true, "", "Copy Link to ${FindPullRequestHostingServices.GitHub.pullRequestName}", "Should return GitHub's short name if hosting is invalid value"),
-        C6(mockk(), false, "GitHub", "Copy Link to ${FindPullRequestHostingServices.GitHub.pullRequestName} URL", "Should return long name if useShortName is false"),
-        C7(mockk(), false, "Bitbucket", "Copy Link to ${FindPullRequestHostingServices.Bitbucket.pullRequestName} URL", "Should return short name if useShortName is false for Bitbucket"),
-        C8(mockk(), false, "GitLab", "Copy Link to ${FindPullRequestHostingServices.GitLab.pullRequestName} URL", "Should return short name if useShortName is false for GitLab"),
-        C9(mockk(), false, "", "Copy Link to ${FindPullRequestHostingServices.GitHub.pullRequestName} URL", "Should return GitHub's short name if hosting is invalid value"),
+        C1(null, true, "GitHub", null, null, "Should return null when PropertiesComponent is null"),
+        C2(mockk(), true, "GitHub", null, "Copy Link to ${FindPullRequestHostingServices.GitHub.pullRequestName}", "Should return short name if useShortName is true"),
+        C3(mockk(), true, "Bitbucket", null, "Copy Link to ${FindPullRequestHostingServices.Bitbucket.pullRequestName}", "Should return short name if useShortName is true for Bitbucket"),
+        C4(mockk(), true, "GitLab", null, "Copy Link to ${FindPullRequestHostingServices.GitLab.pullRequestName}", "Should return short name if useShortName is true for GitLab"),
+        C5(mockk(), true, "", null, "Copy Link to ${FindPullRequestHostingServices.GitHub.pullRequestName}", "Should return GitHub's short name if hosting is invalid value"),
+        C6(mockk(), false, "GitHub", null, "Copy Link to ${FindPullRequestHostingServices.GitHub.pullRequestName} URL", "Should return long name if useShortName is false"),
+        C7(mockk(), false, "Bitbucket", null, "Copy Link to ${FindPullRequestHostingServices.Bitbucket.pullRequestName} URL", "Should return short name if useShortName is false for Bitbucket"),
+        C8(mockk(), false, "GitLab", null, "Copy Link to ${FindPullRequestHostingServices.GitLab.pullRequestName} URL", "Should return short name if useShortName is false for GitLab"),
+        C9(mockk(), false, "", null, "Copy Link to ${FindPullRequestHostingServices.GitHub.pullRequestName} URL", "Should return GitHub's short name if hosting is invalid value"),
+        C10(mockk(), false, "GitHub", 12, "Copy Link to ${FindPullRequestHostingServices.GitHub.pullRequestName}(#12) URL", "Should return long name with prNumber if useShortName is false and prNumber is not null"),
+        C11(mockk(), false, "Bitbucket", 12, "Copy Link to ${FindPullRequestHostingServices.Bitbucket.pullRequestName}(#12) URL", "Should return long name with prNumber if useShortName is false and prNumber is not null"),
+        C12(mockk(), false, "GitLab", 12, "Copy Link to ${FindPullRequestHostingServices.GitLab.pullRequestName}(#12) URL", "Should return long name with prNumber if useShortName is false and prNumber is not null"),
 
         ;
 
@@ -56,7 +60,7 @@ class FindPullRequestCopyActionTest {
             if (test.config != null) {
                 every { test.config.getHosting() } returns test.hosting
             }
-            val result = action.menuText(DummyProject.getInstance(), test.useShortName)
+            val result = action.menuText(DummyProject.getInstance(), test.useShortName, test.prNumber)
             if (test.expected == null) {
                 Assertions.assertNull(result)
             } else {
