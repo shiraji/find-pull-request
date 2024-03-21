@@ -39,7 +39,12 @@ class FindPullRequestModel(
 
     fun createCommitUrl(repository: GitRepository, hostingServices: FindPullRequestHostingServices, webRepoUrl: String, revisionHash: VcsRevisionNumber): String {
         val path = hostingServices.commitPathFormat.format(webRepoUrl, revisionHash)
-        return createUrl(repository, hostingServices, path)
+        return if (config.isJumpToFile()) {
+            val fileAnnotation = gitConfService.getFileAnnotation(repository, virtualFile) ?: return path
+            path + hostingServices.createFileAnchorValue(repository, fileAnnotation)
+        } else {
+            path
+        }
     }
 
     fun createPullRequestPath(repository: GitRepository, revisionHash: VcsRevisionNumber): String {
@@ -68,7 +73,7 @@ class FindPullRequestModel(
             }
 
             val path = targetHostingService.urlPathFormat.format(prNumber)
-            createUrl(repository, targetHostingService, path)
+            createPRUrl(repository, targetHostingService, path)
         } else {
             val commit = gitHistoryService.findCommitLog(project, repository, revisionHash)
             val hostingServices = FindPullRequestHostingServices.values().firstOrNull {
@@ -77,14 +82,14 @@ class FindPullRequestModel(
 
             if (hostingServices != null) {
                 val path = hostingServices.urlPathFormat.format(commit.getNumberFromCommitMessage(hostingServices.squashCommitMessage))
-                createUrl(repository, hostingServices, path)
+                createPRUrl(repository, hostingServices, path)
             } else {
                 throw NoPullRequestFoundException(debugMessage.toString())
             }
         }
     }
 
-    fun createUrl(repository: GitRepository, hostingServices: FindPullRequestHostingServices, path: String): String {
+    fun createPRUrl(repository: GitRepository, hostingServices: FindPullRequestHostingServices, path: String): String {
         return if (config.isJumpToFile()) {
             val fileAnnotation = gitConfService.getFileAnnotation(repository, virtualFile) ?: return path
             path + hostingServices.urlPathForDiff + hostingServices.createFileAnchorValue(repository, fileAnnotation)

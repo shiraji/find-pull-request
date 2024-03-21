@@ -75,7 +75,7 @@ class ListPullRequestTextAnnotationGutterProvider(
                     BrowserUtil.open(url)
                 } else {
                     val path = hostingService.urlPathFormat.format(gitPullRequestInfo.prNumber)
-                    val url = model.createUrl(repository, hostingService, path)
+                    val url = model.createPRUrl(repository, hostingService, path)
 
                     BrowserUtil.open("$webRepoUrl/$url")
                 }
