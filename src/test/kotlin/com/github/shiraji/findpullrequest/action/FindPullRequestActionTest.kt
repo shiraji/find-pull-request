@@ -36,8 +36,8 @@ class FindPullRequestActionTest {
         C8(mockk(), false, "GitLab", null, "Go to ${FindPullRequestHostingServices.GitLab.pullRequestName} page", "Should return long name if useShortName is false for GitLab"),
         C9(mockk(), false, "",  null,"Go to ${FindPullRequestHostingServices.GitHub.pullRequestName} page", "Should return GitHub's long name if hosting is invalid value"),
         C10(mockk(), false, "GitHub",  34,"Go to ${FindPullRequestHostingServices.GitHub.pullRequestName}(#34) page", "Should return GitHub's long name with pr number if hosting is GitHub and prNumber is not null"),
-        C11(mockk(), false, "Bitbucket",  35,"Go to ${FindPullRequestHostingServices.GitHub.pullRequestName}(#35) page", "Should return Bitbucket's long name with pr number if hosting is Bitbucket and prNumber is not null"),
-        C12(mockk(), false, "GitLab",  1,"Go to ${FindPullRequestHostingServices.GitHub.pullRequestName}(#1) page", "Should return GitLab's long name with pr number if hosting is GitLab and prNumber is not null"),
+        C11(mockk(), false, "Bitbucket",  35,"Go to ${FindPullRequestHostingServices.Bitbucket.pullRequestName}(#35) page", "Should return Bitbucket's long name with pr number if hosting is Bitbucket and prNumber is not null"),
+        C12(mockk(), false, "GitLab",  1,"Go to ${FindPullRequestHostingServices.GitLab.pullRequestName}(#1) page", "Should return GitLab's long name with pr number if hosting is GitLab and prNumber is not null"),
 
         ;
 
