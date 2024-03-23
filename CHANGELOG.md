@@ -1,6 +1,8 @@
-### [ver 2.0.3](https://github.com/shiraji/find-pull-request/releases/tag/release-2.0.3)
+### [ver 2.0.4](https://github.com/shiraji/find-pull-request/releases/tag/release-2.0.4)
 
 * Fix list pr actions name
+* Fix the problem with jumping commit pages
+* Add action when right click PR annotation #163
 
 ### [ver 2.0.2](https://github.com/shiraji/find-pull-request/releases/tag/release-2.0.2)
 
