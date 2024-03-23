@@ -1,6 +1,21 @@
 name: CI-test
 
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore:
+      - CHANGELOG.md
+      - LATEST.txt
+      - README.md
+      - RELEASING.md
+    tags:
+      - 'beta-*'
+      - 'release-*'
+  pull_request:
+    paths-ignore:
+      - CHANGELOG.md
+      - LATEST.txt
+      - README.md
+      - RELEASING.md
 
 jobs:
   build-and-test:
