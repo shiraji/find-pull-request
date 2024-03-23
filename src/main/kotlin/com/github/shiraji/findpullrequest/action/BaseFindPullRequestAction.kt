@@ -27,11 +27,11 @@ import git4idea.repo.GitRepository
 import java.util.Locale
 import javax.swing.Icon
 
-abstract class BaseFindPullRequestAction : AnAction() {
+abstract class BaseFindPullRequestAction(private val prNumber: Int?) : AnAction() {
 
     abstract fun actionPerform(e: AnActionEvent, url: String)
 
-    abstract fun menuText(project: Project, useShortName: Boolean): String?
+    abstract fun menuText(project: Project, useShortName: Boolean, prNumber: Int?): String?
 
     private fun menuIcon(project: Project): Icon? {
         val config = PropertiesComponent.getInstance(project) ?: return null
@@ -59,13 +59,6 @@ abstract class BaseFindPullRequestAction : AnAction() {
 
         object : Task.Backgroundable(project, "Finding Pull Request...") {
             override fun run(indicator: ProgressIndicator) {
-                val revisionHash = try {
-                    gitHistoryService.findRevisionHash(project, repository, virtualFile, lineNumber)
-                } catch (e: VcsException) {
-                    showErrorNotification("Could not find revision hash")
-                    return
-                }
-
                 val webRepoUrl = model.createWebRepoUrl(repository)
                 if (webRepoUrl == null) {
                     showErrorNotification("Could not find GitHub repository url")
@@ -73,15 +66,29 @@ abstract class BaseFindPullRequestAction : AnAction() {
                 }
 
                 val hostingServices = FindPullRequestHostingServices.findBy(config.getHosting())
-                try {
-                    val url = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
+
+                if (prNumber == null) {
+                    val revisionHash = try {
+                        gitHistoryService.findRevisionHash(project, repository, virtualFile, lineNumber)
+                    } catch (e: VcsException) {
+                        showErrorNotification("Could not find revision hash")
+                        return
+                    }
+
+                    try {
+                        val url = "$webRepoUrl/${model.createPullRequestPath(repository, revisionHash)}"
+                        actionPerform(e, url)
+                    } catch (ex: VcsException) {
+                        val name =
+                            FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.lowercase(Locale.getDefault())
+                        showErrorNotification("Could not find the $name for $revisionHash : ${ex.message}")
+                    } catch (ex: NoPullRequestFoundException) {
+                        val url = model.createCommitUrl(repository, hostingServices, webRepoUrl, revisionHash)
+                        actionPerformForNoPullRequestFount(e, ex, url = url)
+                    }
+                } else {
+                    val url = "$webRepoUrl/${model.createPullRequestPath(repository, prNumber, hostingServices)}"
                     actionPerform(e, url)
-                } catch (ex: VcsException) {
-                    val name = FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName.lowercase(Locale.getDefault())
-                    showErrorNotification("Could not find the $name for $revisionHash : ${ex.message}")
-                } catch (ex: NoPullRequestFoundException) {
-                    val url = model.createCommitUrl(repository, hostingServices, webRepoUrl, revisionHash)
-                    actionPerformForNoPullRequestFount(e, ex, url = url)
                 }
             }
         }.queue()
@@ -96,7 +103,7 @@ abstract class BaseFindPullRequestAction : AnAction() {
         val virtualFile: VirtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
         val repository = getGitRepository(project, virtualFile) ?: return
         val useShortName = ActionPlaces.EDITOR_POPUP == e.place
-        val text = menuText(project, useShortName) ?: return
+        val text = menuText(project, useShortName, prNumber) ?: return
         val icon = menuIcon(project)
         val description = description(project, editor, virtualFile)
         val gitRepositoryService = GitConfService()

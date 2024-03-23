@@ -47,6 +47,11 @@ class FindPullRequestModel(
         }
     }
 
+    fun createPullRequestPath(repository: GitRepository, prNumber: Int, hostingService: FindPullRequestHostingServices): String {
+        val path = hostingService.urlPathFormat.format(prNumber)
+        return createPRUrl(repository, hostingService, path)
+    }
+
     fun createPullRequestPath(repository: GitRepository, revisionHash: VcsRevisionNumber): String {
         val debugMessage = StringBuilder()
         if (config.isDebugMode()) {
@@ -72,17 +77,17 @@ class FindPullRequestModel(
                 throw NoPullRequestFoundException(debugMessage.toString())
             }
 
-            val path = targetHostingService.urlPathFormat.format(prNumber)
-            createPRUrl(repository, targetHostingService, path)
+            createPullRequestPath(repository, prNumber, targetHostingService)
         } else {
             val commit = gitHistoryService.findCommitLog(project, repository, revisionHash)
-            val hostingServices = FindPullRequestHostingServices.values().firstOrNull {
+            val hostingServices = FindPullRequestHostingServices.entries.firstOrNull {
                 commit.isSquashPullRequestCommit(it)
             }
 
             if (hostingServices != null) {
-                val path = hostingServices.urlPathFormat.format(commit.getNumberFromCommitMessage(hostingServices.squashCommitMessage))
-                createPRUrl(repository, hostingServices, path)
+                val prNumber = commit.getNumberFromCommitMessage(hostingServices.squashCommitMessage)
+                    ?: throw NoPullRequestFoundException(debugMessage.toString())
+                createPullRequestPath(repository, prNumber, hostingServices)
             } else {
                 throw NoPullRequestFoundException(debugMessage.toString())
             }

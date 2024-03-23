@@ -13,6 +13,7 @@ import com.intellij.notification.Notification
 import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.editor.Editor
@@ -21,7 +22,12 @@ import com.intellij.openapi.vfs.VirtualFile
 import java.net.URLEncoder
 import java.util.Locale
 
-class FindPullRequestAction : BaseFindPullRequestAction() {
+class FindPullRequestAction @JvmOverloads constructor(private val prNumber: Int? = null) : BaseFindPullRequestAction(prNumber) {
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.BGT
+    }
+
     override fun actionPerformForNoPullRequestFount(e: AnActionEvent, ex: NoPullRequestFoundException, url: String) {
         val project: Project = e.getData(CommonDataKeys.PROJECT) ?: return
         val config = PropertiesComponent.getInstance(project) ?: return
@@ -45,12 +51,16 @@ class FindPullRequestAction : BaseFindPullRequestAction() {
         BrowserUtil.open(url)
     }
 
-    override fun menuText(project: Project, useShortName: Boolean): String? {
+    override fun menuText(project: Project, useShortName: Boolean, prNumber: Int?): String? {
         val config = PropertiesComponent.getInstance(project) ?: return null
         return if (useShortName) {
             FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName
         } else {
-            "Go to ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName} page"
+            if (prNumber != null) {
+                "Go to ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName}(#$prNumber) page"
+            } else {
+                "Go to ${FindPullRequestHostingServices.findBy(config.getHosting()).pullRequestName} page"
+            }
         }
     }
 

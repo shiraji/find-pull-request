@@ -29,6 +29,10 @@ tasks {
         kotlinOptions.jvmTarget = "17"
     }
 
+    buildSearchableOptions {
+        enabled = false
+    }
+
     patchPluginXml {
         changeNotes.set(project.file("LATEST.txt").readText())
     }

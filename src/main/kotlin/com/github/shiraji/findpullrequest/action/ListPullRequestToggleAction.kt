@@ -13,6 +13,7 @@ import com.github.shiraji.getNumberFromCommitMessage
 import com.github.shiraji.isSquashPullRequestCommit
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.ToggleAction
@@ -33,6 +34,10 @@ import git4idea.GitUtil
 import git4idea.repo.GitRepository
 
 class ListPullRequestToggleAction : ToggleAction() {
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.BGT
+    }
 
     private fun isEnabled(e: AnActionEvent, project: Project): Boolean {
         val selectedFiles = e.getData(CommonDataKeys.VIRTUAL_FILE_ARRAY)
