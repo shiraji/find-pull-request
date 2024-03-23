@@ -1,5 +1,7 @@
-<p>2.0.3</p>
+<p>2.0.4</p>
 <ul>
   <li>Fix list pr actions name</li>
+  <li>Fix the problem with jumping commit pages</li>
+  <li>Add action when right click PR annotation #163</li>
 </ul>
 <p>Older version changes are listed on <a href="https://github.com/shiraji/find-pull-request/blob/main/CHANGELOG.md">CHANGELOG.md</a></p>
