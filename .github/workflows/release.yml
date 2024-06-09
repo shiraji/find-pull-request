@@ -1,0 +1,35 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'release-*'
+
+jobs:
+  test:
+    uses: ./.github/workflows/_test.yml
+  verify:
+    uses: ./.github/workflows/_verify.yml
+  publish:
+    needs: [ test, verify ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: v1-gradle-caches-${{ hashFiles('settings.gradle.kts') }}-${{ hashFiles('build.gradle.kts') }}-${{ hashFiles('gradle.properties') }}
+      - uses: actions/cache@v4
+        with:
+          path: ~/.gradle/wrapper
+          key: v1-gradle-wrapper-${{ hashFiles('settings.gradle.kts') }}-${{ hashFiles('build.gradle.kts') }}-${{ hashFiles('gradle.properties') }}
+      - name: Release
+        env:
+          TAG_NAME: ${{ github.ref }}
+          HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
+        run: ./gradlew buildPlugin publishPlugin -DVERSION=${TAG_NAME#refs/tags/release-} -DCHANNELS=default
